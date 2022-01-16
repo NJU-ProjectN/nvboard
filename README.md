@@ -15,9 +15,21 @@
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+##### 使用Verilator
+
+使用Veriloator，把Verilog转换成C++。
+Virtual FPGA需要使用Verilator生成的一些接口。
+
+##### 编写两个辅助函数
+
+接下来，你需要编写两个辅助函数`update_input()`和`update_output()`。
+当你在虚拟FPGA上改变输入（比如拨动一个开关）的时候，
+虚拟FPGA会自动调用`update_input()`，让你编写的模块能够收到这个改变。
+模块得到新的输出之后，虚拟FPGA会调用`update_output()`，把模块的输出同步到GUI上。
+
+##### 体验虚拟FPGA
+
+要改变某个按键或开关的状态，可以使用键盘快捷键，也可以点击鼠标。
 
 #### 参与贡献
 
@@ -29,9 +41,4 @@
 
 #### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1.  可以用`include/configs.h`选择贴图，让自己的虚拟FPGA开发板更有特色，贴图放在`pic`目录下；
