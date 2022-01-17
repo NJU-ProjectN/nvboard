@@ -264,6 +264,7 @@ static void update_gui_rgb_led(SDL_Renderer *renderer, int index, int color) {
 }
 
 static void update_gui_7segs(SDL_Renderer *renderer, int index, bool enable) {
+  index = 7 - index;
   SDL_Rect move = {index * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_SEP * 4), 0, 0, 0};
   SDL_Rect dst_rect[8];
   for (int i = 0; i < 8; ++i) {

@@ -2,6 +2,24 @@ ifndef TOPNAME
 $(error TOPNAME should be given)
 endif
 
+# generated executable file
+DST_DIR = build
+DST_BIN = $(DST_DIR)/emu_board
+
+# files of nboard
+NBD_SRC = src
+NBD_SRCS := $(shell find $(NBD_SRC) -name "*.cpp")
+NBD_LIB = include
+NBD_LIBS := $(shell find $(NBD_LIB) -name "*.h")
+
+# update.cpp should be implemented by users.
+NBD_OBJS := $(addprefix $(DST_DIR)/, $(addsuffix .o, $(basename $(notdir $(NBD_SRCS))))) \
+            $(DST_DIR)/update.o
+
+# files of emu
+EMU_DIR = emu
+EMU_ARCH := $(shell find $(EMU_DIR) -name "*.a")
+
 ### Constants...
 # Perl executable (from $PERL)
 PERL = perl
@@ -28,37 +46,18 @@ VM_PREFIX = V$(TOPNAME)
 # Module prefix (from --prefix)
 VM_MODPREFIX = V$(TOPNAME)
 # User CFLAGS (from -CFLAGS on Verilator command line)
-VM_USER_CFLAGS = 
+VM_USER_CFLAGS = -I $(NBD_LIB) -I $(EMU_DIR)
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
-VM_USER_LDLIBS = 
+VM_USER_LDLIBS = -lSDL2 -lSDL2_image
 
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = 
 
 # User .cpp directories (from .cpp's on Verilator command line)
-VM_USER_DIR = .
+VM_USER_DIR = ./src
 
-# generated executable file
-DST_DIR = build
-DST_BIN = $(DST_DIR)/emu_board
-
-# files of nboard
-NBD_SRC = src
-NBD_LIB = include
-NBD_SRCS := $(shell find $(NBD_SRC) -name "*.cpp")
-# update.cpp should be implemented by users.
-NBD_OBJS := $(addprefix $(DST_DIR)/, $(addsuffix .o, $(basename $(notdir $(NBD_SRCS))))) \
-            $(DST_DIR)/update.o
-
-# files of emu
-EMU_DIR = emu
-EMU_SRCS := $(shell find $(EMU_DIR) -name "*.cpp")
-EMU_OBJS := $(addprefix $(DST_DIR)/, $(addsuffix .o, $(basename $(notdir $(EMU_SRCS)))))
-
-SDL_FLAGS = -lSDL2 -lSDL2_image
-
-vpath %.cpp $(EMU_DIR)
+#vpath %.cpp $(NBD_SRC)
 
 ### Default rules...
 # Include list of all generated classes
@@ -66,18 +65,13 @@ include $(EMU_DIR)/V$(TOPNAME)_classes.mk
 # Include global rules
 include $(VERILATOR_ROOT)/include/verilated.mk
 
-$(DST_BIN): $(NBD_OBJS) $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
+$(DST_BIN): $(NBD_OBJS) $(VK_GLOBAL_OBJS) $(EMU_DIR)/V$(TOPNAME)__ALL.a
 	@$(LINK) $(LD_FLAGS) $^ $(LOADLIBES) $(LDLIBS) $(LIBS) $(SC_LIBS) -o $@ $(SDL_FLAGS)
 
-$(DST_DIR)/%.o: $(NBD_SRC)/%.cpp
+$(DST_DIR)/%.o: $(NBD_SRC)/%.cpp $(NBD_LIBS)
 	@mkdir -p $(dir $@)
 	@$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) \
-	  -I $(NBD_LIB) -I $(EMU_DIR) -c -o $@ $^
-
-$(DST_DIR)/%.o: $(EMU_DIR)/%.cpp
-	@mkdir -p $(dir $@)
-	@$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) \
-	  -I $(NBD_LIB) -I $(EMU_DIR) -c -o $@ $^
+	  -I $(NBD_LIB) -I $(EMU_DIR) -c -o $@ $<
 
 src/update.cpp: emu/update.cpp
 	@ln -sf $(realpath ./$(EMU_DIR)/update.cpp) $(NBD_SRC)/update.cpp
@@ -87,5 +81,7 @@ run: $(DST_BIN)
 
 clean:
 	@rm -rf $(DST_DIR)
+	@rm -f *.o
+	@rm -f *.d
 
 .PHONY: clean run
