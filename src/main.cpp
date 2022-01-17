@@ -11,6 +11,7 @@ TOP_NAME *dut_ptr;
 std::string nboard_home;
 
 int main() {
+  printf("nboard v0.1\n");
   // init verilog module
   dut_ptr = new TOP_NAME;
   
@@ -43,7 +44,6 @@ int main() {
       update_input(dut_ptr);
       update_gui_input(render);
       dut_ptr->eval();
-      printf("out : %d %d %d %d\n", (dut_ptr->out >> 3) & 1, (dut_ptr->out >> 2) & 1, (dut_ptr->out >> 1) & 1, (dut_ptr->out >> 0) & 1);
       update_output(dut_ptr);
       update_gui_output(render);
     }

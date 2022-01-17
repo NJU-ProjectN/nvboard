@@ -14,7 +14,7 @@ std::string input_pins[] = {
 const int input_size = sizeof(input_pins) / sizeof(std::string);
 
 std::string output_pins[] = {
-  NAIVE_LEDS, RGB_LEDS, SEG7_LEDS
+  NAIVE_LEDS, RGB_LEDS, SEG7_ENBS, SEG7_SEGS
 };
 
 const int output_size = sizeof(output_pins) / sizeof(std::string);

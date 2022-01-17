@@ -27,6 +27,26 @@ static SDL_Texture *tled_off, *tled_r, *tled_g, *tled_b,
 static SDL_Texture *tfpga_background;
 static SDL_Texture *tseg7_background;
 
+static SDL_Rect segs_rect[8] = {
+  {SEG_X + SEG_SEP + SEG_VER_WIDTH, SEG_Y + SEG_SEP, SEG_HOR_WIDTH, SEG_HOR_HEIGHT},
+  {SEG_X + SEG_SEP + SEG_VER_WIDTH + SEG_HOR_WIDTH, SEG_Y + SEG_SEP + SEG_HOR_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
+  {SEG_X + SEG_SEP + SEG_VER_WIDTH + SEG_HOR_WIDTH, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + SEG_VER_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
+  {SEG_X + SEG_SEP + SEG_VER_WIDTH, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + 2 * SEG_VER_HEIGHT, SEG_HOR_WIDTH, SEG_HOR_HEIGHT},
+  {SEG_X + SEG_SEP, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + SEG_VER_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
+  {SEG_X + SEG_SEP, SEG_Y + SEG_SEP + SEG_HOR_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
+  {SEG_X + SEG_SEP + SEG_VER_WIDTH, SEG_Y + SEG_SEP + SEG_HOR_HEIGHT + SEG_VER_HEIGHT, SEG_HOR_WIDTH, SEG_HOR_HEIGHT},
+  {SEG_X + 2 * SEG_SEP + 2 * SEG_VER_WIDTH + SEG_HOR_WIDTH, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + 2 * SEG_VER_HEIGHT, SEG_DOT_WIDTH, SEG_DOT_HEIGHT}
+};
+
+SDL_Rect operator+(const SDL_Rect &A, const SDL_Rect &B) {
+  SDL_Rect ret;
+  ret.x = A.x + B.x;
+  ret.y = A.y + B.y;
+  ret.w = A.w + B.w;
+  ret.h = A.h + B.h;
+  return ret;
+}
+
 extern std::string nboard_home;
 
 void load_background(SDL_Renderer *renderer) {
@@ -131,7 +151,7 @@ std::string input_switches[] = {
 static const int switches_cnt = sizeof(input_switches) / sizeof(std::string);
 
 static void update_gui_switch(SDL_Renderer *renderer, int index, bool val) {
-  index = 15 - index;
+  index = switches_cnt - 1 - index;
   SDL_Rect rect = {SWITCH_X + (SWITCH_WIDTH + SWITCH_SEP) * index, SWITCH_Y, SWITCH_WIDTH, SWITCH_HEIGHT};
   SDL_RenderCopy(renderer, val ? tswitch_on : tswitch_off, NULL, &rect);
 }
@@ -192,13 +212,19 @@ std::string output_rgb_leds[] = {
   RGB_LEDS
 };
 
-std::string output_seg7_leds[] = {
-  SEG7_LEDS
+std::string output_seg7_enbs[] = {
+  SEG7_ENBS
 };
+const int seg7_enbs_cnt = sizeof(output_seg7_enbs) / sizeof(std::string);
+
+std::string output_seg7_segs[] = {
+  SEG7_SEGS
+};
+const int seg7_segs_cnt = sizeof(output_seg7_segs) / sizeof(std::string);
 
 static void update_gui_naive_led(SDL_Renderer *renderer, int index, bool val) {
   //std::cout << "update " << index << std::endl;
-  index = 15 - index;
+  index = naive_leds_cnt - 1 - index;
   SDL_Rect rect = {LED_X + (LED_WIDTH + LED_SEP) * index, LED_Y, LED_WIDTH, LED_HEIGHT};
   SDL_RenderCopy(renderer, val ? tled_g : tled_off, NULL, &rect);
 }
@@ -237,6 +263,22 @@ static void update_gui_rgb_led(SDL_Renderer *renderer, int index, int color) {
   }
 }
 
+static void update_gui_7segs(SDL_Renderer *renderer, int index, bool enable) {
+  SDL_Rect move = {index * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_SEP * 4), 0, 0, 0};
+  SDL_Rect dst_rect[8];
+  for (int i = 0; i < 8; ++i) {
+    dst_rect[i] = move + segs_rect[i];
+  }
+  SDL_RenderCopy(renderer, (enable && !output_map["sega"]) ? tsegled_hor_on : tsegled_hor_off, NULL, &dst_rect[0]);
+  SDL_RenderCopy(renderer, (enable && !output_map["segb"]) ? tsegled_ver_on : tsegled_ver_off, NULL, &dst_rect[1]);
+  SDL_RenderCopy(renderer, (enable && !output_map["segc"]) ? tsegled_ver_on : tsegled_ver_off, NULL, &dst_rect[2]);
+  SDL_RenderCopy(renderer, (enable && !output_map["segd"]) ? tsegled_hor_on : tsegled_hor_off, NULL, &dst_rect[3]);
+  SDL_RenderCopy(renderer, (enable && !output_map["sege"]) ? tsegled_ver_on : tsegled_ver_off, NULL, &dst_rect[4]);
+  SDL_RenderCopy(renderer, (enable && !output_map["segf"]) ? tsegled_ver_on : tsegled_ver_off, NULL, &dst_rect[5]);
+  SDL_RenderCopy(renderer, (enable && !output_map["segg"]) ? tsegled_hor_on : tsegled_hor_off, NULL, &dst_rect[6]);
+  SDL_RenderCopy(renderer, (enable && !output_map["segb"]) ? tsegled_dot_on : tsegled_dot_off, NULL, &dst_rect[7]);
+}
+
 // After SDL receives the changes of inputs, call update_gui_input() 
 
 // After updating the outputs of module, call update_gui_output()
@@ -268,6 +310,14 @@ void update_gui_output(SDL_Renderer *renderer) {
   }
   
   // check seg7s
+  for (int i = 0; i < seg7_enbs_cnt; ++i) {
+    std::string &str = output_seg7_enbs[i];
+    if (output_map.count(str)) {
+      if (output_map[str] || (prev_output_map[str] != output_map[str])) {
+        update_gui_7segs(renderer, i, output_map[str]);
+      }
+    }
+  }
 
   SDL_RenderPresent(renderer);
   return;
@@ -287,6 +337,10 @@ void init_gui(SDL_Renderer *renderer) {
   //dbg_wait_esc();
   for (int i = 0; i < naive_leds_cnt; ++i) {
     update_gui_naive_led(renderer, i, 0);
+  }
+
+  for (int i = 0; i < seg7_enbs_cnt; ++i) {
+    update_gui_7segs(renderer, i, 0);
   }
  
   SDL_RenderPresent(renderer);

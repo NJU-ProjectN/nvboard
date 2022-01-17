@@ -28,9 +28,10 @@ void init_output();
 
 #define RGB_LEDS "r16", "g16", "b16", "r17", "g17", "b17"
 
-#define SEG7_LEDS "an0", "an1", "an2", "an3", \
-                  "an4", "an5", "an6", "an7", \
-                  "sega", "segb", "segc", "segd", \
+#define SEG7_ENBS "an0", "an1", "an2", "an3", \
+                  "an4", "an5", "an6", "an7"
+
+#define SEG7_SEGS "sega", "segb", "segc", "segd", \
                   "sege", "segf", "segg", "decp"
 
 //#define UART_OUTPUT
