@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <string>
 
 extern std::map<std::string, bool> input_map, output_map;
 
@@ -110,8 +111,23 @@ static int keyup_handler(const SDL_Event &ev) {
   return 0;
 }
 
+extern std::string input_btns[];
+extern std::string input_switches[];
+
 static int mousedown_handler(const SDL_Event &ev) {
-  // TODO: finish this function
+  int x_pos = ev.button.x;
+  int y_pos = ev.button.y;
+  if (y_pos >= SWITCH_Y && y_pos < SWITCH_Y + SWITCH_HEIGHT && x_pos >= SWITCH_X && x_pos < SWITCH_X + 16 * SWITCH_WIDTH + 15 * SWITCH_SEP) {
+    if ((x_pos - SWITCH_X) % (SWITCH_WIDTH + SWITCH_SEP) < SWITCH_WIDTH) {
+      int index = 15 - (x_pos - SWITCH_X) / (SWITCH_WIDTH + SWITCH_SEP);
+      input_map[input_switches[index]] ^= 1;
+      return 1;
+    } else {
+      return 0;
+    }
+  } else if (0) {
+
+  }
   return 0;
 }
 
