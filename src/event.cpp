@@ -125,14 +125,50 @@ static int mousedown_handler(const SDL_Event &ev) {
     } else {
       return 0;
     }
-  } else if (0) {
-
+  } else if (y_pos >= BTNC_Y && y_pos < BTNC_Y + BTNC_HEIGHT && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["btnc"] = 1;
+    return 1;
+  } else if (y_pos >= BTNC_Y - BTNC_HEIGHT - BTNC_SEP && y_pos < BTNC_Y - BTNC_SEP && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["btnu"] = 1;
+    return 1;
+  } else if (y_pos >= BTNC_Y + BTNC_HEIGHT + BTNC_SEP && y_pos < BTNC_Y + 2 * BTNC_HEIGHT + BTNC_SEP && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["btnd"] = 1;
+    return 1;
+  } else if (y_pos >= BTNC_Y && y_pos < BTNC_Y + BTNC_HEIGHT && x_pos >= BTNC_X - BTNC_WIDTH - BTNC_SEP && x_pos < BTNC_X - BTNC_SEP) {
+    input_map["btnl"] = 1;
+    return 1;
+  } else if (y_pos >= BTNC_Y && y_pos < BTNC_Y + BTNC_HEIGHT && x_pos >= BTNC_X + BTNC_WIDTH + BTNC_SEP && x_pos < BTNC_X + 2 * BTNC_WIDTH + BTNC_SEP) {
+    input_map["btnr"] = 1;
+    return 1;
+  } else if (y_pos >= BTNC_Y - 2 * BTNC_HEIGHT - 2 * BTNC_SEP && y_pos < BTNC_Y - BTNC_HEIGHT - 2 * BTNC_SEP && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["rst"] = 1;
+    return 1;
   }
   return 0;
 }
 
 static int mouseup_handler(const SDL_Event &ev) {
-  // TODO: finish this function
+  int x_pos = ev.button.x;
+  int y_pos = ev.button.y;
+  if (y_pos >= BTNC_Y && y_pos < BTNC_Y + BTNC_HEIGHT && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["btnc"] = 0;
+    return 1;
+  } else if (y_pos >= BTNC_Y - BTNC_HEIGHT - BTNC_SEP && y_pos < BTNC_Y - BTNC_SEP && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["btnu"] = 0;
+    return 1;
+  } else if (y_pos >= BTNC_Y + BTNC_HEIGHT + BTNC_SEP && y_pos < BTNC_Y + 2 * BTNC_HEIGHT + BTNC_SEP && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["btnd"] = 0;
+    return 1;
+  } else if (y_pos >= BTNC_Y && y_pos < BTNC_Y + BTNC_HEIGHT && x_pos >= BTNC_X - BTNC_WIDTH - BTNC_SEP && x_pos < BTNC_X - BTNC_SEP) {
+    input_map["btnl"] = 0;
+    return 1;
+  } else if (y_pos >= BTNC_Y && y_pos < BTNC_Y + BTNC_HEIGHT && x_pos >= BTNC_X + BTNC_WIDTH + BTNC_SEP && x_pos < BTNC_X + 2 * BTNC_WIDTH + BTNC_SEP) {
+    input_map["btnr"] = 0;
+    return 1;
+  } else if (y_pos >= BTNC_Y - 2 * BTNC_HEIGHT - 2 * BTNC_SEP && y_pos < BTNC_Y - BTNC_HEIGHT - 2 * BTNC_SEP && x_pos >= BTNC_X && x_pos < BTNC_X + BTNC_WIDTH) {
+    input_map["rst"] = 0;
+    return 1;
+  }
   return 0;
 }
 
