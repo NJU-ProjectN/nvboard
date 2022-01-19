@@ -6,8 +6,8 @@
 
 std::vector<Component *> components;
 
-extern std::map<input_pin, bool> input_map;
-extern std::map<output_pin, bool> output_map;
+extern std::map<input_pin, int> input_map;
+extern std::map<output_pin, int> output_map;
 
 Component::Component(SDL_Renderer *rend, int cnt, int init_val, int it, int ct) {
   m_renderer = rend;

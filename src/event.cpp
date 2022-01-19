@@ -2,14 +2,13 @@
 #include <SDL2/SDL.h>
 #include <map>
 #include <string>
-#include <cstdio>
-#include <string>
+#include <iostream>
 #include <vector>
 #include <cassert>
 
 extern std::vector<Component *> components;
-extern std::map<input_pin, bool> input_map;
-extern std::map<output_pin, bool> output_map;
+extern std::map<input_pin, int> input_map;
+extern std::map<output_pin, int> output_map;
 
 static int keydown_handler(const SDL_Event &ev) {
   if (ev.key.keysym.sym == SDLK_ESCAPE) {
@@ -183,7 +182,8 @@ int read_event() {
   return 0;
 }
 
-void dbg_wait_esc() {
+void dbg_wait_esc(std::string s) {
+  std::cout << s << std::endl;
   while (1) {
     if (read_event() == -1) {
       break;

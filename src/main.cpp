@@ -11,7 +11,7 @@ TOP_NAME *dut_ptr;
 std::string nboard_home;
 
 int main() {
-  printf("nboard v0.1\n");
+  printf("nvboard v0.2\n");
   // init verilog module
   dut_ptr = new TOP_NAME;
   
@@ -23,14 +23,16 @@ int main() {
   main_window = SDL_CreateWindow("nvboard", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
   main_renderer = SDL_CreateRenderer(main_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   //vga_window = SDL_CreateWindow("nvboard-vga", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-  //vga_renderer = SDL_CreateRenderer(main_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  //vga_renderer = SDL_CreateRenderer(vga_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   
   nboard_home = getenv("NBOARD_HOME");
+  
   load_background(main_renderer);
   load_texture(main_renderer);
+  //dbg_wait_esc("finish loading bg");
   init_components(main_renderer);
   init_gui(main_renderer);
-  
+  //dbg_wait_esc("finish init gui");
   init_input();
   init_output();
   update_input(dut_ptr);

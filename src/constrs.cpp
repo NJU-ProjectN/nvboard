@@ -4,8 +4,8 @@
 #include <nboard.h>
 #include <SDL2/SDL.h>
 
-std::map<input_pin, bool> input_map;
-std::map<output_pin, bool> output_map;
+std::map<input_pin, int> input_map;
+std::map<output_pin, int> output_map;
 
 void init_input() {
   for (input_pin i = input_pin::BTNC; i <= input_pin::CLK; i = input_pin(int(i) + 1)) {

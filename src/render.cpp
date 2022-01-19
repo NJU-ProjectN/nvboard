@@ -77,7 +77,7 @@ void load_background(SDL_Renderer *renderer) {
   sfpga_background = IMG_Load((nboard_home + "/pic/" + BG_PATH).c_str());
   tfpga_background = SDL_CreateTextureFromSurface(renderer, sfpga_background);
   SDL_RenderCopy(renderer, tfpga_background, NULL, NULL);
-
+  
 #ifdef SEG_BKGND_ENA
 #ifdef SEG_BKGND_CUSTOM
   sseg7_background = IMG_Load((nboard_home + "/pic/" + VSEGLED_BG_PATH).c_str());
@@ -90,7 +90,6 @@ void load_background(SDL_Renderer *renderer) {
   SDL_Rect rect = {SEG_X, SEG_Y, SEG_TOT_WIDTH, SEG_TOT_HEIGHT};
   SDL_RenderCopy(renderer, tseg7_background, NULL, &rect);
 #endif
-  SDL_RenderPresent(renderer);
 }
 
 void fill_rect_texture(SDL_Renderer *renderer, SDL_Surface **surface, SDL_Texture **texture, int r, int g, int b) {
@@ -158,15 +157,14 @@ void load_texture(SDL_Renderer *renderer) {
   fill_rect_texture(renderer, &sled_rgb, &tled_rgb, 0xff, 0xff, 0xff);
 }
 
-extern std::map<input_pin, bool> input_map;
-extern std::map<output_pin, bool> output_map;
+extern std::map<input_pin, int> input_map;
+extern std::map<output_pin, int> output_map;
 
 // render buttons, switches, leds and 7-segs
 void init_gui(SDL_Renderer *renderer) {
   for (auto ptr : components) {
     ptr->update_gui(ptr->get_state());
   }
-  SDL_RenderPresent(renderer);
 }
 
 void update_components(SDL_Renderer *renderer) {

@@ -3,8 +3,8 @@
 #include <string>
 #include <topname.h>
 
-extern std::map<input_pin, bool> input_map;
-extern std::map<output_pin, bool> output_map;
+extern std::map<input_pin, int> input_map;
+extern std::map<output_pin, int> output_map;
 
 void update_input(TOP_NAME *dut_ptr) {
   dut_ptr->clk = input_map[input_pin::BTNC];
