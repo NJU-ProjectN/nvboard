@@ -18,22 +18,25 @@ int main() {
   // init SDL and SDL_image
   SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   IMG_Init(IMG_INIT_PNG);
-  SDL_Window *window = nullptr;
-  SDL_Renderer *render = nullptr;
-  window = SDL_CreateWindow("nboard", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-  render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  SDL_Window *main_window = nullptr;
+  SDL_Renderer *main_renderer = nullptr;
+  main_window = SDL_CreateWindow("nvboard", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+  main_renderer = SDL_CreateRenderer(main_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  //vga_window = SDL_CreateWindow("nvboard-vga", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+  //vga_renderer = SDL_CreateRenderer(main_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   
   nboard_home = getenv("NBOARD_HOME");
-  load_background(render);
-  load_texture(render);
-  //dbg_wait_esc();
+  load_background(main_renderer);
+  load_texture(main_renderer);
+  init_components(main_renderer);
+  init_gui(main_renderer);
+  
   init_input();
   init_output();
-  //dbg_wait_esc();
   update_input(dut_ptr);
   dut_ptr->eval();
-  //dbg_wait_esc();
-  init_gui(render);
+  update_output(dut_ptr);
+  update_components(main_renderer);
   
   // the main cycle
   while (1) {
@@ -42,22 +45,22 @@ int main() {
       break;
     } else if (ev) {
       update_input(dut_ptr);
-      update_gui_input(render);
       dut_ptr->eval();
       update_output(dut_ptr);
-      update_gui_output(render);
+      update_components(main_renderer);
     }
 
     if (read_clock()) {
       update_input(dut_ptr);
       dut_ptr->eval();
       update_output(dut_ptr);
-      update_gui_output(render);
+      update_components(main_renderer);
     }
   }
   
-  SDL_DestroyWindow(window);
-  SDL_DestroyRenderer(render);
+  delete_components();
+  SDL_DestroyWindow(main_window);
+  SDL_DestroyRenderer(main_renderer);
   IMG_Quit();
   SDL_Quit();
   delete dut_ptr;

@@ -45,8 +45,6 @@ void load_texture(SDL_Renderer *renderer);
 
 void init_gui(SDL_Renderer *renderer);
 
-void update_gui_input(SDL_Renderer *renderer);
-
-void update_gui_output(SDL_Renderer *renderer);
+void update_components(SDL_Renderer *renderer);
 
 #endif

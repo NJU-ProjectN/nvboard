@@ -3,3 +3,4 @@
 #include "render.h"
 #include "clock.h"
 #include "event.h"
+#include "component.h"
