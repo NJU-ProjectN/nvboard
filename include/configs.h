@@ -1,6 +1,7 @@
 #ifndef _VFPGA_CONFIGS_H
 #define _VFPGA_CONFIGS_H
 
+void dut_update();
 
 // You can replace pictures used in GUI
 

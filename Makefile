@@ -6,7 +6,7 @@ endif
 INC_PATH ?= 
 
 # files of emu
-DIR ?= $(NBOARD_HOME)/test
+DIR ?= $(NBOARD_HOME)/new_emu
 OBJ_DIR = $(DIR)/obj_dir
 VARCHIVE := $(OBJ_DIR)/V$(TOPNAME)__ALL.a
 INC_PATH += $(OBJ_DIR)
@@ -36,7 +36,7 @@ include $(NBOARD_HOME)/scripts/nboard.mk
 -include V$(TOPNAME)_ver.d
 $(VARCHIVE): $(VSRCS)
 	@echo + VERILATOR "->" $^
-	@$(VERILATOR) $(VFLAGS) -top $(TOPNAME) -cc $(VSRCS)
+	@$(VERILATOR) $(VFLAGS) -top $(TOPNAME) -cc $(VSRCS) --Mdir $(OBJ_DIR)
 
 -include $(COBJS:.o=.d)
 $(OBJ_DIR)/%.o: %.cpp $(VARCHIVE)

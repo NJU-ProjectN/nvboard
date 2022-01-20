@@ -5,18 +5,9 @@
 
 #include <verilated.h>
 #include <nboard.h>
-
 #include <stdlib.h>
-#include <interface.h>
 
 std::string nboard_home;
-
-static inline void update_all(){
-  update_input();
-  dut_eval();
-  update_output();
-}
-
 
 int main() {
   printf("nvboard v0.2\n");
@@ -28,7 +19,7 @@ int main() {
 
   SDL_Window *vga_window = nullptr;
   SDL_Renderer *vga_renderer = nullptr;
-  vga_window = SDL_CreateWindow("nboard-vga", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+  vga_window = SDL_CreateWindow("nboard-vga", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
   vga_renderer = SDL_CreateRenderer(vga_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 
@@ -51,7 +42,7 @@ int main() {
   init_input();
   init_output();
 
-  update_all();
+  dut_update();
   update_components(main_renderer);
   
   // the main cycle
@@ -60,12 +51,12 @@ int main() {
     if (ev == -1) {
       break;
     } else if (ev) {
-      update_all();
+      dut_update();
       update_components(main_renderer);
     }
 
     if (read_clock()) {
-      update_all();
+      dut_update();
       update_components(main_renderer);
     }
   }
