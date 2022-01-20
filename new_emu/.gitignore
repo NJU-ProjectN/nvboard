@@ -1,4 +1,3 @@
-!csrc/*
-!vsrc/*
+!src/*
 !Makefile
 !makefile
