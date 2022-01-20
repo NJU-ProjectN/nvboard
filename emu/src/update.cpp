@@ -9,7 +9,7 @@ extern std::map<input_pin, int> input_map;
 extern std::map<output_pin, int> output_map;
 
 static inline void update_input() {
-  dut.clk = input_map[input_pin::BTNC];
+  dut.clk = input_map[input_pin::CLK];
   uint32_t val_sw = 0;
   for (int i = 0; i < 8; i++) {
     val_sw |= input_map[input_pin(int(input_pin::SW0) + i)] << i;

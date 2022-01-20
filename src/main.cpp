@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string>
+#include <iostream>
 
 #include <nboard.h>
 #include <stdlib.h>
@@ -65,7 +66,7 @@ int main() {
       dut_update();
       update_components(main_renderer);
     }
-
+    
     if (read_clock()) {
       dut_update();
       update_components(main_renderer);
