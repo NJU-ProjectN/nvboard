@@ -1,5 +1,6 @@
 # nvboard
 
+# 近期迭代较快，readme的更新可能不够及时，见谅
 #### 介绍
 用SDL开发的虚拟FPGA开发板，配合Verilator使用
 
