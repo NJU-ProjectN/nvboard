@@ -15,7 +15,7 @@ $(NBD_DST_DIR)/%.o: $(NBD_SRC)/%.cpp
 	@mkdir -p $(dir $@)
 	@$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -I$(NBD_LIB) -c -o $@ $<
 
-# Build the archive of nvboar
+# Build the archive of nvboard
 $(NBD_ARCHIVE): $(NBD_OBJS)
 	@echo + AR "->" $(shell realpath $@ --relative-to $(NBOARD_HOME))
 	@ar rcs $(NBD_ARCHIVE) $(NBD_OBJS)

@@ -11,8 +11,15 @@
 
 std::string nboard_home;
 
+static inline void update_all(){
+  update_input();
+  dut_eval();
+  update_output();
+}
+
+
 int main() {
-  printf("nboard v0.1\n");
+  printf("nvboard v0.2\n");
   // init verilog module
   
   // init SDL and SDL_image
@@ -20,31 +27,32 @@ int main() {
   IMG_Init(IMG_INIT_PNG);
 
   SDL_Window *vga_window = nullptr;
-  SDL_Renderer *vga_render = nullptr;
+  SDL_Renderer *vga_renderer = nullptr;
   vga_window = SDL_CreateWindow("nboard-vga", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-  vga_render = SDL_CreateRenderer(vga_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  vga_renderer = SDL_CreateRenderer(vga_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 
-  SDL_Window *window = nullptr;
-  SDL_Renderer *render = nullptr;
-  window = SDL_CreateWindow("nboard", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-  render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  SDL_Window *main_window = nullptr;
+  SDL_Renderer *main_renderer = nullptr;
+  main_window = SDL_CreateWindow("nvboard", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+  main_renderer = SDL_CreateRenderer(main_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   
+  // To avoid the SDL bugs on hby's linux
   usleep(300000);
 
   nboard_home = getenv("NBOARD_HOME");
-  load_background(render);
-  load_texture(render);
-  //dbg_wait_esc();
+  
+  load_background(main_renderer);
+  load_texture(main_renderer);
+  //dbg_wait_esc("finish loading bg");
+  init_components(main_renderer);
+  init_gui(main_renderer);
+  //dbg_wait_esc("finish init gui");
   init_input();
   init_output();
-  //dbg_wait_esc();
-  update_input();
-  dut_eval();
-  update_output();
-  update_gui_output(render);
-  //dbg_wait_esc();
-  init_gui(render);
+
+  update_all();
+  update_components(main_renderer);
   
   // the main cycle
   while (1) {
@@ -52,26 +60,23 @@ int main() {
     if (ev == -1) {
       break;
     } else if (ev) {
-      update_input();
-      update_gui_input(render);
-      dut_eval();
-      update_output();
-      update_gui_output(render);
+      update_all();
+      update_components(main_renderer);
     }
 
     if (read_clock()) {
-      update_input();
-      dut_eval();
-      update_output();
-      update_gui_output(render);
+      update_all();
+      update_components(main_renderer);
     }
   }
   
-  SDL_DestroyWindow(vga_window);
-  SDL_DestroyRenderer(vga_render);
+  delete_components();
 
-  SDL_DestroyWindow(window);
-  SDL_DestroyRenderer(render);
+  SDL_DestroyWindow(vga_window);
+  SDL_DestroyRenderer(vga_renderer);
+
+  SDL_DestroyWindow(main_window);
+  SDL_DestroyRenderer(main_renderer);
   IMG_Quit();
   SDL_Quit();
   return 0;

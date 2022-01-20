@@ -4,20 +4,26 @@
 
 TOP_NAME dut;
 
-extern std::map<std::string, bool> input_map, output_map;
+extern std::map<input_pin, int> input_map;
+extern std::map<output_pin, int> output_map;
 
-void dut_eval() {
-  dut.eval();
+void update_input(TOP_NAME *dut_ptr) {
+  dut_ptr->clk = input_map[input_pin::BTNC];
+  dut_ptr->reset = input_map[input_pin::RST];
 }
 
-void update_input() {
-  dut.clk = input_map["btnc"];
-  dut.reset = input_map["rst"];
-}
-
-void update_output() {
-  output_map["ld0"] = (dut.out >> 0) & 1;
-  output_map["ld1"] = (dut.out >> 1) & 1;
-  output_map["ld2"] = (dut.out >> 2) & 1;
-  output_map["ld3"] = (dut.out >> 3) & 1;
+void update_output(TOP_NAME *dut_ptr) {
+  output_map[output_pin::LD0] = (dut_ptr->out >> 0) & 1;
+  output_map[output_pin::LD1] = (dut_ptr->out >> 1) & 1;
+  output_map[output_pin::LD2] = (dut_ptr->out >> 2) & 1;
+  output_map[output_pin::LD3] = (dut_ptr->out >> 3) & 1;
+  output_map[output_pin::AN0] = 1;
+  output_map[output_pin::SEGA] = 0;
+  output_map[output_pin::SEGB] = 1;
+  output_map[output_pin::SEGC] = 0;
+  output_map[output_pin::SEGD] = 0;
+  output_map[output_pin::SEGE] = 0;
+  output_map[output_pin::SEGF] = 0;
+  output_map[output_pin::SEGG] = 0;
+  output_map[output_pin::DECP] = 0;
 }

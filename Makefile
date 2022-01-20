@@ -38,7 +38,7 @@ $(VARCHIVE): $(VSRCS)
 	@echo + VERILATOR "->" $^
 	@$(VERILATOR) $(VFLAGS) -top $(TOPNAME) -cc $(VSRCS)
 
-
+-include $(COBJS:.o=.d)
 $(OBJ_DIR)/%.o: %.cpp $(VARCHIVE)
 	@echo + CXX "->" $<
 	@mkdir -p $(dir $@)
