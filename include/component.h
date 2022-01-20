@@ -1,3 +1,6 @@
+#ifndef _VFPGA_COMPONENT_H
+#define _VFPGA_COMPONENT_H
+
 #include <SDL2/SDL.h>
 #include <vector>
 #include "constrs.h"
@@ -70,3 +73,5 @@ public:
 void init_components(SDL_Renderer *renderer);
 
 void delete_components();
+
+#endif

@@ -5,6 +5,7 @@
 
 #include <nboard.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 std::string nboard_home;
 
@@ -40,7 +41,7 @@ int main() {
   );
   
   // To avoid the SDL bugs on hby's linux
-  //usleep(300000);
+  usleep(200000);
 
   nboard_home = getenv("NBOARD_HOME");
   

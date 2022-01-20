@@ -25,6 +25,6 @@ void dut_update();
 
 // II. Experimental Function
 
-//#define HARDWARE_ACC
+#define HARDWARE_ACC
 
 #endif
