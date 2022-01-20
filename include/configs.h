@@ -23,7 +23,11 @@ void dut_update();
 #define SEG_BKGND_CUSTOM
 #define VSEGLED_BG_PATH "vsegled_bg.png"
 
-// II. Experimental Function
+// II. Hardware options
+
+#define CLK_FREQ 1000
+
+// III. Experimental Function
 
 #define HARDWARE_ACC
 
