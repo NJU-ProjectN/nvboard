@@ -1,11 +1,7 @@
 #include <SDL2/SDL.h>
-#include <topname.h>
 
 #ifndef _VFPGA_CONSTRS_H
 #define _VFPGA_CONSTRS_H
-
-void update_input(TOP_NAME *dut_ptr);
-void update_output(TOP_NAME *dut_ptr);
 
 void init_input();
 void init_output();

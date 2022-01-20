@@ -184,6 +184,11 @@ int read_event() {
   case SDL_KEYDOWN:
     return keydown_handler(ev);
     break;
+  case SDL_WINDOWEVENT:
+    if(ev.window.event == SDL_WINDOWEVENT_CLOSE){
+      return -1;
+    }
+    break;
   case SDL_KEYUP:
     return keyup_handler(ev);
     break;

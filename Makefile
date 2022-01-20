@@ -2,84 +2,61 @@ ifndef TOPNAME
 $(error TOPNAME should be given)
 endif
 
-# generated executable file
-DST_DIR = build
-DST_BIN = $(DST_DIR)/emu_board
-
-# files of nboard
-NBD_SRC = src
-NBD_SRCS := $(shell find $(NBD_SRC) -name "*.cpp")
-NBD_LIB = include
-NBD_LIBS := $(shell find $(NBD_LIB) -name "*.h")
-
-# update.cpp should be implemented by users.
-NBD_OBJS := $(addprefix $(DST_DIR)/, $(addsuffix .o, $(basename $(notdir $(NBD_SRCS))))) \
-            $(DST_DIR)/update.o
+# include path
+INC_PATH ?= 
 
 # files of emu
-EMU_DIR = emu
-EMU_ARCH := $(shell find $(EMU_DIR) -name "*.a")
+DIR ?= $(NBOARD_HOME)/test
+OBJ_DIR = $(DIR)/obj_dir
+VARCHIVE := $(OBJ_DIR)/V$(TOPNAME)__ALL.a
+INC_PATH += $(OBJ_DIR)
 
-### Constants...
-# Perl executable (from $PERL)
-PERL = perl
-# Path to Verilator kit (from $VERILATOR_ROOT)
-VERILATOR_ROOT = /usr/share/verilator
-# SystemC include directory with systemc.h (from $SYSTEMC_INCLUDE)
-SYSTEMC_INCLUDE ?= 
-# SystemC library directory with libsystemc.a (from $SYSTEMC_LIBDIR)
-SYSTEMC_LIBDIR ?= 
+# generated executable file
+DST_BIN = $(OBJ_DIR)/NVBOARD_$(TOPNAME)
 
-### Switches...
-# SystemC output mode?  0/1 (from --sc)
-VM_SC = 0
-# Legacy or SystemC output mode?  0/1 (from --sc)
-VM_SP_OR_SC = $(VM_SC)
-# Deprecated
-VM_PCLI = 1
-# Deprecated: SystemC architecture to find link library path (from $SYSTEMC_ARCH)
-VM_SC_TARGET_ARCH = linux
+# SRC of the project
+VSRC_DIR ?= $(DIR)/vsrc
+VSRCS ?= $(shell find $(VSRC_DIR) -name "*.v")
 
-### Vars...
-# Design prefix (from --prefix)
-VM_PREFIX = V$(TOPNAME)
-# Module prefix (from --prefix)
-VM_MODPREFIX = V$(TOPNAME)
-# User CFLAGS (from -CFLAGS on Verilator command line)
-VM_USER_CFLAGS = -I $(NBD_LIB) -I $(EMU_DIR)
-
-# User LDLIBS (from -LDFLAGS on Verilator command line)
-VM_USER_LDLIBS = -lSDL2 -lSDL2_image
-
-# User .cpp files (from .cpp's on Verilator command line)
-VM_USER_CLASSES = 
-
-# User .cpp directories (from .cpp's on Verilator command line)
-VM_USER_DIR = ./src
+CSRC_DIR ?= $(DIR)/csrc
+CSRCS ?= $(shell find $(CSRC_DIR) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
+COBJS = $(CSRCS:%.cpp=$(OBJ_DIR)/%.o)
 
 ### Default rules...
-# Include list of all generated classes
-include $(EMU_DIR)/V$(TOPNAME)_classes.mk
 # Include global rules
+
+include $(NBOARD_HOME)/scripts/vtrace.mk
 include $(VERILATOR_ROOT)/include/verilated.mk
 
-$(DST_BIN): $(NBD_OBJS) $(VK_GLOBAL_OBJS) $(EMU_DIR)/V$(TOPNAME)__ALL.a
-	@$(LINK) $(LD_FLAGS) $^ $(LOADLIBES) $(LDLIBS) $(LIBS) $(SC_LIBS) -o $@ $(SDL_FLAGS)
+# Build rules of nboard
+include $(NBOARD_HOME)/scripts/nboard.mk
 
-$(DST_DIR)/%.o: $(NBD_SRC)/%.cpp $(NBD_LIBS)
+
+-include V$(TOPNAME)_all.d
+-include V$(TOPNAME)_ver.d
+$(VARCHIVE): $(VSRCS)
+	@echo + VERILATOR "->" $^
+	@$(VERILATOR) $(VFLAGS) -top $(TOPNAME) -cc $(VSRCS)
+
+
+$(OBJ_DIR)/%.o: %.cpp $(VARCHIVE)
+	@echo + CXX "->" $<
 	@mkdir -p $(dir $@)
 	@$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) \
-	  -I $(NBD_LIB) -I $(EMU_DIR) -c -o $@ $<
+		-DTOP_NAME="V$(TOPNAME)" -c -o $@ $<
 
-src/update.cpp: emu/update.cpp
-	@ln -sf $(realpath ./$(EMU_DIR)/update.cpp) $(NBD_SRC)/update.cpp
+$(DST_BIN): $(VK_GLOBAL_OBJS) $(COBJS) $(NBD_ARCHIVE) $(VARCHIVE)
+	@echo + LD "->" $@
+	@mkdir -p $(dir $@)
+	@$(LINK) $(LD_FLAGS) $^ $(LOADLIBES) $(LDLIBS) $(LIBS) $(SC_LIBS) -o $@ $(SDL_FLAGS)
+
 
 run: $(DST_BIN)
 	@$(DST_BIN)
 
 clean:
-	@rm -rf $(DST_DIR)
-	@rm -f *.o
-	@rm -f *.d
+	rm -rf $(OBJ_DIR)
+	rm -f verilated.d
+	rm -f verilated.o
 
 .PHONY: clean run
