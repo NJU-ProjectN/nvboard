@@ -3,7 +3,6 @@
 #include <SDL2/SDL_image.h>
 #include <string>
 
-#include <verilated.h>
 #include <nboard.h>
 #include <stdlib.h>
 
@@ -20,16 +19,28 @@ int main() {
   SDL_Window *vga_window = nullptr;
   SDL_Renderer *vga_renderer = nullptr;
   vga_window = SDL_CreateWindow("nboard-vga", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-  vga_renderer = SDL_CreateRenderer(vga_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  vga_renderer = SDL_CreateRenderer(vga_window, -1, 
+#ifdef HARDWARE_ACC
+  SDL_RENDERER_ACCELERATED
+#else
+  SDL_RENDERER_SOFTWARE
+#endif
+  );
 
 
   SDL_Window *main_window = nullptr;
   SDL_Renderer *main_renderer = nullptr;
   main_window = SDL_CreateWindow("nvboard", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-  main_renderer = SDL_CreateRenderer(main_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  main_renderer = SDL_CreateRenderer(main_window, -1,
+#ifdef HARDWARE_ACC
+  SDL_RENDERER_ACCELERATED
+#else
+  SDL_RENDERER_SOFTWARE
+#endif
+  );
   
   // To avoid the SDL bugs on hby's linux
-  usleep(300000);
+  //usleep(300000);
 
   nboard_home = getenv("NBOARD_HOME");
   

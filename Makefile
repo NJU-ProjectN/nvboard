@@ -6,7 +6,7 @@ INC_PATH ?=
 
 # files of emu
 TOPNAME ?= top
-DIR ?= $(NBOARD_HOME)/new_emu
+DIR ?= $(NBOARD_HOME)/emu
 OBJ_DIR = $(DIR)/obj_dir
 
 # generated executable file

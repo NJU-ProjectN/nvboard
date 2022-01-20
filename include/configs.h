@@ -3,6 +3,8 @@
 
 void dut_update();
 
+
+// I. Mapping
 // You can replace pictures used in GUI
 
 // 640*480 png
@@ -20,5 +22,9 @@ void dut_update();
 #define SEG_BKGND_ENA
 #define SEG_BKGND_CUSTOM
 #define VSEGLED_BG_PATH "vsegled_bg.png"
+
+// II. Experimental Function
+
+//#define HARDWARE_ACC
 
 #endif
