@@ -3,19 +3,17 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
-#include "constrs.h"
-
+#include <constrs.h>
 
 // interface type
-#define INPUT_TYPE     1
-#define OUTPUT_TYPE    2
+enum {
+  INPUT_TYPE = 1, OUTPUT_TYPE = 2
+};
 
 // component type
-#define BUTTON_TYPE    1
-#define SWICTH_TYPE    2
-#define NAIVE_LED_TYPE 3
-#define RGB_LED_TYPE   4
-#define SEGS7_TYPE     5
+enum{
+  BUTTON_TYPE = 1, SWICTH_TYPE, NAIVE_LED_TYPE, RGB_LED_TYPE, SEGS7_TYPE, VGA_TYPE
+};
 
 union Pin{
   input_pin m_in;

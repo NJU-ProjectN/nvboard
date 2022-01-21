@@ -1,7 +1,9 @@
-#include <nboard.h>
+#include <clock.h>
 #include <map>
 #include <SDL2/SDL_timer.h>
 #include <iostream>
+#include <configs.h>
+#include <constrs.h>
 
 extern std::map<input_pin, int> input_map;
 extern std::map<output_pin, int> output_map;

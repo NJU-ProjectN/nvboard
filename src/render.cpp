@@ -1,4 +1,4 @@
-#include <nboard.h>
+#include <render.h>
 #include <string>
 #include <map>
 #include <SDL2/SDL.h>
@@ -6,6 +6,8 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <configs.h>
+#include <component.h>
 
 extern std::vector<Component *> components;
 

@@ -1,4 +1,6 @@
-#include <nboard.h>
+#include <component.h>
+#include <configs.h>
+#include <render.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <vector>

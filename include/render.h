@@ -1,7 +1,7 @@
-#include <SDL2/SDL.h>
-
 #ifndef VFPGA_RENDER_H
 #define VFPGA_RENDER_H
+
+#include <SDL2/SDL.h>
 
 #define WINDOW_WIDTH   640
 #define WINDOW_HEIGHT  480

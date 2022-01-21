@@ -1,5 +1,6 @@
 VERILATOR = verilator
-VERILATOR_CFLAGS += -MMD -Wall --build -cc 
+VERILATOR_CFLAGS += -MMD -Wall --build -cc -Wno-lint \
+				-O3 --x-assign fast --x-initial fast --noassert
 
 # include path
 INC_PATH ?= 
@@ -29,11 +30,12 @@ CFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 LDFLAGS += -lSDL2 -lSDL2_image
 
 $(DST_BIN): $(SRCS) $(NBD_ARCHIVE)
+	@rm -rf $(OBJ_DIR)
 	@echo $(INC_PATH)
 	@$(VERILATOR) $(VERILATOR_CFLAGS) \
-		-top $(TOPNAME) $^ --exe \
+		-top $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--Mdir $(OBJ_DIR) -o $(DST_EXE)
+		--Mdir $(OBJ_DIR) --exe -o $(DST_EXE)
 
 run: $(DST_BIN)
 	@$(DST_BIN)

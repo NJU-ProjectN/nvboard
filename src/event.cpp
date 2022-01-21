@@ -1,10 +1,11 @@
-#include <nboard.h>
+#include <event.h>
 #include <SDL2/SDL.h>
 #include <map>
 #include <string>
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <component.h>
 
 extern std::vector<Component *> components;
 extern std::map<input_pin, int> input_map;

@@ -1,8 +1,6 @@
+#include <constrs.h>
 #include <map>
 #include <string>
-
-#include <nboard.h>
-#include <SDL2/SDL.h>
 
 std::map<input_pin, int> input_map;
 std::map<output_pin, int> output_map;

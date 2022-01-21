@@ -12,23 +12,11 @@ std::string nboard_home;
 
 int main() {
   printf("nvboard v0.2\n");
-  // init verilog module
   
   // init SDL and SDL_image
   SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   IMG_Init(IMG_INIT_PNG);
-
-  SDL_Window *vga_window = nullptr;
-  SDL_Renderer *vga_renderer = nullptr;
-  vga_window = SDL_CreateWindow("nboard-vga", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-  vga_renderer = SDL_CreateRenderer(vga_window, -1, 
-#ifdef HARDWARE_ACC
-  SDL_RENDERER_ACCELERATED
-#else
-  SDL_RENDERER_SOFTWARE
-#endif
-  );
-
+  VGA *vga = new VGA();
 
   SDL_Window *main_window = nullptr;
   SDL_Renderer *main_renderer = nullptr;
@@ -57,27 +45,22 @@ int main() {
 
   dut_update();
   update_components(main_renderer);
-  
+  vga->update_vga();
   // the main cycle
   while (1) {
     int ev = read_event();
+    bool clock_updated = read_clock();
     if (ev == -1) {
       break;
-    } else if (ev) {
+    } else if (ev || clock_updated) {
       dut_update();
       update_components(main_renderer);
-    }
-    
-    if (read_clock()) {
-      dut_update();
-      update_components(main_renderer);
+      vga->update_vga();
     }
   }
   
   delete_components();
-
-  SDL_DestroyWindow(vga_window);
-  SDL_DestroyRenderer(vga_renderer);
+  delete vga;
 
   SDL_DestroyWindow(main_window);
   SDL_DestroyRenderer(main_renderer);

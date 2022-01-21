@@ -1,9 +1,6 @@
 #ifndef _VFPGA_CONFIGS_H
 #define _VFPGA_CONFIGS_H
 
-void dut_update();
-
-
 // I. Mapping
 // You can replace pictures used in GUI
 
@@ -25,7 +22,7 @@ void dut_update();
 
 // II. Hardware options
 
-#define CLK_FREQ 1000
+#define CLK_FREQ 50000000
 
 // III. Experimental Function
 
