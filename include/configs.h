@@ -24,8 +24,14 @@
 
 #define CLK_FREQ 50000000
 
+#define CLK_DBG
+
+#define VGA_ENA
+
 // III. Experimental Function
 
-#define HARDWARE_ACC
+//#define HARDWARE_ACC
+
+//#define VSYNC
 
 #endif

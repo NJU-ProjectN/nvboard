@@ -1,11 +1,9 @@
-#include <component.h>
-#include <configs.h>
-#include <render.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <nboard.h>
 #include <vector>
 #include <iostream>
 #include <map>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 std::vector<Component *> components;
 
@@ -84,7 +82,7 @@ void Component::add_output(const output_pin &out) {
   pins.push_back(temp);
 }
 
-void Component::update_gui(int newval) {
+void Component::update_gui() {
   SDL_RenderCopy(m_renderer, m_textures[m_state], NULL, m_rects[m_state]);
 }
 
@@ -92,16 +90,16 @@ void Component::update_state() {
   Pin pin = *(pins.begin());
   int newval = (m_interface_type == INPUT_TYPE) ? input_map[pin.m_in] : output_map[pin.m_out];
   if (newval != m_state) {
-    m_state = newval;
-    update_gui(newval);
+    set_state(newval);
+    update_gui();
   }
 }
 
 RGB_LED::RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int it, int ct)
   : Component(rend, cnt, init_val, it, ct){}
 
-void RGB_LED::update_gui(int newval) {
-  SDL_RenderCopy(get_renderer(), get_texture(newval), NULL, get_rect(newval));
+void RGB_LED::update_gui() {
+  SDL_RenderCopy(get_renderer(), get_texture(get_state()), NULL, get_rect(get_state()));
 }
 
 void RGB_LED::update_state() {
@@ -110,15 +108,16 @@ void RGB_LED::update_state() {
     newval = (newval << 1) | output_map[get_output(i)];
   }
   if (newval != get_state()) {
-    update_gui(newval);
     set_state(newval);
+    update_gui();
   }
 }
 
 SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int it, int ct)
   : Component(rend, cnt, init_val, it, ct){}
 
-void SEGS7::update_gui(int newval) {
+void SEGS7::update_gui() {
+  int newval = get_state();
   for (int i = 0; i < 16; ++i) {
     if ((newval >> i) & 1) {
       SDL_RenderCopy(get_renderer(), get_texture(i), NULL, get_rect(i));
@@ -136,8 +135,8 @@ void SEGS7::update_state() {
     }
   }
   if (newval != get_state()) {
-    update_gui(newval);
     set_state(newval);
+    update_gui();
   }
 }
 
@@ -248,6 +247,18 @@ void init_components(SDL_Renderer *renderer) {
     ptr->add_output(output_pin(int(output_pin::AN0) + i));
     components.push_back(ptr);
   }
+
+#ifdef VGA_ENA
+  // init vga
+  ptr = new VGA(renderer, 1, 0, OUTPUT_TYPE, VGA_TYPE);
+  rect_ptr = new SDL_Rect;
+  *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
+  ptr->set_rect(rect_ptr, 0);
+  for (output_pin p = output_pin::VGA_CLK; p <= output_pin::VGA_B; p = output_pin(int(p) + 1)) {
+    ptr->add_output(p);
+  }
+  components.push_back(ptr);
+#endif
 }
 
 void delete_components() {
