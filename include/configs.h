@@ -22,7 +22,7 @@
 
 // II. Hardware options
 
-#define CLK_FREQ 50000000
+#define CLK_FREQ 1000000
 
 // III. Experimental Function
 
