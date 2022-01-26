@@ -8,7 +8,7 @@
 软件架构说明
 ```
 .
-├── emu
+├── emu                     演示项目目录
 │   └── ...
 ├── include
 │   ├── clock.h
@@ -18,7 +18,7 @@
 │   ├── nboard.h
 │   └── render.h
 ├── LICENSE
-├── Makefile
+├── Makefile                NVBOARD项目构建makefile
 ├── pic
 │   ├── vbg_1.png
 │   ├── vbg_2.png
@@ -29,7 +29,7 @@
 │   └── vsw_on.png
 ├── README.en.md
 ├── README.md
-└── src
+└── src                     NVBORAD源码
     ├── clock.cpp
     ├── constrs.cpp
     ├── event.cpp
@@ -92,20 +92,21 @@ endmodule
 
 NVBOARD会在输入有了变化或时钟边沿处调用`dut_update()`，当你在虚拟FPGA上改变输入（比如按下`btnc`）的时候，
 `input_map`里面对应的键值会随之更新，
-接下来nvboard就会调用`update_input()`，
-你需要把`input_map`里面的键值赋值给模块的引脚，
-让你编写的模块能够收到这个改变。
 
-模块得到新的输出之后，nvboard会随即调用`update_output()`，
-你也需要把模块的输出存入`output_map`，
-nvboard会把模块的输出同步到GUI上。
+接下来`dut_update()`就会执行`update_input()`， 把`input_map`里面的键值赋值给模块的引脚，让你编写的模块能够收到这个改变。
+
+之后，模块会进行模拟计算，最终将结果更新到输出引脚。
+
+模块得到新的输出之后，`dut_update()`会执行`update_output()`，把模块的输出存入`output_map`。
+
+`dut_update()`调用结束后，nvboard会把模块的输出同步到GUI上。
 
 在`update.cpp`里，你需要编写以下内容
 - 创建一个顶层模块对象`dut`
 - 你需要手动编写辅助函数`dut_update()`，其行为如下：
   1. 从`input_map`中更新顶层模块输入
   2. 执行模块模拟过程`dut.eval();`
-  3. 像`output_map`中更新顶层模块输出
+  3. 向`output_map`中更新顶层模块输出
 
 ##### 体验虚拟FPGA
 
