@@ -13,7 +13,12 @@ static uint64_t freq;
 static uint64_t init_time;
 static uint64_t clk_cnt;
 
+// Return true at posedge or negedge of clk.
 bool read_clock() {
+#ifdef CLK_DBG
+  input_map[input_pin::CLK] ^= 1;
+  return true;
+#else
   if (!clock_ena) {
     freq = SDL_GetPerformanceFrequency();
     init_time = SDL_GetPerformanceCounter();
@@ -28,4 +33,5 @@ bool read_clock() {
     return true;
   }
   return false;
+#endif
 }
