@@ -9,11 +9,12 @@ NBD_OBJS := $(addprefix $(NBD_DST_DIR)/, $(addsuffix .o, $(basename $(notdir $(N
 
 # The archive of nvboard
 NBD_ARCHIVE = $(NBD_DST_DIR)/NVBOARD.a
+CXXFLAGS += -MMD -O3
 
 $(NBD_DST_DIR)/%.o: $(NBD_SRC)/%.cpp
 	@echo + CXX "->" NBOARD_HOME/$(shell realpath $< --relative-to $(NBOARD_HOME))
 	@mkdir -p $(dir $@)
-	@$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -I$(NBD_LIB) -c -o $@ $<
+	@$(OBJCACHE) $(CXX) $(CXXFLAGS) -I$(NBD_LIB) -c -o $@ $<
 
 # Build the archive of nvboard
 $(NBD_ARCHIVE): $(NBD_OBJS)

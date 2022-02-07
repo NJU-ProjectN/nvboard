@@ -1,18 +1,24 @@
+#ifndef _VFPGA_COMPONENT_H
+#define _VFPGA_COMPONENT_H
+
 #include <SDL2/SDL.h>
 #include <vector>
-#include "constrs.h"
-
+#include <constrs.h>
 
 // interface type
-#define INPUT_TYPE     1
-#define OUTPUT_TYPE    2
+enum {
+  INPUT_TYPE = 1, OUTPUT_TYPE = 2
+};
 
 // component type
-#define BUTTON_TYPE    1
-#define SWICTH_TYPE    2
-#define NAIVE_LED_TYPE 3
-#define RGB_LED_TYPE   4
-#define SEGS7_TYPE     5
+enum {
+  BUTTON_TYPE = 1, SWICTH_TYPE, NAIVE_LED_TYPE, RGB_LED_TYPE, SEGS7_TYPE, VGA_TYPE
+};
+
+// logic type
+enum {
+  COMB_TYPE = 1, SEQ_TYPE = 2
+};
 
 union Pin{
   input_pin m_in;
@@ -47,7 +53,7 @@ public:
   void set_state(int val);
   void add_input(const input_pin &in);
   void add_output(const output_pin &out);
-  virtual void update_gui(int newval);
+  virtual void update_gui();
   virtual void update_state();
 
   friend void delete_components();
@@ -56,17 +62,19 @@ public:
 class RGB_LED : public Component{
 public:
   RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
-  virtual void update_gui(int newval);
+  virtual void update_gui();
   virtual void update_state();
 };
 
 class SEGS7 : public Component{
 public:
   SEGS7(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
-  virtual void update_gui(int newval);
+  virtual void update_gui();
   virtual void update_state();
 };
 
 void init_components(SDL_Renderer *renderer);
 
 void delete_components();
+
+#endif

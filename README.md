@@ -8,7 +8,7 @@
 软件架构说明
 ```
 .
-├── emu
+├── emu                     演示项目目录
 │   └── ...
 ├── include
 │   ├── clock.h
@@ -18,7 +18,7 @@
 │   ├── nboard.h
 │   └── render.h
 ├── LICENSE
-├── Makefile
+├── Makefile                NVBOARD项目构建makefile
 ├── pic
 │   ├── vbg_1.png
 │   ├── vbg_2.png
@@ -29,13 +29,13 @@
 │   └── vsw_on.png
 ├── README.en.md
 ├── README.md
-└── src
+└── src                     NVBORAD源码
     ├── clock.cpp
     ├── constrs.cpp
     ├── event.cpp
     ├── main.cpp
     ├── render.cpp
-    └── update.cpp -> $NBOARD_HOME/emu/update.cpp
+    └── uvga.cpp
 ```
 
 #### 安装教程
@@ -45,10 +45,28 @@
 
 #### 使用说明
 
-##### 使用Verilator
+##### 编写makefie
 
-使用Veriloator，把Verilog转换成C++。
-比如，新建verilog文件`top.v`：
+你可以在任意运行在NVBOARD的项目目录下编写makefile，makefile格式如下
+
+```makefile
+# 需要手动指定项目目录
+DIR = .
+## 默认项目源码在项目目录的src文件夹下，可手动指定
+### SRC_DIR ?= $(DIR)/src
+## 参与verilator编译的文件默认为$(SRC_DIR)下的所有*.v, *.c, *.cc, *.cpp文件，可手动指定
+### SRCS ?= $(shell find $(SRC_DIR) -name "*.v" -or -name "*.c" -or -name "*.cc" -or -name "*.cpp")
+
+
+# 需要指定顶层模块名称
+TOPNAME = top
+
+# 需要在最后将NVBOARD的makefile包含进来
+-include $(NBOARD_HOME)/Makefile
+
+```
+
+##### 编写项目文件
 
 ```
 //top.v
@@ -63,44 +81,40 @@ module top (
 endmodule
 ```
 
-这是一个简单的计数器。我们可以执行以下命令：
-
-```
-verilator -Wall -cc -build top.v
-```
-
-生成nboard需要的头文件（`Vtop.h`）、静态链接库文件（`Vtop__ALL.a`）、makefile文件（`Vtop_classes.mk`）。
+这是一个简单的计数器。你可以将其放入$SRC_DIR文件夹中
 
 ##### 编写两个辅助函数
 
-接下来，你需要在`update.cpp`里编写两个辅助函数`update_input()`和`update_output()`。
+接下来，你需要在src文件中新建一个c++代码文件(如`update.cpp`)。
 
 在`emu`下有一个`update.cpp`的示例。
 可以看到`input_map`和`output_map`，这两个`std::map`就是nboard和verilog通信的渠道。
 
-当你在虚拟FPGA上改变输入（比如按下`btnc`）的时候，
+NVBOARD会在输入有了变化或时钟边沿处调用`dut_update()`，当你在虚拟FPGA上改变输入（比如按下`btnc`）的时候，
 `input_map`里面对应的键值会随之更新，
-接下来nvboard就会调用`update_input()`，
-你需要把`input_map`里面的键值赋值给模块的引脚，
-让你编写的模块能够收到这个改变。
 
-模块得到新的输出之后，nvboard会随即调用`update_output()`，
-你也需要把模块的输出存入`output_map`，
-nvboard会把模块的输出同步到GUI上。
+接下来`dut_update()`就会执行`update_input()`， 把`input_map`里面的键值赋值给模块的引脚，让你编写的模块能够收到这个改变。
 
-##### 让nvboard知道模块的名称
+之后，模块会进行模拟计算，最终将结果更新到输出引脚。
 
-新建`topname.h`，在这里把verilator生成的头文件包含进来，再加一条宏定义：
+模块得到新的输出之后，`dut_update()`会执行`update_output()`，把模块的输出存入`output_map`。
 
-```
-#define TOP_NAME Vtop
-```
+`dut_update()`调用结束后，nvboard会把模块的输出同步到GUI上。
+
+在`update.cpp`里，你需要编写以下内容
+- 创建一个顶层模块对象`dut`
+- 你需要手动编写辅助函数`dut_update()`，其行为如下：
+  1. 从`input_map`中更新顶层模块输入
+  2. 执行模块模拟过程`dut.eval();`
+  3. 向`output_map`中更新顶层模块输出
 
 ##### 体验虚拟FPGA
 
-把头文件（`Vtop.h`）、静态链接库文件（`Vtop__ALL.a`）、makefile文件（`Vtop_classes.mk`）、辅助更新函数（`update.cpp`）、在`$NBOARD_HOME`下执行`make TOPNAME=top run`即可体验虚拟FPGA。
-
-要改变某个按键或开关的状态，可以使用键盘快捷键，也可以用鼠标单击。
+最后，你只需要在项目目录下执行
+```shell
+make run
+```
+命令，即可在NVBOARD上模拟运行你自己的verilog代码！
 
 #### 特技
 

@@ -1,4 +1,4 @@
-#include <nboard.h>
+#include <render.h>
 #include <string>
 #include <map>
 #include <SDL2/SDL.h>
@@ -6,6 +6,10 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <configs.h>
+#include <component.h>
+
+#include <event.h>
 
 extern std::vector<Component *> components;
 
@@ -76,7 +80,8 @@ extern std::string nboard_home;
 void load_background(SDL_Renderer *renderer) {
   sfpga_background = IMG_Load((nboard_home + "/pic/" + BG_PATH).c_str());
   tfpga_background = SDL_CreateTextureFromSurface(renderer, sfpga_background);
-  SDL_RenderCopy(renderer, tfpga_background, NULL, NULL);
+  SDL_Rect rect_bg = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+  SDL_RenderCopy(renderer, tfpga_background, NULL, &rect_bg);
   
 #ifdef SEG_BKGND_ENA
 #ifdef SEG_BKGND_CUSTOM
@@ -87,8 +92,8 @@ void load_background(SDL_Renderer *renderer) {
 #endif
   
   tseg7_background = SDL_CreateTextureFromSurface(renderer, sseg7_background);
-  SDL_Rect rect = {SEG_X, SEG_Y, SEG_TOT_WIDTH, SEG_TOT_HEIGHT};
-  SDL_RenderCopy(renderer, tseg7_background, NULL, &rect);
+  SDL_Rect rect_seg7 = {SEG_X, SEG_Y, SEG_TOT_WIDTH, SEG_TOT_HEIGHT};
+  SDL_RenderCopy(renderer, tseg7_background, NULL, &rect_seg7);
 #endif
 }
 
@@ -163,7 +168,7 @@ extern std::map<output_pin, int> output_map;
 // render buttons, switches, leds and 7-segs
 void init_gui(SDL_Renderer *renderer) {
   for (auto ptr : components) {
-    ptr->update_gui(ptr->get_state());
+    ptr->update_gui();
   }
 }
 
@@ -171,5 +176,4 @@ void update_components(SDL_Renderer *renderer) {
   for (auto ptr : components) {
     ptr->update_state();
   }
-  SDL_RenderPresent(renderer);
 }

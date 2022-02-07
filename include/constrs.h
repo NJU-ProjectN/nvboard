@@ -1,10 +1,11 @@
-#include <SDL2/SDL.h>
-
 #ifndef _VFPGA_CONSTRS_H
 #define _VFPGA_CONSTRS_H
 
+#include <map>
+
 void init_input();
 void init_output();
+void dut_update();
 
 #define CLK_INPUT CLK
 
@@ -30,19 +31,26 @@ void init_output();
 
 //#define UART_OUTPUT
 
-//#define VGA_OUTPUT
+#define VGA_OUTPUT VGA_CLK, VGA_VSYNC, VGA_HSYNC, VGA_BLANK_N,  \
+                   VGA_R, VGA_G, VGA_B
 
 enum class input_pin{
   BTN_INPUT,
   SW_INPUT,
-  CLK_INPUT
+  CLK_INPUT,
+  NR_INPUT_PINS
 };
 
 enum class output_pin{
   NAIVE_LEDS_OUTPUT,
   RGB_LEDS_OUTPUT,
   SEG7_ENBS_OUTPUT,
-  SEG7_SEGS_OUTPUT
+  SEG7_SEGS_OUTPUT,
+  VGA_OUTPUT,
+  NR_OUTPUT_PINS
 };
+
+extern std::map<input_pin, int> input_map;
+extern std::map<output_pin, int> output_map;
 
 #endif

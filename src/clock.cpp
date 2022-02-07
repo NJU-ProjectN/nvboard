@@ -1,7 +1,9 @@
-#include <nboard.h>
+#include <clock.h>
 #include <map>
 #include <SDL2/SDL_timer.h>
 #include <iostream>
+#include <configs.h>
+#include <constrs.h>
 
 extern std::map<input_pin, int> input_map;
 extern std::map<output_pin, int> output_map;
@@ -11,7 +13,12 @@ static uint64_t freq;
 static uint64_t init_time;
 static uint64_t clk_cnt;
 
+// Return true at posedge or negedge of clk.
 bool read_clock() {
+#ifdef CLK_DBG
+  input_map[input_pin::CLK] ^= 1;
+  return true;
+#else
   if (!clock_ena) {
     freq = SDL_GetPerformanceFrequency();
     init_time = SDL_GetPerformanceCounter();
@@ -26,4 +33,5 @@ bool read_clock() {
     return true;
   }
   return false;
+#endif
 }
