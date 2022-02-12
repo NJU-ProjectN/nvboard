@@ -14,8 +14,7 @@
 │   ├── clock.h
 │   ├── configs.h
 │   ├── constrs.h
-│   ├── event.h
-│   ├── nboard.h
+│   ├── nvboard.h
 │   └── render.h
 ├── LICENSE
 ├── Makefile                NVBOARD项目构建makefile
@@ -30,18 +29,17 @@
 ├── README.en.md
 ├── README.md
 └── src                     NVBORAD源码
-    ├── clock.cpp
-    ├── constrs.cpp
+    ├── component.cpp
     ├── event.cpp
-    ├── main.cpp
+    ├── nvboard.cpp
     ├── render.cpp
-    └── uvga.cpp
+    └── vga.cpp
 ```
 
 #### 安装教程
 
 1.  将项目拷贝到本地，`git clone https://github.com/NJU-ProjectN/nvboard.git`；
-2.  接下来，把本项目的目录设置成环境变量`NBOARD_HOME`。
+2.  接下来，把本项目的目录设置成环境变量`NVBOARD_HOME`。
 
 #### 使用说明
 
@@ -62,7 +60,7 @@ DIR = .
 TOPNAME = top
 
 # 需要在最后将NVBOARD的makefile包含进来
--include $(NBOARD_HOME)/Makefile
+-include $(NVBOARD_HOME)/Makefile
 
 ```
 
@@ -88,7 +86,7 @@ endmodule
 接下来，你需要在src文件中新建一个c++代码文件(如`update.cpp`)。
 
 在`emu`下有一个`update.cpp`的示例。
-可以看到`input_map`和`output_map`，这两个`std::map`就是nboard和verilog通信的渠道。
+可以看到`input_map`和`output_map`，这两个`std::map`就是nvboard和verilog通信的渠道。
 
 NVBOARD会在输入有了变化或时钟边沿处调用`dut_update()`，当你在虚拟FPGA上改变输入（比如按下`btnc`）的时候，
 `input_map`里面对应的键值会随之更新，

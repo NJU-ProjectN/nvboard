@@ -7,7 +7,7 @@ INC_PATH ?=
 
 # files of emu
 TOPNAME ?= top
-DIR ?= $(NBOARD_HOME)/emu
+DIR ?= $(NVBOARD_HOME)/emu
 OBJ_DIR = $(DIR)/obj_dir
 
 # generated executable file
@@ -21,8 +21,8 @@ SRCS ?= $(shell find $(SRC_DIR) -name "*.v" -or -name "*.c" -or -name "*.cc" -or
 
 ### Default rules...
 
-# Build rules of nboard
-include $(NBOARD_HOME)/scripts/nboard.mk
+# Build rules of nvboard
+include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 INCFLAGS = $(addprefix -I, $(INC_PATH))
 CFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""

@@ -1,5 +1,5 @@
 #include <vga.h>
-#include <nboard.h>
+#include <nvboard.h>
 #include <macro.h>
 #include <assert.h>
 

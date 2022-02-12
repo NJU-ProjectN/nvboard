@@ -73,17 +73,17 @@ SDL_Rect btn_rects[6] = {
   {BTNC_X, BTNC_Y - 2 * (BTNC_HEIGHT + BTNC_SEP), BTNC_WIDTH, BTNC_HEIGHT}
 };
 
-extern std::string nboard_home;
+extern std::string nvboard_home;
 
 void load_background(SDL_Renderer *renderer) {
-  sfpga_background = IMG_Load((nboard_home + "/pic/" + BG_PATH).c_str());
+  sfpga_background = IMG_Load((nvboard_home + "/pic/" + BG_PATH).c_str());
   tfpga_background = SDL_CreateTextureFromSurface(renderer, sfpga_background);
   SDL_Rect rect_bg = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
   SDL_RenderCopy(renderer, tfpga_background, NULL, &rect_bg);
   
 #ifdef SEG_BKGND_ENA
 #ifdef SEG_BKGND_CUSTOM
-  sseg7_background = IMG_Load((nboard_home + "/pic/" + VSEGLED_BG_PATH).c_str());
+  sseg7_background = IMG_Load((nvboard_home + "/pic/" + VSEGLED_BG_PATH).c_str());
 #else
   sseg7_background = SDL_CreateRGBSurface(0, SEG_TOT_WIDTH, SEG_TOT_HEIGHT, 32, 0, 0, 0, 0);
   SDL_FillRect(sseg7_background, NULL, SDL_MapRGB(sseg7_background->format, 0x00, 0x00, 0x00));
@@ -102,17 +102,17 @@ void fill_rect_texture(SDL_Renderer *renderer, SDL_Surface **surface, SDL_Textur
 
 void load_texture(SDL_Renderer *renderer) {
   // buttons
-  sbutton_on = IMG_Load((nboard_home + "/pic/" + VBTN_ON_PATH).c_str());
+  sbutton_on = IMG_Load((nvboard_home + "/pic/" + VBTN_ON_PATH).c_str());
   assert(sbutton_on != nullptr);
   tbutton_on = SDL_CreateTextureFromSurface(renderer, sbutton_on);
-  sbutton_off = IMG_Load((nboard_home + "/pic/" + VBTN_OFF_PATH).c_str());
+  sbutton_off = IMG_Load((nvboard_home + "/pic/" + VBTN_OFF_PATH).c_str());
   assert(sbutton_off != nullptr);
   tbutton_off = SDL_CreateTextureFromSurface(renderer, sbutton_off);
 
   // switches
-  sswitch_on = IMG_Load((nboard_home + "/pic/" + VSW_ON_PATH).c_str());
+  sswitch_on = IMG_Load((nvboard_home + "/pic/" + VSW_ON_PATH).c_str());
   tswitch_on = SDL_CreateTextureFromSurface(renderer, sswitch_on);
-  sswitch_off = IMG_Load((nboard_home + "/pic/" + VSW_OFF_PATH).c_str());
+  sswitch_off = IMG_Load((nvboard_home + "/pic/" + VSW_OFF_PATH).c_str());
   tswitch_off = SDL_CreateTextureFromSurface(renderer, sswitch_off);
   
   // 7 segs

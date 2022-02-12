@@ -1,4 +1,4 @@
-#include <nboard.h>
+#include <nvboard.h>
 #include <Vtop.h>
 #include <vga.h>
 

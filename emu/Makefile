@@ -10,4 +10,4 @@ DIR = .
 TOPNAME = top
 
 # 需要在最后将NVBOARD的makefile包含进来
--include $(NBOARD_HOME)/Makefile
+-include $(NVBOARD_HOME)/Makefile

@@ -1,6 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <nboard.h>
+#include <nvboard.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/time.h>
@@ -15,7 +15,7 @@ static map<void *, vector<input_pin >> input_pin_map;
 static map<void *, vector<output_pin>> output_pin_map;
 map<input_pin, int> input_map;
 map<output_pin, int> output_map;
-string nboard_home;
+string nvboard_home;
 
 int read_event();
 
@@ -111,7 +111,7 @@ void nvboard_init() {
     // To avoid the SDL bugs on hby's linux
     //usleep(200000);
 
-    nboard_home = getenv("NBOARD_HOME");
+    nvboard_home = getenv("NVBOARD_HOME");
     
     load_background(main_renderer);
     load_texture(main_renderer);
