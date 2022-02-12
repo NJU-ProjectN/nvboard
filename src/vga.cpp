@@ -3,6 +3,7 @@
 #include <macro.h>
 #include <configs.h>
 #include <cstring>
+#include <assert.h>
 
 VGA_MODE vga_mod_accepted[NR_VGA_MODE] = {
   [VGA_MODE_640_480] = {
@@ -56,10 +57,32 @@ void VGA::update_state() {
     return;
   }
   if(vga_blank_n) {
-    int vga_r = output_map[output_pin::VGA_R];
-    int vga_g = output_map[output_pin::VGA_G];
-    int vga_b = output_map[output_pin::VGA_B];
+    int vga_r = (output_map[output_pin::VGA_R7] << 7) | 
+                (output_map[output_pin::VGA_R6] << 6) | 
+                (output_map[output_pin::VGA_R5] << 5) | 
+                (output_map[output_pin::VGA_R4] << 4) |
+                (output_map[output_pin::VGA_R3] << 3) | 
+                (output_map[output_pin::VGA_R2] << 2) | 
+                (output_map[output_pin::VGA_R1] << 1) | 
+                 output_map[output_pin::VGA_R0];
+    int vga_g = (output_map[output_pin::VGA_G7] << 7) | 
+                (output_map[output_pin::VGA_G6] << 6) | 
+                (output_map[output_pin::VGA_G5] << 5) | 
+                (output_map[output_pin::VGA_G4] << 4) |
+                (output_map[output_pin::VGA_G3] << 3) | 
+                (output_map[output_pin::VGA_G2] << 2) | 
+                (output_map[output_pin::VGA_G1] << 1) | 
+                 output_map[output_pin::VGA_G0];
+    int vga_b = (output_map[output_pin::VGA_B7] << 7) | 
+                (output_map[output_pin::VGA_B6] << 6) | 
+                (output_map[output_pin::VGA_B5] << 5) | 
+                (output_map[output_pin::VGA_B4] << 4) |
+                (output_map[output_pin::VGA_B3] << 3) | 
+                (output_map[output_pin::VGA_B2] << 2) | 
+                (output_map[output_pin::VGA_B1] << 1) | 
+                 output_map[output_pin::VGA_B0];
     uint32_t vga_rgb = (vga_r << 16) | (vga_g << 8) | (vga_b);
+    assert(vga_pos < vga_screen_width * vga_screen_height);
     pixels[vga_pos] = vga_rgb;
     vga_pos ++;
   }

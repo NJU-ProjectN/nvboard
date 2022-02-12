@@ -4,6 +4,7 @@
 #include <Vtop.h>
 #include <vga.h>
 
+#if 0
 static TOP_NAME dut;
 
 extern std::map<input_pin, int> input_map;
@@ -36,3 +37,4 @@ void dut_update() {
   dut.eval();
   update_output();
 }
+#endif

@@ -2,6 +2,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string>
+#include <vector>
+#include <map>
 #include <iostream>
 
 #include <nboard.h>
@@ -11,10 +13,17 @@
 #include <sys/time.h>
 #include <assert.h>
 
-SDL_Window *main_window = nullptr;
-SDL_Renderer *main_renderer = nullptr;
+using namespace std;
 
-std::string nboard_home;
+static SDL_Window *main_window = nullptr;
+static SDL_Renderer *main_renderer = nullptr;
+
+string nboard_home;
+
+map<input_pin, int> input_map;
+map<output_pin, int> output_map;
+static map<void *, vector<input_pin >> input_pin_map;
+static map<void *, vector<output_pin>> output_pin_map;
 
 static int read_event_flag = true;
 static int render_flag = true;
@@ -53,10 +62,16 @@ void nvboard_init(){
     init_components(main_renderer);
     init_gui(main_renderer);
     //dbg_wait_esc("finish init gui");
-    init_input();
-    init_output();
+    //init_input();
+    //init_output();
+    for (input_pin i = input_pin(0); i < input_pin::NR_INPUT_PINS; i = input_pin((int)i + 1)) {
+      input_map[i] = 0;
+    }
+    for (output_pin i = output_pin(0); i < output_pin::NR_OUTPUT_PINS; i = output_pin((int)i + 1)) {
+      output_map[i] = 0;
+    }
 
-    dut_update();
+    //dut_update();
     update_components(main_renderer);
     //dbg_wait_esc("finish update");
     struct sigaction s;
@@ -73,6 +88,7 @@ void nvboard_init(){
     assert(ret == 0);
 }
 
+#if 0
 void nvboard_update(output_pin pin, int val){
     output_map[pin] = val;
     update_components(main_renderer);
@@ -83,8 +99,9 @@ void nvboard_update(output_pin pin, int val){
 }
 
 int nvboard_getval(input_pin pin){
-    return input_map[pin];
+    return input_pin_map[pin];
 }
+#endif
 
 void nvboard_quit(){
     delete_components();
@@ -95,16 +112,89 @@ void nvboard_quit(){
 }
 
 
+#if 0
 void nvboard_render() {
     SDL_RenderPresent(main_renderer);
 }
+#endif
 
-int nvboard_event_handler(){
+static int nvboard_event_handler() {
     if(!read_event_flag) return 0;
     read_event_flag = false;
     int ev = read_event();
     if(ev != -1){
         update_components(main_renderer);
+    } else {
+      exit(0);
     }
     return ev;
+}
+
+void nvboard_bind_pin(vector<output_pin> &pin, void *signal) {
+  output_pin_map[signal] = pin;
+}
+
+void nvboard_bind_pin(vector<input_pin> &pin, void *signal) {
+  input_pin_map[signal] = pin;
+}
+
+void nvboard_bind_pin(output_pin pin, void *signal) {
+  vector<output_pin> p = {pin};
+  nvboard_bind_pin(p, signal);
+}
+
+void nvboard_bind_pin(input_pin pin, void *signal) {
+  vector<input_pin> p = {pin};
+  nvboard_bind_pin(p, signal);
+}
+
+static void nvboard_update_all_input() {
+  for (auto p = input_pin_map.begin(); p != input_pin_map.end(); p ++) {
+    void *ptr = p->first;
+    vector<input_pin> &pins = p->second;
+    uint32_t size = pins.size();
+    assert(size <= 64);
+    uint64_t val = 0;
+    for (auto ppins = pins.begin(); ppins != pins.end(); ppins ++) {
+      val |= input_map[*(ppins)];
+      val <<= 1;
+    }
+
+    if (size <= 8) { *(uint8_t *)ptr = val; }
+    else if (size <= 16) { *(uint16_t *)ptr = val; }
+    else if (size <= 32) { *(uint32_t *)ptr = val; }
+    else if (size <= 64) { *(uint64_t *)ptr = val; }
+  }
+}
+
+static void nvboard_update_all_output() {
+  for (auto p = output_pin_map.begin(); p != output_pin_map.end(); p ++) {
+    void *ptr = p->first;
+    vector<output_pin> &pins = p->second;
+    uint32_t size = pins.size();
+    assert(size <= 64);
+    uint64_t val = 0;
+    if (size <= 8) { val = *(uint8_t *)ptr; }
+    else if (size <= 16) { val = *(uint16_t *)ptr; }
+    else if (size <= 32) { val = *(uint32_t *)ptr; }
+    else if (size <= 64) { val = *(uint64_t *)ptr; }
+
+    for (auto ppins = pins.rbegin(); ppins != pins.rend(); ppins ++) {
+      output_map[*(ppins)] = val & 1;
+      val >>= 1;
+    }
+  }
+}
+
+void nvboard_update_all() {
+  nvboard_update_all_input();
+  nvboard_update_all_output();
+
+  update_components(main_renderer);
+  if(render_flag) {
+    SDL_RenderPresent(main_renderer);
+    render_flag = false;
+  }
+
+  nvboard_event_handler();
 }

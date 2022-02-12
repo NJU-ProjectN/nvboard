@@ -2,10 +2,7 @@
 #define _VFPGA_CONSTRS_H
 
 #include <map>
-
-void init_input();
-void init_output();
-void dut_update();
+#include <vector>
 
 #define CLK_INPUT CLK
 
@@ -32,7 +29,9 @@ void dut_update();
 //#define UART_OUTPUT
 
 #define VGA_OUTPUT VGA_CLK, VGA_VSYNC, VGA_HSYNC, VGA_BLANK_N,  \
-                   VGA_R, VGA_G, VGA_B
+                   VGA_R0, VGA_R1, VGA_R2, VGA_R3, VGA_R4, VGA_R5, VGA_R6, VGA_R7, \
+                   VGA_G0, VGA_G1, VGA_G2, VGA_G3, VGA_G4, VGA_G5, VGA_G6, VGA_G7, \
+                   VGA_B0, VGA_B1, VGA_B2, VGA_B3, VGA_B4, VGA_B5, VGA_B6, VGA_B7
 
 enum class input_pin{
   BTN_INPUT,
@@ -52,5 +51,12 @@ enum class output_pin{
 
 extern std::map<input_pin, int> input_map;
 extern std::map<output_pin, int> output_map;
+
+using namespace std;
+
+void nvboard_bind_pin(vector <output_pin> &pin, void *signal);
+void nvboard_bind_pin(vector <input_pin> &pin, void *signal);
+void nvboard_bind_pin(output_pin pin, void *signal);
+void nvboard_bind_pin(input_pin pin, void *signal);
 
 #endif

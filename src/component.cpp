@@ -254,7 +254,7 @@ void init_components(SDL_Renderer *renderer) {
   rect_ptr = new SDL_Rect;
   *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
   ptr->set_rect(rect_ptr, 0);
-  for (output_pin p = output_pin::VGA_CLK; p <= output_pin::VGA_B; p = output_pin(int(p) + 1)) {
+  for (output_pin p = output_pin::VGA_CLK; p <= output_pin::VGA_B7; p = output_pin(int(p) + 1)) {
     ptr->add_output(p);
   }
   components.push_back(ptr);
