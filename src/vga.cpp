@@ -1,8 +1,6 @@
 #include <vga.h>
-#include <constrs.h>
+#include <nboard.h>
 #include <macro.h>
-#include <configs.h>
-#include <cstring>
 #include <assert.h>
 
 VGA_MODE vga_mod_accepted[NR_VGA_MODE] = {

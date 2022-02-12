@@ -9,8 +9,6 @@
 #include <configs.h>
 #include <component.h>
 
-#include <event.h>
-
 extern std::vector<Component *> components;
 
 SDL_Surface *sbutton_on, *sbutton_off;

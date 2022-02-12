@@ -5,12 +5,8 @@
 static TOP_NAME dut;
 
 void nvboard_init();
-//void nvboard_update(output_pin pin, int val);
 void nvboard_quit();
 void nvboard_update_all();
-//int nvboard_getval(input_pin pin);
-//void nvboard_render();
-//int nvboard_event_handler();
 
 int main() {
   nvboard_bind_pin(output_pin::VGA_CLK,     &dut.VGA_CLK);

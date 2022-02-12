@@ -1,15 +1,12 @@
-#include <event.h>
 #include <SDL2/SDL.h>
 #include <map>
 #include <string>
 #include <iostream>
 #include <vector>
-#include <cassert>
 #include <component.h>
 
 extern std::vector<Component *> components;
 extern std::map<input_pin, int> input_map;
-extern std::map<output_pin, int> output_map;
 
 static int keydown_handler(const SDL_Event &ev) {
   if (ev.key.keysym.sym == SDLK_ESCAPE) {
@@ -115,9 +112,6 @@ static int keyup_handler(const SDL_Event &ev) {
   return 0;
 }
 
-extern std::string input_btns[];
-extern std::string input_switches[];
-
 static int mousedown_handler(const SDL_Event &ev) {
   int x_pos = ev.button.x;
   int y_pos = ev.button.y;
@@ -186,13 +180,4 @@ int read_event() {
     break;
   }
   return 0;
-}
-
-void dbg_wait_esc(std::string s) {
-  std::cout << s << std::endl;
-  while (1) {
-    if (read_event() == -1) {
-      break;
-    }
-  }
 }
