@@ -76,7 +76,7 @@ static void nvboard_update_all_output() {
   }
 }
 
-void nvboard_update_all() {
+void nvboard_update() {
   nvboard_update_all_input();
   nvboard_update_all_output();
 

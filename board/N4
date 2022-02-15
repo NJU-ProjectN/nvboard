@@ -1,0 +1,97 @@
+input CLK
+
+input BTNC
+input BTNU
+input BTND
+input BTNL
+input BTNR
+
+input RST
+
+input SW0
+input SW1
+input SW2
+input SW3
+input SW4
+input SW5
+input SW6
+input SW7
+input SW8
+input SW9
+input SW10
+input SW11
+input SW12
+input SW13
+input SW14
+input SW15
+
+output LD0
+output LD1
+output LD2
+output LD3
+output LD4
+output LD5
+output LD6
+output LD7
+output LD8
+output LD9
+output LD10
+output LD11
+output LD12
+output LD13
+output LD14
+output LD15
+
+output R16
+output G16
+output B16
+output R17
+output G17
+output B17
+
+output AN0
+output AN1
+output AN2
+output AN3
+output AN4
+output AN5
+output AN6
+output AN7
+
+output SEGA
+output SEGB
+output SEGC
+output SEGD
+output SEGE
+output SEGF
+output SEGG
+output DECP
+
+output VGA_CLK
+output VGA_VSYNC
+output VGA_HSYNC
+output VGA_BLANK_N
+output VGA_R0
+output VGA_R1
+output VGA_R2
+output VGA_R3
+output VGA_R4
+output VGA_R5
+output VGA_R6
+output VGA_R7
+output VGA_G0
+output VGA_G1
+output VGA_G2
+output VGA_G3
+output VGA_G4
+output VGA_G5
+output VGA_G6
+output VGA_G7
+output VGA_B0
+output VGA_B1
+output VGA_B2
+output VGA_B3
+output VGA_B4
+output VGA_B5
+output VGA_B6
+output VGA_B7

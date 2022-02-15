@@ -37,10 +37,15 @@ $(DST_BIN): $(SRCS) $(NBD_ARCHIVE)
 		$(addprefix -CFLAGS , $(CFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
 		--Mdir $(OBJ_DIR) --exe -o $(DST_EXE)
 
-run: $(DST_BIN)
+CONS_FILES ?= $(shell find $(SRC_DIR) -name "*.cons")
+
+cons: $(CONS_FILES)
+	python $(NVBOARD_HOME)/scripts/auto_pin_bind.py $(CONS_FILES)
+
+run: $(DST_BIN) cons
 	@$(DST_BIN)
 
 clean:
 	rm -rf $(OBJ_DIR)
 
-.PHONY: clean run
+.PHONY: clean run cons

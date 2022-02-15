@@ -1,3 +1,4 @@
 !src/*
 !Makefile
 !makefile
+auto_bind.cpp
