@@ -46,8 +46,8 @@ static void nvboard_update_all_input() {
     assert(size <= 64);
     uint64_t val = 0;
     for (auto ppins = pins.begin(); ppins != pins.end(); ppins ++) {
-      val |= input_map[*(ppins)];
       val <<= 1;
+      val |= input_map[*(ppins)];
     }
 
     if (size <= 8) { *(uint8_t *)ptr = val; }
