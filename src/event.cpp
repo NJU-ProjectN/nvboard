@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <component.h>
+#include <keyboard.h>
 
 extern std::vector<Component *> components;
 extern std::map<input_pin, int> input_map;
@@ -33,6 +34,11 @@ static void mouseup_handler(const SDL_Event &ev) {
   }
 }
 
+static void key_handler(uint8_t scancode, int is_keydown){
+  extern KEYBOARD* kb;
+  kb->push_key(scancode, is_keydown);
+}
+
 // Return -1 when esc is pressed.
 // Else return whether buttons / switches are pressed.
 int read_event() {
@@ -45,6 +51,9 @@ int read_event() {
       break;
     case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
     case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
+    case SDL_KEYDOWN:
+    case SDL_KEYUP:
+      key_handler(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN); break;
   }
   return 0;
 }

@@ -95,3 +95,8 @@ output VGA_B4
 output VGA_B5
 output VGA_B6
 output VGA_B7
+
+input PS2_CLK
+input PS2_DAT
+input PS2_CLK2
+input PS2_DAT2

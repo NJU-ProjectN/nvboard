@@ -3,3 +3,4 @@
 #include <render.h>
 #include <component.h>
 #include <vga.h>
+#include <keyboard.h>

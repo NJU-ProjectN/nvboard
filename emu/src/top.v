@@ -1,6 +1,8 @@
 module top (
     input clk,
     input [7:0] sw,
+    input ps2_clk,
+    input ps2_data,
     output [15:0] ledr,
     output VGA_CLK,
     output VGA_HSYNC,
@@ -35,6 +37,13 @@ vga_ctrl my_vga_ctrl(
     .vga_r(VGA_R),
     .vga_g(VGA_G),
     .vga_b(VGA_B)
+);
+
+ps2_keyboard my_keyboard(
+    .clk(clk),
+    .resetn(1),
+    .ps2_clk(ps2_clk),
+    .ps2_data(ps2_data)
 );
 
 vmem my_vmem(

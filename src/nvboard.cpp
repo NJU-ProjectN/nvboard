@@ -55,6 +55,8 @@ static void nvboard_update_all_input() {
     else if (size <= 32) { *(uint32_t *)ptr = val; }
     else if (size <= 64) { *(uint64_t *)ptr = val; }
   }
+  static int pre_clk;
+  pre_clk = input_map[input_pin::PS2_CLK];
 }
 
 static void nvboard_update_all_output() {

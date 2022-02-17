@@ -169,9 +169,12 @@ void init_gui(SDL_Renderer *renderer) {
     ptr->update_gui();
   }
 }
-
+#include <keyboard.h>
 void update_components(SDL_Renderer *renderer) {
   for (auto ptr : components) {
     ptr->update_state();
   }
+  extern KEYBOARD* kb;
+  kb->update_state();
+
 }
