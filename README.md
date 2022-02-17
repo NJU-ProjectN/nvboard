@@ -1,31 +1,32 @@
 # nvboard
 
-# 近期迭代较快，readme的更新可能不够及时，见谅
 #### 介绍
-用SDL开发的虚拟FPGA开发板，配合Verilator使用
+
+nvboard是基于SDL开发的虚拟FPGA开发板，可以在Verilator仿真环境中模拟FPGA，支持RGB LED，七段数码管，开关，键盘和VGA。
 
 #### 软件架构
+
 软件架构说明
+
 ```
 .
+├── board                   开发板配置文件
+│   └── ...
 ├── emu                     演示项目目录
 │   └── ...
 ├── include
-│   ├── clock.h
-│   ├── configs.h
-│   ├── constrs.h
-│   ├── nvboard.h
-│   └── render.h
+│   ├── at_scancode.h
+│   ├── component.h
+│   ├── configs.h
+│   ├── constrs.h
+│   ├── keyboard.h
+│   ├── macro.h
+│   ├── nvboard.h
+│   ├── render.h
+│   └── vga.h
 ├── LICENSE
 ├── Makefile                NVBOARD项目构建makefile
-├── pic
-│   ├── vbg_1.png
-│   ├── vbg_2.png
-│   ├── vbtn_off.png
-│   ├── vbtn_on.png
-│   ├── vsegled_bg.png
-│   ├── vsw_off.png
-│   └── vsw_on.png
+├── pic                     NVBOARD图片信息
 ├── README.en.md
 ├── README.md
 └── src                     NVBORAD源码
@@ -38,10 +39,39 @@
 
 #### 安装教程
 
-1.  将项目拷贝到本地，`git clone https://github.com/NJU-ProjectN/nvboard.git`；
-2.  接下来，把本项目的目录设置成环境变量`NVBOARD_HOME`。
+1. 将项目拷贝到本地，`git clone https://github.com/NJU-ProjectN/nvboard.git`；
+2. 接下来，把本项目的目录设置成环境变量 `NVBOARD_HOME`。
 
-#### 使用说明
+#### 示例
+
+本项目下的emu是一个演示项目，在该目录下通过 `make run` 命令可运行该项目。
+
+### 使用说明
+
+#### 编写C++文件
+
+NVBoard提供了以下几组API
+
+- nvboard_init: 初始化nvboard
+- nvboard_quit: 退出nvboard
+- nvboard_bind_pin(pin, signal): 将HDL的信号signal连接到nvboard里的引脚pin上
+- nvboard_update: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数
+
+为了方便进行信号的绑定，可以在你的项目目录下编写约束文件(.cons)，通过命令 `make cons` 能够依据编写的约束文件生成c++文件，
+调用该文件中的 `nvboard_bind_pins`函数即可完成所有信号的绑定。约束文件的格式如下所示
+
+```
+top=top_name
+
+signal pin
+
+signal (pin1,pin2,... pink)
+```
+
+在约束文件的开头，需要指定指定顶层模块名为top_name。约束文件支持两种信号绑定方式，`signal pin`表示将顶层模块的signal信号绑定到引脚pin上，
+`signal (pin1,pin2,...,pink)`表示将顶层模块的signal信号的每一位从高到低依次绑定到 `pin2,pin1,...,pink`上。
+
+可以查看在该项目的board目录下的板卡配置文件中查看NVBoard的引脚信息。
 
 ##### 编写makefie
 
@@ -55,7 +85,6 @@ DIR = .
 ## 参与verilator编译的文件默认为$(SRC_DIR)下的所有*.v, *.c, *.cc, *.cpp文件，可手动指定
 ### SRCS ?= $(shell find $(SRC_DIR) -name "*.v" -or -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 
-
 # 需要指定顶层模块名称
 TOPNAME = top
 
@@ -64,56 +93,16 @@ TOPNAME = top
 
 ```
 
-##### 编写项目文件
-
-```
-//top.v
-module top (
-  input clk,
-  input reset,
-  output reg [3:0] out);
-  
-  always @(posedge clk) begin
-    out <= reset ? 0 : out + 1;
-  end  
-endmodule
-```
-
-这是一个简单的计数器。你可以将其放入$SRC_DIR文件夹中
-
-##### 编写两个辅助函数
-
-接下来，你需要在src文件中新建一个c++代码文件(如`update.cpp`)。
-
-在`emu`下有一个`update.cpp`的示例。
-可以看到`input_map`和`output_map`，这两个`std::map`就是nvboard和verilog通信的渠道。
-
-NVBOARD会在输入有了变化或时钟边沿处调用`dut_update()`，当你在虚拟FPGA上改变输入（比如按下`btnc`）的时候，
-`input_map`里面对应的键值会随之更新，
-
-接下来`dut_update()`就会执行`update_input()`， 把`input_map`里面的键值赋值给模块的引脚，让你编写的模块能够收到这个改变。
-
-之后，模块会进行模拟计算，最终将结果更新到输出引脚。
-
-模块得到新的输出之后，`dut_update()`会执行`update_output()`，把模块的输出存入`output_map`。
-
-`dut_update()`调用结束后，nvboard会把模块的输出同步到GUI上。
-
-在`update.cpp`里，你需要编写以下内容
-- 创建一个顶层模块对象`dut`
-- 你需要手动编写辅助函数`dut_update()`，其行为如下：
-  1. 从`input_map`中更新顶层模块输入
-  2. 执行模块模拟过程`dut.eval();`
-  3. 向`output_map`中更新顶层模块输出
-
-##### 体验虚拟FPGA
+##### 体验NVBoard
 
 最后，你只需要在项目目录下执行
+
 ```shell
 make run
 ```
+
 命令，即可在NVBOARD上模拟运行你自己的verilog代码！
 
 #### 特技
 
-1.  可以用`include/configs.h`选择贴图，让自己的虚拟FPGA开发板更有特色，贴图放在`pic`目录下；
+1. 可以用 `include/configs.h`选择贴图，让自己的虚拟FPGA开发板更有特色，贴图放在 `pic`目录下；
