@@ -20,11 +20,15 @@
 
 #define RGB_LEDS_OUTPUT R16, G16, B16, R17, G17, B17
 
-#define SEG7_ENBS_OUTPUT AN0, AN1, AN2, AN3, \
-                         AN4, AN5, AN6, AN7
 
-#define SEG7_SEGS_OUTPUT SEGA, SEGB, SEGC, SEGD, \
-                         SEGE, SEGF, SEGG, DECP
+#define SEG7_SEGS_OUTPUT SEG0A, SEG0B, SEG0C, SEG0D, SEG0E, SEG0F, SEG0G, DEC0P, \
+                         SEG1A, SEG1B, SEG1C, SEG1D, SEG1E, SEG1F, SEG1G, DEC1P, \
+                         SEG2A, SEG2B, SEG2C, SEG2D, SEG2E, SEG2F, SEG2G, DEC2P, \
+                         SEG3A, SEG3B, SEG3C, SEG3D, SEG3E, SEG3F, SEG3G, DEC3P, \
+                         SEG4A, SEG4B, SEG4C, SEG4D, SEG4E, SEG4F, SEG4G, DEC4P, \
+                         SEG5A, SEG5B, SEG5C, SEG5D, SEG5E, SEG5F, SEG5G, DEC5P, \
+                         SEG6A, SEG6B, SEG6C, SEG6D, SEG6E, SEG6F, SEG6G, DEC6P, \
+                         SEG7A, SEG7B, SEG7C, SEG7D, SEG7E, SEG7F, SEG7G, DEC7P
 
 //#define UART_OUTPUT
 

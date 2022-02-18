@@ -58,14 +58,77 @@ output AN5
 output AN6
 output AN7
 
-output SEGA
-output SEGB
-output SEGC
-output SEGD
-output SEGE
-output SEGF
-output SEGG
-output DECP
+output SEG0A
+output SEG0B
+output SEG0C
+output SEG0D
+output SEG0E
+output SEG0F
+output SEG0G
+output DEC0P
+
+output SEG1A
+output SEG1B
+output SEG1C
+output SEG1D
+output SEG1E
+output SEG1F
+output SEG1G
+output DEC1P
+
+output SEG2A
+output SEG2B
+output SEG2C
+output SEG2D
+output SEG2E
+output SEG2F
+output SEG2G
+output DEC2P
+
+output SEG3A
+output SEG3B
+output SEG3C
+output SEG3D
+output SEG3E
+output SEG3F
+output SEG3G
+output DEC3P
+
+output SEG4A
+output SEG4B
+output SEG4C
+output SEG4D
+output SEG4E
+output SEG4F
+output SEG4G
+output DEC4P
+
+output SEG5A
+output SEG5B
+output SEG5C
+output SEG5D
+output SEG5E
+output SEG5F
+output SEG5G
+output DEC5P
+
+output SEG6A
+output SEG6B
+output SEG6C
+output SEG6D
+output SEG6E
+output SEG6F
+output SEG6G
+output DEC6P
+
+output SEG7A
+output SEG7B
+output SEG7C
+output SEG7D
+output SEG7E
+output SEG7F
+output SEG7G
+output DEC7P
 
 output VGA_CLK
 output VGA_VSYNC

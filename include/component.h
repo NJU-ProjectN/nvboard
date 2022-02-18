@@ -77,4 +77,7 @@ void init_components(SDL_Renderer *renderer);
 
 void delete_components();
 
+#define GET_SEGA(i) (output_pin(int(output_pin::SEG0A) + 8 * i))
+#define GET_DECP(i) (output_pin(int(output_pin::SEG0A) + 8 * i + 7))
+
 #endif

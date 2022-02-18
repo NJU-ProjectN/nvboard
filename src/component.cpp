@@ -126,12 +126,8 @@ void SEGS7::update_gui() {
 
 void SEGS7::update_state() {
   int newval = 0;
-  if (output_map[get_output(8)] == 0) {
-    newval = 0x5555;
-  } else {
-    for (int i = 0; i < 8; ++i) {
-      newval |= (output_map[get_output(i)]) ? (1 << (i << 1)) : (1 << (i << 1 | 1));
-    }
+  for (int i = 0; i < 8; ++i) {
+    newval |= (output_map[get_output(i)]) ? (1 << (i << 1)) : (1 << (i << 1 | 1));
   }
   if (newval != get_state()) {
     set_state(newval);
@@ -168,7 +164,7 @@ void init_components(SDL_Renderer *renderer) {
   // init buttons
   for (int i = 0; i < 6; ++i) {
     ptr = new Component(renderer, 2, 0, INPUT_TYPE, BUTTON_TYPE);
-    
+
     // off
     rect_ptr = new SDL_Rect;
     *rect_ptr = btn_rects[i];
@@ -240,10 +236,9 @@ void init_components(SDL_Renderer *renderer) {
       ptr->set_rect(rect_ptr, j << 1 | 1);
     }
 
-    for (output_pin p = output_pin::SEGA; p <= output_pin::DECP; p = output_pin(int(p) + 1)) {
+    for (output_pin p = GET_SEGA(i); p <= GET_DECP(i); p = output_pin(int(p) + 1)) {
       ptr->add_output(p);
     }
-    ptr->add_output(output_pin(int(output_pin::AN0) + i));
     components.push_back(ptr);
   }
 
