@@ -7,7 +7,7 @@ static TOP_NAME dut;
 void nvboard_init();
 void nvboard_quit();
 void nvboard_update();
-void nvboard_bind_pins(Vtop* top);
+void nvboard_bind_all_pins(Vtop* top);
 
 int main() {
 
