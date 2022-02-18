@@ -39,8 +39,8 @@ enum class input_pin{
   BTN_INPUT,
   SW_INPUT,
   CLK_INPUT,
+  KEYBOARD_INPUT,
   NR_INPUT_PINS,
-  KEYBOARD_INPUT
 };
 
 enum class output_pin{
