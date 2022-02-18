@@ -262,7 +262,7 @@ void init_components(SDL_Renderer *renderer) {
   // init keyboard
   extern KEYBOARD* kb;
   kb = new KEYBOARD(renderer, 0, 0, INPUT_TYPE, KEYBOARD_TYPE);
-  for (input_pin p = input_pin::PS2_CLK; p <= input_pin::PS2_DAT2; p = input_pin(int(p) + 1)){
+  for (input_pin p = input_pin::PS2_CLK; p <= input_pin::PS2_DAT; p = input_pin(int(p) + 1)){
     kb->add_input(p);
   }
   // components.push_back(kb);

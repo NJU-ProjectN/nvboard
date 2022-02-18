@@ -33,7 +33,7 @@
                    VGA_G0, VGA_G1, VGA_G2, VGA_G3, VGA_G4, VGA_G5, VGA_G6, VGA_G7, \
                    VGA_B0, VGA_B1, VGA_B2, VGA_B3, VGA_B4, VGA_B5, VGA_B6, VGA_B7
 
-#define KEYBOARD_INPUT PS2_CLK, PS2_DAT, PS2_CLK2, PS2_DAT2
+#define KEYBOARD_INPUT PS2_CLK, PS2_DAT
 
 enum class input_pin{
   BTN_INPUT,

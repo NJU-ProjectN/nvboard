@@ -98,5 +98,3 @@ output VGA_B7
 
 input PS2_CLK
 input PS2_DAT
-input PS2_CLK2
-input PS2_DAT2
