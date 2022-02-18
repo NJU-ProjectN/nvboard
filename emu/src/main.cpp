@@ -11,7 +11,7 @@ void nvboard_bind_pins(Vtop* top);
 
 int main() {
 
-  nvboard_bind_pins(&dut);
+  nvboard_bind_all_pins(&dut);
   nvboard_init();
 
   while(1){

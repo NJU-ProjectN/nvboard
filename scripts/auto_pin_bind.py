@@ -76,7 +76,7 @@ def bind_vec_pins(f, inout, signal, pins):
 
 
 def init_info(f, top):
-  write_dep(bind_f, "#include <nvboard.h>\n#include \"V" + top + ".h\"\n\nvoid nvboard_bind_pins(V" + top + "* top){\n")
+  write_dep(bind_f, "#include <nvboard.h>\n#include \"V" + top + ".h\"\n\nvoid nvboard_bind_all_pins(V" + top + "* top){\n")
 
 dep = 0
 start_of_line = True
