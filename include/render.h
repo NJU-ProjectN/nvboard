@@ -2,10 +2,43 @@
 #define VFPGA_RENDER_H
 
 #include <SDL2/SDL.h>
+#include <vga.h>
+#include <configs.h>
 
-#define WINDOW_WIDTH   640
-#define WINDOW_HEIGHT  480
+#ifdef MODE_NEMU
+#define WINDOW_WIDTH   800
+#define WINDOW_HEIGHT  600
 
+#define SWITCH_X       100
+#define SWITCH_Y       400
+#define SWITCH_SEP     10
+#define SWITCH_WIDTH   20
+#define SWITCH_HEIGHT  40
+
+#define BTNC_X         650
+#define BTNC_Y         200
+#define BTNC_SEP       20
+#define BTNC_WIDTH     20
+#define BTNC_HEIGHT    20
+
+#define LED_X          105
+#define LED_Y          360
+#define LED_SEP        20
+#define LED_WIDTH      10
+#define LED_HEIGHT     4
+
+#define SEG_X          100
+#define SEG_Y          240
+
+#define SEG_VER_WIDTH  2
+#define SEG_VER_HEIGHT 40
+#define SEG_HOR_WIDTH  40
+#define SEG_HOR_HEIGHT 2
+#define SEG_DOT_WIDTH  SEG_VER_WIDTH
+#define SEG_DOT_HEIGHT SEG_HOR_HEIGHT
+#else
+#define WINDOW_WIDTH   VGA_DEFAULT_WIDTH
+#define WINDOW_HEIGHT  VGA_DEFAULT_HEIGHT
 #define SWITCH_X       80
 #define SWITCH_Y       400
 #define SWITCH_SEP     10
@@ -33,6 +66,8 @@
 #define SEG_HOR_HEIGHT 2
 #define SEG_DOT_WIDTH  SEG_VER_WIDTH
 #define SEG_DOT_HEIGHT SEG_HOR_HEIGHT
+#endif
+
 
 #define SEG_SEP        2
 

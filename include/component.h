@@ -72,9 +72,11 @@ public:
   virtual void update_gui();
   virtual void update_state();
 };
-
+#ifdef MODE_NEMU
+void init_components(SDL_Renderer *renderer, uint32_t* vmem, int MODE800x600);
+#else
 void init_components(SDL_Renderer *renderer);
-
+#endif
 void delete_components();
 
 #define GET_SEGA(i) (output_pin(int(output_pin::SEG0A) + 8 * i))

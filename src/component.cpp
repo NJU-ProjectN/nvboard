@@ -157,6 +157,114 @@ SDL_Rect operator+(const SDL_Rect &A, const SDL_Rect &B) {
 
 SDL_Texture *segs_texture(int index, int val);
 
+#ifdef MODE_NEMU
+void init_components(SDL_Renderer *renderer, uint32_t* vmem, int MODE800x600) {
+  Component *ptr = nullptr;
+  SDL_Rect *rect_ptr = nullptr;
+
+  // init buttons
+  for (int i = 0; i < 6; ++i) {
+    ptr = new Component(renderer, 2, 0, INPUT_TYPE, BUTTON_TYPE);
+
+    // off
+    rect_ptr = new SDL_Rect;
+    *rect_ptr = btn_rects[i];
+    ptr->set_rect(rect_ptr, 0);
+    ptr->set_texture(tbutton_off, 0);
+
+    // on
+    rect_ptr = new SDL_Rect;
+    *rect_ptr = btn_rects[i];
+    ptr->set_rect(rect_ptr, 1);
+    ptr->set_texture(tbutton_on, 1);
+
+    ptr->add_input(input_pin(int(input_pin::BTNC) + i));
+    components.push_back(ptr);
+  }
+
+  // init switches
+  for (int i = 0; i < 16; ++i) {
+    ptr = new Component(renderer, 2, 0, INPUT_TYPE, SWICTH_TYPE);
+
+    // off
+    rect_ptr = new SDL_Rect;
+    *rect_ptr = (SDL_Rect){SWITCH_X + (15 - i) * (SWITCH_WIDTH + SWITCH_SEP), SWITCH_Y, SWITCH_WIDTH, SWITCH_HEIGHT};
+    ptr->set_rect(rect_ptr, 0);
+    ptr->set_texture(tswitch_off, 0);
+
+    // on
+    rect_ptr = new SDL_Rect;
+    *rect_ptr = (SDL_Rect){SWITCH_X + (15 - i) * (SWITCH_WIDTH + SWITCH_SEP), SWITCH_Y, SWITCH_WIDTH, SWITCH_HEIGHT};
+    ptr->set_rect(rect_ptr, 1);
+    ptr->set_texture(tswitch_on, 1);
+
+    ptr->add_input(input_pin(int(input_pin::SW0) + i));
+    components.push_back(ptr);
+  }
+
+  // init naive leds
+  for (int i = 0; i < 16; ++i) {
+    ptr = new Component(renderer, 2, 0, OUTPUT_TYPE, NAIVE_LED_TYPE);
+
+    // off
+    rect_ptr = new SDL_Rect;
+    *rect_ptr = (SDL_Rect){LED_X + (15 - i) * (LED_WIDTH + LED_SEP), LED_Y, LED_WIDTH, LED_HEIGHT};
+    ptr->set_rect(rect_ptr, 0);
+    ptr->set_texture(tled_off, 0);
+
+    // on
+    rect_ptr = new SDL_Rect;
+    *rect_ptr = (SDL_Rect){LED_X + (15 - i) * (LED_WIDTH + LED_SEP), LED_Y, LED_WIDTH, LED_HEIGHT};
+    ptr->set_rect(rect_ptr, 1);
+    ptr->set_texture(tled_g, 1);
+
+    ptr->add_output(output_pin(int(output_pin::LD0) + i));
+    components.push_back(ptr);
+  }
+
+  // init 7-segment display
+  for (int i = 0; i < 8; ++i) {
+    SDL_Rect mv = {(7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_SEP * 4), 0, 0, 0};
+    ptr = new SEGS7(renderer, 16, 0x5555, OUTPUT_TYPE, SEGS7_TYPE);
+    for (int j = 0; j < 8; ++j) {
+      rect_ptr = new SDL_Rect;
+      *rect_ptr = mv + segs_rect[j];
+      ptr->set_texture(segs_texture(j, 0), j << 1 | 0);
+      ptr->set_rect(rect_ptr, j << 1 | 0);
+      rect_ptr = new SDL_Rect;
+      *rect_ptr = mv + segs_rect[j];
+      ptr->set_texture(segs_texture(j, 1), j << 1 | 1);
+      ptr->set_rect(rect_ptr, j << 1 | 1);
+    }
+
+    for (output_pin p = GET_SEGA(i); p <= GET_DECP(i); p = output_pin(int(p) + 1)) {
+      ptr->add_output(p);
+    }
+    components.push_back(ptr);
+  }
+
+#ifdef VGA_ENA
+  // init vga
+  ptr = new VGA(renderer, 1, 0, OUTPUT_TYPE, VGA_TYPE, vmem, MODE800x600);
+  rect_ptr = new SDL_Rect;
+  *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+  ptr->set_rect(rect_ptr, 0);
+  for (output_pin p = output_pin::VGA_CLK; p <= output_pin::VGA_B7; p = output_pin(int(p) + 1)) {
+    ptr->add_output(p);
+  }
+  components.push_back(ptr);
+#endif
+
+  // init keyboard
+  extern KEYBOARD* kb;
+  kb = new KEYBOARD(renderer, 0, 0, INPUT_TYPE, KEYBOARD_TYPE);
+  for (input_pin p = input_pin::PS2_CLK; p <= input_pin::PS2_DAT; p = input_pin(int(p) + 1)){
+    kb->add_input(p);
+  }
+  // components.push_back(kb);
+
+}
+#else
 void init_components(SDL_Renderer *renderer) {
   Component *ptr = nullptr;
   SDL_Rect *rect_ptr = nullptr;
@@ -263,6 +371,7 @@ void init_components(SDL_Renderer *renderer) {
   // components.push_back(kb);
 
 }
+#endif
 
 void delete_components() {
   for (auto comp_ptr : components) {

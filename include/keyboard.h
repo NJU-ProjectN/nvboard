@@ -32,6 +32,7 @@ class KEYBOARD : public Component{
     KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
     ~KEYBOARD();
     void push_key(uint8_t scancode, bool is_keydown);
+    uint8_t pop_key(bool* succ);
     virtual void update_state();
 };
 

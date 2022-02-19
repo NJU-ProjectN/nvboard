@@ -78,6 +78,73 @@ static void nvboard_update_all_output() {
   }
 }
 
+#ifdef MODE_NEMU
+extern "C" {
+  void nvboard_update() {
+
+    if(render_flag) {
+      update_components(main_renderer);
+      SDL_RenderPresent(main_renderer);
+      render_flag = false;
+    }
+
+    nvboard_event_handler();
+  }
+
+  uint8_t nvboard_get_key(bool* succ){
+    extern KEYBOARD* kb;
+    return kb->pop_key(succ);
+  }
+
+  void nvboard_init(uint32_t* vmem, int MODE800x600) {
+    printf("nvboard v0.2\n");
+    // init SDL and SDL_image
+    SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+    IMG_Init(IMG_INIT_PNG);
+
+    main_window = SDL_CreateWindow("nvboard", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH * 2, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    main_renderer = SDL_CreateRenderer(main_window, -1,
+    #ifdef VSYNC
+        SDL_RENDERER_PRESENTVSYNC |
+    #endif
+    #ifdef HARDWARE_ACC
+        SDL_RENDERER_ACCELERATED |
+    #else
+        SDL_RENDERER_SOFTWARE |
+    #endif
+        0
+    );
+
+    nvboard_home = getenv("NVBOARD_HOME");
+
+    load_background(main_renderer);
+    load_texture(main_renderer);
+    init_components(main_renderer, vmem, MODE800x600);
+    init_gui(main_renderer);
+
+    update_components(main_renderer);
+    struct sigaction s;
+    memset(&s, 0, sizeof(s));
+    s.sa_handler = alarm_sig_handler;
+    int ret = sigaction(SIGVTALRM, &s, NULL);
+    assert(ret == 0);
+
+    struct itimerval it = {};
+    it.it_value.tv_sec = 0;
+    it.it_value.tv_usec = 1000000 / 60;
+    it.it_interval = it.it_value;
+    ret = setitimer(ITIMER_VIRTUAL, &it, NULL);
+    assert(ret == 0);
+  }
+  void nvboard_quit(){
+      delete_components();
+      SDL_DestroyWindow(main_window);
+      SDL_DestroyRenderer(main_renderer);
+      IMG_Quit();
+      SDL_Quit();
+  }
+}
+#else
 void nvboard_update() {
   nvboard_update_all_input();
   nvboard_update_all_output();
@@ -148,6 +215,7 @@ void nvboard_quit(){
     IMG_Quit();
     SDL_Quit();
 }
+#endif
 
 void nvboard_bind_pin(vector<output_pin> &pin, void *signal) {
   output_pin_map[signal] = pin;

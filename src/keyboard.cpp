@@ -31,6 +31,10 @@ KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int it, int ct):
 
 
 void KEYBOARD::push_key(uint8_t sdl_key, bool is_keydown){
+#ifdef MODE_NEMU
+  all_keys.push(sdl_key);
+  all_keys.push(is_keydown);
+#else
   uint8_t at_key = sdl2at(sdl_key, 1);
   if(at_key == 0xe0){
     all_keys.push(0xe0);
@@ -38,8 +42,14 @@ void KEYBOARD::push_key(uint8_t sdl_key, bool is_keydown){
   }
   if(!is_keydown) all_keys.push(0x0f);
   all_keys.push(at_key);
+#endif
 }
 
+#ifdef MODE_NEMU
+void KEYBOARD::update_state(){
+
+}
+#else
 void KEYBOARD::update_state(){
   if(cur_key == NOT_A_KEY){
     if(all_keys.empty()) return;
@@ -68,4 +78,16 @@ void KEYBOARD::update_state(){
   else{
     left_clk --;
   }
+}
+#endif
+
+uint8_t KEYBOARD::pop_key(bool* succ){
+  if(all_keys.empty()) {
+    *succ = false;
+    return 0;
+  }
+  *succ = true;
+  uint8_t top = all_keys.front();
+  all_keys.pop();
+  return top;
 }
