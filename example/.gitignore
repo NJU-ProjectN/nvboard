@@ -1,4 +1,2 @@
-!src/*
-!Makefile
-!makefile
-auto_bind.cpp
+!resource/*.hex
+!constr/*.nxdc

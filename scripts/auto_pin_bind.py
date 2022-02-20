@@ -89,9 +89,14 @@ if len(sys.argv) <= 1:
   exit(-1)
 cons_path = sys.argv[1]
 
+if len(sys.argv) <= 2:
+  print("output file missing!")
+  exit(-1)
+output_path = sys.argv[2]
+
 
 cons_f = open(cons_path, "r")
-bind_f = open('src/auto_bind.cpp', "w")
+bind_f = open(output_path, "w")
 
 line = cons_f.readline()
 line = line.split('=')
