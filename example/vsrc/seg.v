@@ -11,7 +11,15 @@ module seg(
   output [7:0] o_seg7
 );
 
-parameter segs = {8'b01100001, 8'b11011010, 8'b11110010, 8'b01100110, 8'b10110110, 8'b10111110, 8'b11100000, 8'b11111110};
+wire [7:0] segs [7:0];
+assign segs[0] = 8'b01100001;
+assign segs[1] = 8'b11011010;
+assign segs[2] = 8'b11110010;
+assign segs[3] = 8'b01100110;
+assign segs[4] = 8'b10110110;
+assign segs[5] = 8'b10111110;
+assign segs[6] = 8'b11100000;
+assign segs[7] = 8'b11111110;
 
 parameter CLK_NUM = 500000;
 
@@ -26,13 +34,13 @@ always @(posedge clk) begin
   end
 end
 
-assign o_seg1 = ~(segs>> (((offset + 3'd0)&7) * 8));
-assign o_seg2 = ~(segs>> (((offset + 3'd1)&7) * 8));
-assign o_seg3 = ~(segs>> (((offset + 3'd2)&7) * 8));
-assign o_seg4 = ~(segs>> (((offset + 3'd3)&7) * 8));
-assign o_seg5 = ~(segs>> (((offset + 3'd4)&7) * 8));
-assign o_seg6 = ~(segs>> (((offset + 3'd5)&7) * 8));
-assign o_seg7 = ~(segs>> (((offset + 3'd6)&7) * 8));
-assign o_seg8 = ~(segs>> (((offset + 3'd7)&7) * 8));
+assign o_seg0 = ~segs[offset + 3'd0];
+assign o_seg1 = ~segs[offset + 3'd1];
+assign o_seg2 = ~segs[offset + 3'd2];
+assign o_seg3 = ~segs[offset + 3'd3];
+assign o_seg4 = ~segs[offset + 3'd4];
+assign o_seg5 = ~segs[offset + 3'd5];
+assign o_seg6 = ~segs[offset + 3'd6];
+assign o_seg7 = ~segs[offset + 3'd7];
 
 endmodule

@@ -4,11 +4,9 @@ module ps2_keyboard(clk,resetn,ps2_clk,ps2_data);
     reg [9:0] buffer;        // ps2_data bits
     reg [3:0] count;  // count ps2_data bits
     reg [2:0] ps2_clk_sync;
-    reg pre_clk;
 
     always @(posedge clk) begin
         ps2_clk_sync <=  {ps2_clk_sync[1:0],ps2_clk};
-        pre_clk <= clk;
     end
 
     wire sampling = ps2_clk_sync[2] & ~ps2_clk_sync[1];
