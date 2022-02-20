@@ -1,22 +1,22 @@
-# files of nvboard
+# files of NVBoard
 NBD_SRC = $(NVBOARD_HOME)/src
 NBD_SRCS := $(shell find $(NBD_SRC) -name "*.cpp")
-NBD_LIB = $(NVBOARD_HOME)/include
-INC_PATH += $(NBD_LIB)
+NBD_INC = $(NVBOARD_HOME)/include
+INC_PATH += $(NBD_INC)
 
 NBD_DST_DIR = $(NVBOARD_HOME)/build
 NBD_OBJS := $(addprefix $(NBD_DST_DIR)/, $(addsuffix .o, $(basename $(notdir $(NBD_SRCS)))))
 
-# The archive of nvboard
-NBD_ARCHIVE = $(NBD_DST_DIR)/NVBOARD.a
+# The archive of NVBoard
+NBD_ARCHIVE = $(NBD_DST_DIR)/nvboard.a
 CXXFLAGS += -MMD -O3
 
 $(NBD_DST_DIR)/%.o: $(NBD_SRC)/%.cpp
 	@echo + CXX "->" NVBOARD_HOME/$(shell realpath $< --relative-to $(NVBOARD_HOME))
 	@mkdir -p $(dir $@)
-	@$(OBJCACHE) $(CXX) $(CXXFLAGS) -I$(NBD_LIB) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) -I$(NBD_INC) -c -o $@ $<
 
-# Build the archive of nvboard
+# Build the archive of NVBoard
 $(NBD_ARCHIVE): $(NBD_OBJS)
 	@echo + AR "->" $(shell realpath $@ --relative-to $(NVBOARD_HOME))
 	@ar rcs $(NBD_ARCHIVE) $(NBD_OBJS)
