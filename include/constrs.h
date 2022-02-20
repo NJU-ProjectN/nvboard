@@ -59,11 +59,4 @@ enum class output_pin{
 extern std::map<input_pin, int> input_map;
 extern std::map<output_pin, int> output_map;
 
-using namespace std;
-
-void nvboard_bind_pin(vector <output_pin> &pin, void *signal);
-void nvboard_bind_pin(vector <input_pin> &pin, void *signal);
-void nvboard_bind_pin(output_pin pin, void *signal);
-void nvboard_bind_pin(input_pin pin, void *signal);
-
 #endif

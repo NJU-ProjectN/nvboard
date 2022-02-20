@@ -4,15 +4,13 @@
 
 NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Verilator仿真环境中模拟FPGA，支持LED，七段数码管，开关，键盘和VGA。
 
-## 软件架构
-
-软件架构说明
+## 项目文件说明
 
 ```
 .
-├── board                   开发板配置文件
+├── board                   # 引脚说明文件
 │   └── ...
-├── example                 示例项目
+├── example                 # 示例项目
 │   └── ...
 ├── include
 │   ├── at_scancode.h
@@ -25,10 +23,11 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 │   ├── render.h
 │   └── vga.h
 ├── LICENSE
-├── Makefile                NVBoard项目构建Makefile
-├── pic                     NVBoard图片信息
-├── README.en.md
+├── pic                     # NVBoard图片资源
 ├── README.md
+├── scripts
+│   ├── auto_pin_bind.py    # 生成引脚绑定代码的脚本
+│   └── nvboard.mk          # NVBoard构建规则
 └── src                     NVBorad源码
     ├── component.cpp
     ├── event.cpp
@@ -39,68 +38,79 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 
 ## 安装教程
 
-1. 将项目拷贝到本地，`git clone https://github.com/NJU-ProjectN/nvboard.git`；
-2. 接下来，把本项目的目录设置成环境变量 `NVBOARD_HOME`。
+1. 将项目拷贝到本地，`git clone https://github.com/NJU-ProjectN/nvboard.git`
+2. 通过`apt-get install libsdl2-dev libsdl2-image-dev`安装SDL2和SDL2-image
+3. 把本项目的目录设置成环境变量`NVBOARD_HOME`
 
 ## 示例
 
 `example`目录下包含一个示例项目，在该目录下通过 `make run` 命令可运行该项目。
 
-## 使用说明
+## 接入verilator步骤
 
-### 编写C++文件
+### API说明
 
 NVBoard提供了以下几组API
 
-- `nvboard_init()`: 初始化NVBoard
-- `nvboard_quit()`: 退出NVBoard
-- `nvboard_bind_pin(pin, signal)`: 将HDL的信号signal连接到NVBoard里的引脚pin上
-- `nvboard_update()`: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数
+- `void nvboard_init()`: 初始化NVBoard
+- `void nvboard_quit()`: 退出NVBoard
+- `void nvboard_bind_pin(pin, void *signal)`: 将HDL的信号signal连接到NVBoard里的引脚pin上
+- `void nvboard_update()`: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数
 
-为了方便进行信号的绑定，可以在你的项目目录下编写我们自定义的约束文件(.nxdc)，通过命令`make nxdc`能够依据编写的约束文件生成c++文件，
-调用该文件中的`nvboard_bind_all_pins(dut)`函数即可完成所有信号的绑定。自定义约束文件的格式如下所示
+### 引脚绑定
 
+手动调用`nvboard_bind_pin()`来绑定所有引脚较为繁琐。
+为了方便进行信号的绑定，NVBoard项目提供了一套从自定义约束文件生成绑定代码的流程。具体地
+1. 编写一个自定义格式的约束文件，其格式为
 ```
 top=top_name
 
 signal pin
-
 signal (pin1,pin2,... pink)
 ```
-
 在约束文件的开头，需要指定顶层模块名为`top_name`。约束文件支持两种信号绑定方式，`signal pin`表示将顶层模块的`signal`端口信号绑定到引脚`pin`上，
 `signal (pin1,pin2,...,pink)`表示将顶层模块的`signal`信号的每一位从高到低依次绑定到`pin1,pin2,...,pink`上。
+约束文件支持空行。
+2. 通过命令`python $(NVBOARD_HOME)/auto_pin_bind.py 约束文件 auto_bind.cpp`来生成C++文件。
+调用该文件中的`nvboard_bind_all_pins(dut)`函数即可完成所有信号的绑定。
+注意，该脚本的错误处理并不完善，若自定义约束文件中存在错误，则可能无法生成正确的C++文件。
 
-可以在该项目的board目录下的板卡配置文件中查看NVBoard的引脚信息。
+可以在`board`目录下的引脚说明文件中查看引脚信息。
 
-### 编写makefile
+### 调用API
 
-你可以在任意运行在NVBoard的项目目录下编写makefile，makefile格式如下
+在C++仿真代码中调用NVBoard提供的API
+```c++
+#include <nvboard.h>
 
-```makefile
-# 需要手动指定项目目录
-DIR = .
-## 默认项目源码在项目目录的src文件夹下，可手动指定
-### SRC_DIR ?= $(DIR)/src
-## 参与verilator编译的文件默认为$(SRC_DIR)下的所有*.v, *.c, *.cc, *.cpp文件，可手动指定
-### SRCS ?= $(shell find $(SRC_DIR) -name "*.v" -or -name "*.c" -or -name "*.cc" -or -name "*.cpp")
+// ...
+nvboard_bind_all_pins(&dut);
+nvboard_init();
 
-# 需要指定顶层模块名称
-TOPNAME = top
+while (1) {
+  // ...
+  nvboard_update();
+}
 
-# 需要在最后将NVBoard的makefile包含进来
--include $(NVBOARD_HOME)/Makefile
+nvboard_quit();
 ```
+具体地
+* 在进入verilator仿真的循环前，先对引脚进行绑定，然后对NVBoard进行初始化
+* 在verilator仿真的循环中更新NVBoard各组件的状态
+* 退出verilator仿真的循环后，销毁NVBoard的相关资源
 
-### 体验NVBoard
+### 编译链接
 
-最后，你只需要在项目目录下执行
-
-```shell
-make run
+在Makefile中
+* 将生成的上述引脚绑定的C++文件加入源文件列表
+* 将NVBoard的构建脚本包含进来
 ```
+include $(NVBOARD_HOME)/scripts/nvboard.mk
+```
+* 通过`make nvboard-archive`生成NVBoard的库文件
+* 在生成verilator仿真可执行文件(即`$(NVBOARD_ARCHIEVE)`)将这个库文件加入链接过程，并添加链接选项`-lSDL2 -lSDL2_image`
 
-命令，即可在NVBoard上模拟运行你自己的verilog代码！
+可以参考示例项目中的Makefile文件，即`example/Makefile`
 
 ## 特技
 
