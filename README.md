@@ -57,8 +57,8 @@ NVBoard提供了以下几组API
 - `nvboard_bind_pin(pin, signal)`: 将HDL的信号signal连接到NVBoard里的引脚pin上
 - `nvboard_update()`: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数
 
-为了方便进行信号的绑定，可以在你的项目目录下编写约束文件(.cons)，通过命令`make cons`能够依据编写的约束文件生成c++文件，
-调用该文件中的`nvboard_bind_all_pins(dut)`函数即可完成所有信号的绑定。约束文件的格式如下所示
+为了方便进行信号的绑定，可以在你的项目目录下编写我们自定义的约束文件(.nxdc)，通过命令`make nxdc`能够依据编写的约束文件生成c++文件，
+调用该文件中的`nvboard_bind_all_pins(dut)`函数即可完成所有信号的绑定。自定义约束文件的格式如下所示
 
 ```
 top=top_name
