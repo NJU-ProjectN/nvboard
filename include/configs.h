@@ -34,6 +34,6 @@
 
 //#define VSYNC
 
-#define MODE_NEMU
+//#define MODE_NEMU
 
 #endif
