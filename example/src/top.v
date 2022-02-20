@@ -22,8 +22,9 @@ module top (
     output [7:0] seg7
 );
 
-test test1(
+led led1(
     .clk(clk),
+    .rst(rst),
     .sw(sw),
     .ledr(ledr)
 );
