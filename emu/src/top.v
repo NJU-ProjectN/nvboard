@@ -1,5 +1,6 @@
 module top (
     input clk,
+    input rst,
     input [7:0] sw,
     input ps2_clk,
     input ps2_data,
@@ -35,7 +36,7 @@ wire [23:0] vga_data;
 
 vga_ctrl my_vga_ctrl(
     .pclk(clk),
-    .reset(1'b0),
+    .reset(rst),
     .vga_data(vga_data),
     .h_addr(h_addr),
     .v_addr(v_addr),
@@ -49,14 +50,14 @@ vga_ctrl my_vga_ctrl(
 
 ps2_keyboard my_keyboard(
     .clk(clk),
-    .resetn(1),
+    .resetn(~rst),
     .ps2_clk(ps2_clk),
     .ps2_data(ps2_data)
 );
 
 seg mu_seg(
     .clk(clk),
-    .rst(0),
+    .rst(rst),
     .o_seg0(seg0),
     .o_seg1(seg1),
     .o_seg2(seg2),
