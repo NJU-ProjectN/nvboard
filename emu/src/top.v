@@ -10,16 +10,15 @@ module top (
     output VGA_BLANK_N,
     output [7:0] VGA_R,
     output [7:0] VGA_G,
-	output [7:0] VGA_B,
+    output [7:0] VGA_B,
+    output [7:0] seg0,
     output [7:0] seg1,
     output [7:0] seg2,
     output [7:0] seg3,
     output [7:0] seg4,
     output [7:0] seg5,
     output [7:0] seg6,
-    output [7:0] seg7,
-    output [7:0] seg8,
-    output [7:0] an
+    output [7:0] seg7
 );
 
 test test1(
@@ -58,14 +57,14 @@ ps2_keyboard my_keyboard(
 seg mu_seg(
     .clk(clk),
     .rst(0),
+    .o_seg0(seg0),
     .o_seg1(seg1),
     .o_seg2(seg2),
     .o_seg3(seg3),
     .o_seg4(seg4),
     .o_seg5(seg5),
     .o_seg6(seg6),
-    .o_seg7(seg7),
-    .o_seg8(seg8)
+    .o_seg7(seg7)
 );
 
 vmem my_vmem(
