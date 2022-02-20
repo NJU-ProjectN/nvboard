@@ -5,9 +5,9 @@ VERILATOR_CFLAGS += -MMD -Wall --build -cc -Wno-lint \
 # include path
 INC_PATH ?= 
 
-# files of emu
+# files of the RTL project
 TOPNAME ?= top
-DIR ?= $(NVBOARD_HOME)/emu
+DIR ?= $(NVBOARD_HOME)/example
 OBJ_DIR = $(DIR)/obj_dir
 
 # generated executable file

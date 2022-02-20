@@ -12,7 +12,7 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 .
 ├── board                   开发板配置文件
 │   └── ...
-├── emu                     演示项目目录
+├── example                 示例项目
 │   └── ...
 ├── include
 │   ├── at_scancode.h
@@ -44,7 +44,7 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 
 ## 示例
 
-本项目下的emu是一个演示项目，在该目录下通过 `make run` 命令可运行该项目。
+`example`目录下包含一个示例项目，在该目录下通过 `make run` 命令可运行该项目。
 
 ## 使用说明
 
