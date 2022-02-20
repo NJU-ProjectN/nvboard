@@ -92,7 +92,7 @@ void nvboard_update() {
 }
 
 void nvboard_init() {
-    printf("nvboard v0.2\n");
+    printf("NVBoard v0.2\n");
     // init SDL and SDL_image
     SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     IMG_Init(IMG_INIT_PNG);
