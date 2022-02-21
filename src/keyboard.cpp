@@ -36,7 +36,7 @@ void KEYBOARD::push_key(uint8_t sdl_key, bool is_keydown){
     all_keys.push(0xe0);
     at_key = sdl2at(sdl_key, 0);
   }
-  if(!is_keydown) all_keys.push(0x0f);
+  if(!is_keydown) all_keys.push(0xf0);
   all_keys.push(at_key);
 }
 

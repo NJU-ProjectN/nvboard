@@ -84,7 +84,7 @@ void VGA::update_state() {
     pixels[vga_pos] = vga_rgb;
     vga_pos ++;
   }
-  if(VGA_POS_EDGE(vsync)) {
+  if(VGA_NEG_EDGE(vsync)) {
     vga_pos = 0;
     update_gui();
   }
