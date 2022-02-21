@@ -34,9 +34,11 @@ VGA::~VGA() {
 }
 
 void VGA::update_gui() {
+#ifdef SHOW_FRAME_UPDATE
   static int frames = 0;
   frames ++;
   printf("%d frames\n", frames);
+#endif
   SDL_Texture *temp_texture = get_texture(0);
   SDL_Renderer *temp_renderer = get_renderer();
   SDL_Rect *temp_rect = get_rect(0);

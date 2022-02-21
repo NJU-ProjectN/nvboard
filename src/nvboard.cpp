@@ -79,6 +79,23 @@ static void nvboard_update_all_output() {
 }
 
 void nvboard_update() {
+#ifdef CALCULATE_CLOCK_FREQUENCY
+  static int update_count = 0, last_count = 0;
+  static time_t begin = 0;
+
+  update_count ++;
+  if(!begin) time(&begin);
+  else {
+    time_t end;
+    time(&end);
+    if(end - begin >= CALCULATE_CLOCK_FREQUENCY_INTERVAL) {
+      printf("Clock frequency: %ld cycles/s\n", (update_count - last_count) / (end - begin));
+      begin = end;
+      last_count = update_count;
+    }
+  }
+#endif
+
   nvboard_update_all_input();
   nvboard_update_all_output();
 
