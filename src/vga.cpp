@@ -50,7 +50,7 @@ void VGA::update_state() {
   int vga_vsync = output_map[output_pin::VGA_VSYNC];
   int vga_hsync = output_map[output_pin::VGA_HSYNC];
   int vga_blank_n = output_map[output_pin::VGA_BLANK_N];
-  if(!VGA_POS_EDGE(clk)){
+  if(!VGA_NEG_EDGE(clk)){
     vga_pre_clk = vga_clk;
     return;
   }
