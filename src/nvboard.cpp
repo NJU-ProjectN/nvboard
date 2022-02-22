@@ -2,13 +2,26 @@
 #include <SDL2/SDL_image.h>
 #include <nvboard.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <sys/time.h>
 #include <assert.h>
 #include <string>
 #include <stdarg.h>
 
-using namespace std;
+#define FPS 60
+
+static uint64_t boot_time = 0;
+
+static uint64_t get_time_internal() {
+  struct timeval now;
+  gettimeofday(&now, NULL);
+  uint64_t us = now.tv_sec * 1000000 + now.tv_usec;
+  return us;
+}
+
+static uint64_t get_time() {
+  uint64_t now = get_time_internal();
+  return now - boot_time;
+}
 
 typedef struct PinMap {
   int len;
@@ -27,28 +40,9 @@ static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
 uint64_t input_map[NR_INPUT_PINS] = {0};
 uint64_t output_map[NR_OUTPUT_PINS] = {0};
-string nvboard_home;
+std::string nvboard_home;
 
 int read_event();
-
-static int read_event_flag = true;
-static int render_flag = true;
-static void alarm_sig_handler(int signum) {
-    read_event_flag = true;
-    render_flag = true;
-}
-
-static int nvboard_event_handler() {
-    if(!read_event_flag) return 0;
-    read_event_flag = false;
-    int ev = read_event();
-    if(ev != -1){
-        update_components(main_renderer);
-    } else {
-      exit(0);
-    }
-    return ev;
-}
 
 static void nvboard_update_input(PinMap *p) {
   void *ptr = p->signal;
@@ -97,12 +91,16 @@ void nvboard_update() {
   }
 
   update_components(main_renderer);
-  if(render_flag) {
-    SDL_RenderPresent(main_renderer);
-    render_flag = false;
-  }
 
-  nvboard_event_handler();
+  static uint64_t last = 0;
+  uint64_t now = get_time();
+  if (now - last > 1000000 / FPS) {
+    last = now;
+    SDL_RenderPresent(main_renderer);
+    int ev = read_event();
+    if (ev != -1) { update_components(main_renderer); }
+    else { exit(0); }
+  }
 }
 
 void nvboard_init() {
@@ -124,9 +122,6 @@ void nvboard_init() {
         0
     );
     
-    // To avoid the SDL bugs on hby's linux
-    //usleep(200000);
-
     nvboard_home = getenv("NVBOARD_HOME");
     
     load_background(main_renderer);
@@ -135,18 +130,8 @@ void nvboard_init() {
     init_gui(main_renderer);
 
     update_components(main_renderer);
-    struct sigaction s;
-    memset(&s, 0, sizeof(s));
-    s.sa_handler = alarm_sig_handler;
-    int ret = sigaction(SIGVTALRM, &s, NULL);
-    assert(ret == 0);
 
-    struct itimerval it = {};
-    it.it_value.tv_sec = 0;
-    it.it_value.tv_usec = 1000000 / 60;
-    it.it_interval = it.it_value;
-    ret = setitimer(ITIMER_VIRTUAL, &it, NULL);
-    assert(ret == 0);
+    boot_time = get_time_internal();
 }
 
 void nvboard_quit(){
