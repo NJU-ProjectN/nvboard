@@ -46,39 +46,39 @@ void VGA::update_gui() {
 }
 
 void VGA::update_state() {
-  int vga_clk = output_map[output_pin::VGA_CLK];
-  int vga_vsync = output_map[output_pin::VGA_VSYNC];
-  int vga_hsync = output_map[output_pin::VGA_HSYNC];
-  int vga_blank_n = output_map[output_pin::VGA_BLANK_N];
+  int vga_clk = output_map[VGA_CLK];
+  int vga_vsync = output_map[VGA_VSYNC];
+  int vga_hsync = output_map[VGA_HSYNC];
+  int vga_blank_n = output_map[VGA_BLANK_N];
   if(!VGA_NEG_EDGE(clk)){
     vga_pre_clk = vga_clk;
     return;
   }
   if(vga_blank_n) {
-    int vga_r = (output_map[output_pin::VGA_R7] << 7) | 
-                (output_map[output_pin::VGA_R6] << 6) | 
-                (output_map[output_pin::VGA_R5] << 5) | 
-                (output_map[output_pin::VGA_R4] << 4) |
-                (output_map[output_pin::VGA_R3] << 3) | 
-                (output_map[output_pin::VGA_R2] << 2) | 
-                (output_map[output_pin::VGA_R1] << 1) | 
-                 output_map[output_pin::VGA_R0];
-    int vga_g = (output_map[output_pin::VGA_G7] << 7) | 
-                (output_map[output_pin::VGA_G6] << 6) | 
-                (output_map[output_pin::VGA_G5] << 5) | 
-                (output_map[output_pin::VGA_G4] << 4) |
-                (output_map[output_pin::VGA_G3] << 3) | 
-                (output_map[output_pin::VGA_G2] << 2) | 
-                (output_map[output_pin::VGA_G1] << 1) | 
-                 output_map[output_pin::VGA_G0];
-    int vga_b = (output_map[output_pin::VGA_B7] << 7) | 
-                (output_map[output_pin::VGA_B6] << 6) | 
-                (output_map[output_pin::VGA_B5] << 5) | 
-                (output_map[output_pin::VGA_B4] << 4) |
-                (output_map[output_pin::VGA_B3] << 3) | 
-                (output_map[output_pin::VGA_B2] << 2) | 
-                (output_map[output_pin::VGA_B1] << 1) | 
-                 output_map[output_pin::VGA_B0];
+    int vga_r = (output_map[VGA_R7] << 7) |
+                (output_map[VGA_R6] << 6) |
+                (output_map[VGA_R5] << 5) |
+                (output_map[VGA_R4] << 4) |
+                (output_map[VGA_R3] << 3) |
+                (output_map[VGA_R2] << 2) |
+                (output_map[VGA_R1] << 1) |
+                 output_map[VGA_R0];
+    int vga_g = (output_map[VGA_G7] << 7) |
+                (output_map[VGA_G6] << 6) |
+                (output_map[VGA_G5] << 5) |
+                (output_map[VGA_G4] << 4) |
+                (output_map[VGA_G3] << 3) |
+                (output_map[VGA_G2] << 2) |
+                (output_map[VGA_G1] << 1) |
+                 output_map[VGA_G0];
+    int vga_b = (output_map[VGA_B7] << 7) |
+                (output_map[VGA_B6] << 6) |
+                (output_map[VGA_B5] << 5) |
+                (output_map[VGA_B4] << 4) |
+                (output_map[VGA_B3] << 3) |
+                (output_map[VGA_B2] << 2) |
+                (output_map[VGA_B1] << 1) |
+                 output_map[VGA_B0];
     uint32_t vga_rgb = (vga_r << 16) | (vga_g << 8) | (vga_b);
     assert(vga_pos < vga_screen_width * vga_screen_height);
     pixels[vga_pos] = vga_rgb;

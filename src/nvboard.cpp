@@ -9,12 +9,26 @@
 
 using namespace std;
 
+typedef struct PinMap {
+  bool is_vec;
+  bool is_output;
+  union {
+    uint16_t pin;
+    struct {
+      int len;
+      uint16_t *pins;
+    };
+  };
+  void *signal;
+  PinMap *next;
+} PinMap;
+
+static PinMap *pin_map = NULL;
+
 static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
-static map<void *, vector<input_pin >> input_pin_map;
-static map<void *, vector<output_pin>> output_pin_map;
-map<input_pin, int> input_map;
-map<output_pin, int> output_map;
+uint64_t input_map[NR_INPUT_PINS] = {0};
+uint64_t output_map[NR_OUTPUT_PINS] = {0};
 string nvboard_home;
 
 int read_event();
@@ -38,49 +52,51 @@ static int nvboard_event_handler() {
     return ev;
 }
 
-static void nvboard_update_all_input() {
-  for (auto p = input_pin_map.begin(); p != input_pin_map.end(); p ++) {
-    void *ptr = p->first;
-    vector<input_pin> &pins = p->second;
-    uint32_t size = pins.size();
-    assert(size <= 64);
-    uint64_t val = 0;
-    for (auto ppins = pins.begin(); ppins != pins.end(); ppins ++) {
-      val <<= 1;
-      val |= input_map[*(ppins)];
-    }
-
-    if (size <= 8) { *(uint8_t *)ptr = val; }
-    else if (size <= 16) { *(uint16_t *)ptr = val; }
-    else if (size <= 32) { *(uint32_t *)ptr = val; }
-    else if (size <= 64) { *(uint64_t *)ptr = val; }
+static void nvboard_update_input(PinMap *p) {
+  void *ptr = p->signal;
+  if (!p->is_vec) {
+    uint8_t val = input_map[p->pin];
+    *(uint8_t *)ptr = val;
+    return;
   }
-  static int pre_clk;
-  pre_clk = input_map[input_pin::PS2_CLK];
+
+  int len = p->len;
+  uint64_t val = 0;
+  for (int i = 0; i < len; i ++) {
+    val <<= 1;
+    val |= input_map[p->pins[i]];
+  }
+  if (len <= 8) { *(uint8_t *)ptr = val; }
+  else if (len <= 16) { *(uint16_t *)ptr = val; }
+  else if (len <= 32) { *(uint32_t *)ptr = val; }
+  else if (len <= 64) { *(uint64_t *)ptr = val; }
 }
 
-static void nvboard_update_all_output() {
-  for (auto p = output_pin_map.begin(); p != output_pin_map.end(); p ++) {
-    void *ptr = p->first;
-    vector<output_pin> &pins = p->second;
-    uint32_t size = pins.size();
-    assert(size <= 64);
-    uint64_t val = 0;
-    if (size <= 8) { val = *(uint8_t *)ptr; }
-    else if (size <= 16) { val = *(uint16_t *)ptr; }
-    else if (size <= 32) { val = *(uint32_t *)ptr; }
-    else if (size <= 64) { val = *(uint64_t *)ptr; }
+static void nvboard_update_output(PinMap *p) {
+  void *ptr = p->signal;
+  if (!p->is_vec) {
+    uint8_t val = *(uint8_t *)ptr;
+    output_map[p->pin] = val & 1;
+    return;
+  }
 
-    for (auto ppins = pins.rbegin(); ppins != pins.rend(); ppins ++) {
-      output_map[*(ppins)] = val & 1;
-      val >>= 1;
-    }
+  int len = p->len;
+  uint64_t val = 0;
+  if (len <= 8) { val = *(uint8_t *)ptr; }
+  else if (len <= 16) { val = *(uint16_t *)ptr; }
+  else if (len <= 32) { val = *(uint32_t *)ptr; }
+  else if (len <= 64) { val = *(uint64_t *)ptr; }
+  for (int i = 0; i < len; i ++) {
+    output_map[p->pins[i]] = val & 1;
+    val >>= 1;
   }
 }
 
 void nvboard_update() {
-  nvboard_update_all_input();
-  nvboard_update_all_output();
+  for (auto p = pin_map; p != NULL; p = p->next) {
+    if (p->is_output) nvboard_update_output(p);
+    else nvboard_update_input(p);
+  }
 
   update_components(main_renderer);
   if(render_flag) {
@@ -119,12 +135,6 @@ void nvboard_init() {
     load_texture(main_renderer);
     init_components(main_renderer);
     init_gui(main_renderer);
-    for (input_pin i = input_pin(0); i < input_pin::NR_INPUT_PINS; i = input_pin((int)i + 1)) {
-      input_map[i] = 0;
-    }
-    for (output_pin i = output_pin(0); i < output_pin::NR_OUTPUT_PINS; i = output_pin((int)i + 1)) {
-      output_map[i] = 0;
-    }
 
     update_components(main_renderer);
     struct sigaction s;
@@ -149,20 +159,52 @@ void nvboard_quit(){
     SDL_Quit();
 }
 
-void nvboard_bind_pin(vector<output_pin> &pin, void *signal) {
-  output_pin_map[signal] = pin;
+void nvboard_bind_output_pin(vector<uint16_t> &pin, void *signal) {
+  PinMap *p = new PinMap;
+  p->is_vec = true;
+  p->is_output = true;
+  p->len = pin.size();
+  assert(p->len < 64);
+  p->pins = new uint16_t[p->len];
+  for (int i = 0; i < p->len; i ++) {
+    p->pins[i] = pin[p->len - 1 - i];
+  }
+  p->signal = signal;
+  p->next = pin_map;
+  pin_map = p;
 }
 
-void nvboard_bind_pin(vector<input_pin> &pin, void *signal) {
-  input_pin_map[signal] = pin;
+void nvboard_bind_input_pin(vector<uint16_t> &pin, void *signal) {
+  PinMap *p = new PinMap;
+  p->is_vec = true;
+  p->is_output = false;
+  p->len = pin.size();
+  assert(p->len < 64);
+  p->pins = new uint16_t[p->len];
+  for (int i = 0; i < p->len; i ++) {
+    p->pins[i] = pin[i];
+  }
+  p->signal = signal;
+  p->next = pin_map;
+  pin_map = p;
 }
 
-void nvboard_bind_pin(output_pin pin, void *signal) {
-  vector<output_pin> p = {pin};
-  nvboard_bind_pin(p, signal);
+void nvboard_bind_output_pin(uint16_t pin, void *signal) {
+  PinMap *p = new PinMap;
+  p->is_vec = false;
+  p->is_output = true;
+  p->pin = pin;
+  p->signal = signal;
+  p->next = pin_map;
+  pin_map = p;
 }
 
-void nvboard_bind_pin(input_pin pin, void *signal) {
-  vector<input_pin> p = {pin};
-  nvboard_bind_pin(p, signal);
+void nvboard_bind_input_pin(uint16_t pin, void *signal) {
+  PinMap *p = new PinMap;
+  p->is_vec = false;
+  p->is_output = false;
+  p->pin = pin;
+  p->signal = signal;
+  p->next = pin_map;
+  pin_map = p;
 }

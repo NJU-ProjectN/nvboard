@@ -7,7 +7,6 @@
 #include <keyboard.h>
 
 extern std::vector<Component *> components;
-extern std::map<input_pin, int> input_map;
 
 static void mousedown_handler(const SDL_Event &ev) {
   int x_pos = ev.button.x;

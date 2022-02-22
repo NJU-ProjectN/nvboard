@@ -25,8 +25,8 @@ class KEYBOARD : public Component{
     int data_idx;
     int left_clk;
     int cur_key;
-    int* ps2_clk;
-    int* ps2_dat;
+    uint64_t* ps2_clk;
+    uint64_t* ps2_dat;
 
   public:
     KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);

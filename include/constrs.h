@@ -1,8 +1,7 @@
 #ifndef _VFPGA_CONSTRS_H
 #define _VFPGA_CONSTRS_H
 
-#include <map>
-#include <vector>
+#include <stdint.h>
 
 #define CLK_INPUT CLK
 
@@ -39,7 +38,7 @@
 
 #define KEYBOARD_INPUT PS2_CLK, PS2_DAT
 
-enum class input_pin{
+enum {
   BTN_INPUT,
   SW_INPUT,
   CLK_INPUT,
@@ -47,7 +46,7 @@ enum class input_pin{
   NR_INPUT_PINS,
 };
 
-enum class output_pin{
+enum {
   NAIVE_LEDS_OUTPUT,
   RGB_LEDS_OUTPUT,
   SEG7_ENBS_OUTPUT,
@@ -56,7 +55,7 @@ enum class output_pin{
   NR_OUTPUT_PINS
 };
 
-extern std::map<input_pin, int> input_map;
-extern std::map<output_pin, int> output_map;
+extern uint64_t input_map [];
+extern uint64_t output_map[];
 
 #endif
