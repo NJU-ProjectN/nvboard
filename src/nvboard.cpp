@@ -96,7 +96,7 @@ void nvboard_update() {
     time_t end;
     time(&end);
     if(end - begin >= CALCULATE_CLOCK_FREQUENCY_INTERVAL) {
-      printf("Clock frequency: %ld cycles/s\n", (update_count - last_count) / (end - begin));
+      printf("Clock frequency: %ld cycles/s\n", (update_count - last_count) / (end - begin) / 2);
       begin = end;
       last_count = update_count;
     }
