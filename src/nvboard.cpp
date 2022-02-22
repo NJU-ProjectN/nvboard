@@ -28,7 +28,7 @@ static void calculate_clock_frequency() {
   static time_t begin = 0;
 
   update_count ++;
-  if(!begin) time(&begin);
+  if(!begin) time(&begin), last_count = update_count;
   else {
     time_t end;
     time(&end);
