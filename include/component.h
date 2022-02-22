@@ -55,6 +55,7 @@ public:
   void add_output(const uint16_t out);
   virtual void update_gui();
   virtual void update_state();
+  void remove();
 
   friend void delete_components();
 };
@@ -74,7 +75,10 @@ public:
 };
 
 void init_components(SDL_Renderer *renderer);
+void init_gui(SDL_Renderer *renderer);
 
+void update_components(SDL_Renderer *renderer);
+void update_rt_components(SDL_Renderer *renderer);
 void delete_components();
 
 #define GET_SEGA(i) (SEG0A + 8 * i)

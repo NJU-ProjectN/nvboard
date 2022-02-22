@@ -9,8 +9,6 @@
 #include <configs.h>
 #include <component.h>
 
-extern std::vector<Component *> components;
-
 SDL_Surface *sbutton_on, *sbutton_off;
 SDL_Surface *sswitch_on, *sswitch_off;
 SDL_Surface *ssegled_ver_off, *ssegled_ver_on,
@@ -158,20 +156,4 @@ void load_texture(SDL_Renderer *renderer) {
 
   sled_rgb = SDL_CreateRGBSurface(0, LED_WIDTH, LED_HEIGHT, 32, 0, 0, 0, 0);
   fill_rect_texture(renderer, &sled_rgb, &tled_rgb, 0xff, 0xff, 0xff);
-}
-
-// render buttons, switches, leds and 7-segs
-void init_gui(SDL_Renderer *renderer) {
-  for (auto ptr : components) {
-    ptr->update_gui();
-  }
-}
-#include <keyboard.h>
-void update_components(SDL_Renderer *renderer) {
-  for (auto ptr : components) {
-    ptr->update_state();
-  }
-  extern KEYBOARD* kb;
-  kb->update_state();
-
 }

@@ -10,7 +10,20 @@ def inout_dict(file_path):
     line = line.strip(' \n')
     line = line.split(' ')
     if len(line) == 2:
-      inout[line[1].replace(' ', '')] = line[0].replace(' ', '')
+      direction = line[0].replace(' ', '')
+      is_real_time_str = 'false'
+      is_output_str = ''
+      if direction.startswith('rt_'):
+        is_real_time_str = 'true'
+        direction = direction[3:]
+      if direction == "input":
+        is_output_str = 'false'
+      elif direction == "output":
+        is_output_str = 'true'
+      else:
+        print("invalid direction")
+        exit(-1)
+      inout[line[1].replace(' ', '')] = (is_output_str, is_real_time_str)
     line = f.readline()
   return inout
 
@@ -54,24 +67,20 @@ def bind_pin(f, inout, signal, pin):
   pin = pin.replace(' ', '')
   check_pin_valid(inout, pin)
   signal_addr = "&top->" + signal
-  write_dep(bind_f, "nvboard_bind_" + inout[pin] + "_pin(" + pin + ", " + signal_addr + ");\n")
+  strs = inout[pin]
+  write_dep(bind_f, "nvboard_bind_pin(" + signal_addr + ", " + strs[1] + ", " + strs[0] + ", 1, " + pin + ");\n")
 
 
 def bind_vec_pins(f, inout, signal, pins):
-  vec_name = signal + "_pins"
   for idx in range(len(pins)):
     pins[idx] = pins[idx].replace(' ', '')
     check_pin_valid(inout, pins[idx])
-  write_dep(bind_f, "vector<uint16_t> " + vec_name + "{\n")
   signal_addr = "&top->" + signal
+  strs = inout[pins[0]]
+  write_dep(bind_f, "nvboard_bind_pin(" + signal_addr + ", "  + strs[1] + ", " + strs[0] + ", " + str(len(pins)))
   for idx in range(len(pins)):
-    if idx != 0:
-      write_dep(bind_f, ", ")
-    if idx % 4 == 0 and idx != 0:
-      write_dep(bind_f, "\n")
-    write_dep(bind_f, pins[idx])
-  write_dep(bind_f, "\n};\n")
-  write_dep(bind_f, "nvboard_bind_" + inout[pins[0]] + "_pin(" + vec_name + ", " + signal_addr + ");\n")
+    write_dep(bind_f, ", " + pins[idx])
+  write_dep(bind_f, ");\n")
 
 
 def init_info(f, top):
