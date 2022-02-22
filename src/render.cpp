@@ -160,9 +160,6 @@ void load_texture(SDL_Renderer *renderer) {
   fill_rect_texture(renderer, &sled_rgb, &tled_rgb, 0xff, 0xff, 0xff);
 }
 
-extern std::map<input_pin, int> input_map;
-extern std::map<output_pin, int> output_map;
-
 // render buttons, switches, leds and 7-segs
 void init_gui(SDL_Renderer *renderer) {
   for (auto ptr : components) {

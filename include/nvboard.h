@@ -9,8 +9,8 @@ using namespace std;
 
 void nvboard_init();
 void nvboard_quit();
-void nvboard_bind_pin(vector <output_pin> &pin, void *signal);
-void nvboard_bind_pin(vector <input_pin> &pin, void *signal);
-void nvboard_bind_pin(output_pin pin, void *signal);
-void nvboard_bind_pin(input_pin pin, void *signal);
+void nvboard_bind_output_pin(vector <uint16_t> &pin, void *signal);
+void nvboard_bind_input_pin(vector <uint16_t> &pin, void *signal);
+void nvboard_bind_output_pin(uint16_t pin, void *signal);
+void nvboard_bind_input_pin(uint16_t pin, void *signal);
 void nvboard_update();

@@ -3,8 +3,6 @@
 #include <macro.h>
 #include <assert.h>
 
-extern std::map<input_pin, int> input_map;
-
 KEYBOARD* kb;
 
 #define FILL_KEYMAP_FIRST(a) keymap_first[SDL_PREFIX(a)] = GET_FIRST(AT_PREFIX(a));
@@ -25,7 +23,7 @@ int sdl2at(int scancode, int is_first){
 KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int it, int ct):
   Component(rend, cnt, init_val, it, ct),
   data_idx(0), left_clk(0), cur_key(NOT_A_KEY),
-  ps2_clk(&input_map[input_pin::PS2_CLK]), ps2_dat(&input_map[input_pin::PS2_DAT]){
+  ps2_clk(&input_map[PS2_CLK]), ps2_dat(&input_map[PS2_DAT]){
     keymap_init();
   }
 

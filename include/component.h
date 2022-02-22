@@ -20,9 +20,9 @@ enum {
   COMB_TYPE = 1, SEQ_TYPE = 2
 };
 
-union Pin{
-  input_pin m_in;
-  output_pin m_out;
+union Pin {
+  uint16_t m_in;
+  uint16_t m_out;
 };
 
 class Component{
@@ -45,14 +45,14 @@ public:
   SDL_Rect *get_rect(int idx) const;
   SDL_Texture *get_texture(int idx) const;
   int get_state() const;
-  input_pin get_input(int idx = 0) const;
-  output_pin get_output(int idx = 0) const;
+  uint16_t get_input(int idx = 0) const;
+  uint16_t get_output(int idx = 0) const;
 
   void set_rect(SDL_Rect *rect, int val);
   void set_texture(SDL_Texture *texture, int val);
   void set_state(int val);
-  void add_input(const input_pin &in);
-  void add_output(const output_pin &out);
+  void add_input(const uint16_t in);
+  void add_output(const uint16_t out);
   virtual void update_gui();
   virtual void update_state();
 
@@ -77,7 +77,7 @@ void init_components(SDL_Renderer *renderer);
 
 void delete_components();
 
-#define GET_SEGA(i) (output_pin(int(output_pin::SEG0A) + 8 * i))
-#define GET_DECP(i) (output_pin(int(output_pin::SEG0A) + 8 * i + 7))
+#define GET_SEGA(i) (SEG0A + 8 * i)
+#define GET_DECP(i) (SEG0A + 8 * i + 7)
 
 #endif
