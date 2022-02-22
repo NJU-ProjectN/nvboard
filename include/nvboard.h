@@ -5,12 +5,10 @@
 #include <vga.h>
 #include <keyboard.h>
 
-using namespace std;
+#define NVBOARD_DIR_input  false
+#define NVBOARD_DIR_output true
 
 void nvboard_init();
 void nvboard_quit();
-void nvboard_bind_output_pin(vector <uint16_t> &pin, void *signal);
-void nvboard_bind_input_pin(vector <uint16_t> &pin, void *signal);
-void nvboard_bind_output_pin(uint16_t pin, void *signal);
-void nvboard_bind_input_pin(uint16_t pin, void *signal);
+void nvboard_bind_pin(void *signal, bool is_output, int len, ...);
 void nvboard_update();

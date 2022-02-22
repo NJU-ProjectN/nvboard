@@ -54,24 +54,18 @@ def bind_pin(f, inout, signal, pin):
   pin = pin.replace(' ', '')
   check_pin_valid(inout, pin)
   signal_addr = "&top->" + signal
-  write_dep(bind_f, "nvboard_bind_" + inout[pin] + "_pin(" + pin + ", " + signal_addr + ");\n")
+  write_dep(bind_f, "nvboard_bind_pin(" + signal_addr + ", " + "NVBOARD_DIR_" + inout[pin] + ", 1, " + pin + ");\n")
 
 
 def bind_vec_pins(f, inout, signal, pins):
-  vec_name = signal + "_pins"
   for idx in range(len(pins)):
     pins[idx] = pins[idx].replace(' ', '')
     check_pin_valid(inout, pins[idx])
-  write_dep(bind_f, "vector<uint16_t> " + vec_name + "{\n")
   signal_addr = "&top->" + signal
+  write_dep(bind_f, "nvboard_bind_pin(" + signal_addr + ", "  + "NVBOARD_DIR_" + inout[pins[0]] + ", " + str(len(pins)))
   for idx in range(len(pins)):
-    if idx != 0:
-      write_dep(bind_f, ", ")
-    if idx % 4 == 0 and idx != 0:
-      write_dep(bind_f, "\n")
-    write_dep(bind_f, pins[idx])
-  write_dep(bind_f, "\n};\n")
-  write_dep(bind_f, "nvboard_bind_" + inout[pins[0]] + "_pin(" + vec_name + ", " + signal_addr + ");\n")
+    write_dep(bind_f, ", " + pins[idx])
+  write_dep(bind_f, ");\n")
 
 
 def init_info(f, top):

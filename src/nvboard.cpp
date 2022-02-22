@@ -6,18 +6,16 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <string>
+#include <stdarg.h>
 
 using namespace std;
 
 typedef struct PinMap {
-  bool is_vec;
+  int len;
   bool is_output;
   union {
     uint16_t pin;
-    struct {
-      int len;
-      uint16_t *pins;
-    };
+    uint16_t *pins;
   };
   void *signal;
   PinMap *next;
@@ -54,7 +52,7 @@ static int nvboard_event_handler() {
 
 static void nvboard_update_input(PinMap *p) {
   void *ptr = p->signal;
-  if (!p->is_vec) {
+  if (p->len == 1) {
     uint8_t val = input_map[p->pin];
     *(uint8_t *)ptr = val;
     return;
@@ -74,7 +72,7 @@ static void nvboard_update_input(PinMap *p) {
 
 static void nvboard_update_output(PinMap *p) {
   void *ptr = p->signal;
-  if (!p->is_vec) {
+  if (p->len == 1) {
     uint8_t val = *(uint8_t *)ptr;
     output_map[p->pin] = val & 1;
     return;
@@ -159,51 +157,25 @@ void nvboard_quit(){
     SDL_Quit();
 }
 
-void nvboard_bind_output_pin(vector<uint16_t> &pin, void *signal) {
+void nvboard_bind_pin(void *signal, bool is_output, int len, ...) {
   PinMap *p = new PinMap;
-  p->is_vec = true;
-  p->is_output = true;
-  p->len = pin.size();
-  assert(p->len < 64);
-  p->pins = new uint16_t[p->len];
-  for (int i = 0; i < p->len; i ++) {
-    p->pins[i] = pin[p->len - 1 - i];
+  p->is_output = is_output;
+  p->len = len;
+  assert(len < 64);
+
+  va_list ap;
+  va_start(ap, len);
+  if (len == 1) { p->pin = (uint16_t)va_arg(ap, int); }
+  else {
+    p->pins = new uint16_t[p->len];
+    for (int i = 0; i < len; i ++) {
+      uint16_t pin = va_arg(ap, int);
+      if (is_output) p->pins[len - 1 - i] = pin;
+      else p->pins[i] = pin;
+    }
   }
-  p->signal = signal;
-  p->next = pin_map;
-  pin_map = p;
-}
+  va_end(ap);
 
-void nvboard_bind_input_pin(vector<uint16_t> &pin, void *signal) {
-  PinMap *p = new PinMap;
-  p->is_vec = true;
-  p->is_output = false;
-  p->len = pin.size();
-  assert(p->len < 64);
-  p->pins = new uint16_t[p->len];
-  for (int i = 0; i < p->len; i ++) {
-    p->pins[i] = pin[i];
-  }
-  p->signal = signal;
-  p->next = pin_map;
-  pin_map = p;
-}
-
-void nvboard_bind_output_pin(uint16_t pin, void *signal) {
-  PinMap *p = new PinMap;
-  p->is_vec = false;
-  p->is_output = true;
-  p->pin = pin;
-  p->signal = signal;
-  p->next = pin_map;
-  pin_map = p;
-}
-
-void nvboard_bind_input_pin(uint16_t pin, void *signal) {
-  PinMap *p = new PinMap;
-  p->is_vec = false;
-  p->is_output = false;
-  p->pin = pin;
   p->signal = signal;
   p->next = pin_map;
   pin_map = p;
