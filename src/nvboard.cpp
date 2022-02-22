@@ -23,6 +23,23 @@ static uint64_t get_time() {
   return now - boot_time;
 }
 
+static void calculate_clock_frequency() {
+  static int update_count = 0, last_count = 0;
+  static time_t begin = 0;
+
+  update_count ++;
+  if(!begin) time(&begin);
+  else {
+    time_t end;
+    time(&end);
+    if(end - begin >= CALCULATE_CLOCK_FREQUENCY_INTERVAL) {
+      printf("Clock frequency: %ld cycles/s\n", (update_count - last_count) / (end - begin) / 2);
+      begin = end;
+      last_count = update_count;
+    }
+  }
+}
+
 typedef struct PinMap {
   int len;
   bool is_output;
@@ -87,20 +104,7 @@ static void nvboard_update_output(PinMap *p) {
 
 void nvboard_update() {
 #ifdef CALCULATE_CLOCK_FREQUENCY
-  static int update_count = 0, last_count = 0;
-  static time_t begin = 0;
-
-  update_count ++;
-  if(!begin) time(&begin);
-  else {
-    time_t end;
-    time(&end);
-    if(end - begin >= CALCULATE_CLOCK_FREQUENCY_INTERVAL) {
-      printf("Clock frequency: %ld cycles/s\n", (update_count - last_count) / (end - begin) / 2);
-      begin = end;
-      last_count = update_count;
-    }
-  }
+  calculate_clock_frequency();
 #endif
 
   for (auto p = rt_pin_map; p != NULL; p = p->next) {
