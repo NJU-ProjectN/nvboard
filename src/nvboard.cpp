@@ -35,6 +35,7 @@ typedef struct PinMap {
 } PinMap;
 
 static PinMap *pin_map = NULL;
+static PinMap *rt_pin_map = NULL; // real-time pins
 
 static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
@@ -85,7 +86,7 @@ static void nvboard_update_output(PinMap *p) {
 }
 
 void nvboard_update() {
-  for (auto p = pin_map; p != NULL; p = p->next) {
+  for (auto p = rt_pin_map; p != NULL; p = p->next) {
     if (p->is_output) nvboard_update_output(p);
     else nvboard_update_input(p);
   }
@@ -96,6 +97,12 @@ void nvboard_update() {
   uint64_t now = get_time();
   if (now - last > 1000000 / FPS) {
     last = now;
+
+    for (auto p = pin_map; p != NULL; p = p->next) {
+      if (p->is_output) nvboard_update_output(p);
+      else nvboard_update_input(p);
+    }
+
     SDL_RenderPresent(main_renderer);
     int ev = read_event();
     if (ev != -1) { update_components(main_renderer); }
@@ -142,7 +149,7 @@ void nvboard_quit(){
     SDL_Quit();
 }
 
-void nvboard_bind_pin(void *signal, bool is_output, int len, ...) {
+void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...) {
   PinMap *p = new PinMap;
   p->is_output = is_output;
   p->len = len;
@@ -162,6 +169,6 @@ void nvboard_bind_pin(void *signal, bool is_output, int len, ...) {
   va_end(ap);
 
   p->signal = signal;
-  p->next = pin_map;
-  pin_map = p;
+  if (is_rt) { p->next = rt_pin_map; rt_pin_map = p; }
+  else { p->next = pin_map; pin_map = p; }
 }
