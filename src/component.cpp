@@ -8,6 +8,7 @@ extern uint64_t input_map [];
 extern uint64_t output_map [];
 
 std::vector<Component *> components;
+std::vector<Component *> rt_components; // real-time components
 
 Component::Component(SDL_Renderer *rend, int cnt, int init_val, int it, int ct) {
   m_renderer = rend;
@@ -92,6 +93,10 @@ void Component::update_state() {
     set_state(newval);
     update_gui();
   }
+}
+
+void Component::remove() {
+  for (auto rect_ptr : m_rects) { delete rect_ptr; }
 }
 
 RGB_LED::RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int it, int ct)
@@ -251,7 +256,7 @@ void init_components(SDL_Renderer *renderer) {
   for (int p = VGA_CLK; p <= VGA_B7; p ++) {
     ptr->add_output(p);
   }
-  components.push_back(ptr);
+  rt_components.push_back(ptr);
 #endif
 
   // init keyboard
@@ -260,16 +265,31 @@ void init_components(SDL_Renderer *renderer) {
   for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
     kb->add_input(p);
   }
-  // components.push_back(kb);
+  rt_components.push_back(kb);
+}
 
+static void delete_components(std::vector<Component *> *c) {
+  for (auto comp_ptr : *c) {
+    comp_ptr->remove();
+    delete comp_ptr;
+  }
+  c->clear();
 }
 
 void delete_components() {
-  for (auto comp_ptr : components) {
-    for (auto rect_ptr : comp_ptr->m_rects) {
-      delete rect_ptr;
-    }
-    delete comp_ptr;
-  }
-  components.clear();
+  delete_components(&components);
+  delete_components(&rt_components);
+}
+
+// render buttons, switches, leds and 7-segs
+void init_gui(SDL_Renderer *renderer) {
+  for (auto ptr : components) { ptr->update_gui(); }
+}
+
+void update_components(SDL_Renderer *renderer) {
+  for (auto ptr : components) { ptr->update_state(); }
+}
+
+void update_rt_components(SDL_Renderer *renderer) {
+  for (auto ptr : rt_components) { ptr->update_state(); }
 }

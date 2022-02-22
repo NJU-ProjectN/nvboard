@@ -91,7 +91,7 @@ void nvboard_update() {
     else nvboard_update_input(p);
   }
 
-  update_components(main_renderer);
+  update_rt_components(main_renderer);
 
   static uint64_t last = 0;
   uint64_t now = get_time();
@@ -103,10 +103,11 @@ void nvboard_update() {
       else nvboard_update_input(p);
     }
 
-    SDL_RenderPresent(main_renderer);
     int ev = read_event();
-    if (ev != -1) { update_components(main_renderer); }
-    else { exit(0); }
+    if (ev == -1) { exit(0); }
+
+    update_components(main_renderer);
+    SDL_RenderPresent(main_renderer);
   }
 }
 
@@ -137,6 +138,7 @@ void nvboard_init() {
     init_gui(main_renderer);
 
     update_components(main_renderer);
+    update_rt_components(main_renderer);
 
     boot_time = get_time_internal();
 }
