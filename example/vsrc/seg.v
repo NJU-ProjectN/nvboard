@@ -21,7 +21,7 @@ assign segs[5] = 8'b10111110;
 assign segs[6] = 8'b11100000;
 assign segs[7] = 8'b11111110;
 
-parameter CLK_NUM = 500000;
+parameter CLK_NUM = 5000000;
 
 reg [31:0] count;
 reg [2:0] offset;

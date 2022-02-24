@@ -24,7 +24,6 @@ int main() {
 
   while(1) {
     nvboard_update();
-    dut.clk = !dut.clk;
-    dut.eval();
+    single_cycle();
   }
 }

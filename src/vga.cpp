@@ -34,7 +34,7 @@ VGA::~VGA() {
 }
 
 void VGA::update_gui() {
-#ifdef SHOW_FRAME_UPDATE
+#ifdef DEBUG
   static int frames = 0;
   frames ++;
   printf("%d frames\n", frames);
@@ -48,14 +48,9 @@ void VGA::update_gui() {
 }
 
 void VGA::update_state() {
-  int vga_clk = output_map[VGA_CLK];
   int vga_vsync = output_map[VGA_VSYNC];
   int vga_hsync = output_map[VGA_HSYNC];
   int vga_blank_n = output_map[VGA_BLANK_N];
-  if(!VGA_NEG_EDGE(clk)){
-    vga_pre_clk = vga_clk;
-    return;
-  }
   if(vga_blank_n) {
     int vga_r = (output_map[VGA_R7] << 7) |
                 (output_map[VGA_R6] << 6) |
@@ -91,5 +86,4 @@ void VGA::update_state() {
     update_gui();
   }
   vga_pre_vsync = vga_vsync;
-  vga_pre_clk = vga_clk;
 }
