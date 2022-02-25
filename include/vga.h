@@ -24,6 +24,7 @@ private:
   int vga_pos;
   int vga_pre_clk, vga_pre_vsync, vga_pre_hsync;
   int vga_vaddr, vga_haddr;
+  int vga_clk_cnt;
 public:
   VGA(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
   ~VGA();

@@ -22,10 +22,6 @@
 
 // II. Hardware options
 
-#define CLK_FREQ 1000000
-
-#define CLK_DBG
-
 #define VGA_ENA
 
 // III. Experimental Function

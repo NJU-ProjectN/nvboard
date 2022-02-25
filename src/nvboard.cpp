@@ -111,7 +111,7 @@ void nvboard_update() {
   }
 }
 
-void nvboard_init() {
+void nvboard_init(int vga_clk_cycle) {
     printf("NVBoard v0.2\n");
     // init SDL and SDL_image
     SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
@@ -141,6 +141,8 @@ void nvboard_init() {
     update_rt_components(main_renderer);
 
     boot_time = get_time_internal();
+    extern void vga_set_clk_cycle(int cycle);
+    vga_set_clk_cycle(vga_clk_cycle);
 }
 
 void nvboard_quit(){
