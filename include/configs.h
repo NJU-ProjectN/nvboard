@@ -34,9 +34,7 @@
 
 //#define VSYNC
 
-#define SHOW_FRAME_UPDATE
-
-#define CALCULATE_CLOCK_FREQUENCY
+//#define DEBUG
 #define CALCULATE_CLOCK_FREQUENCY_INTERVAL 1
 
 #endif

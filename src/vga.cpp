@@ -20,7 +20,7 @@ VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int it, int ct):
     Component(rend, cnt, init_val, it, ct), 
     vga_screen_width(VGA_DEFAULT_WIDTH), vga_screen_height(VGA_DEFAULT_HEIGHT),
     vga_pre_clk(0), vga_pre_hsync(0), vga_pre_vsync(0),
-    vga_pos(0), vga_vaddr(0), vga_haddr(0) {
+    vga_pos(0), vga_vaddr(0), vga_haddr(0), vga_clk_cnt(1) {
   SDL_Texture *temp_texture = SDL_CreateTexture(rend, SDL_PIXELFORMAT_ARGB8888,
     SDL_TEXTUREACCESS_STATIC, vga_screen_width, vga_screen_height);
   set_texture(temp_texture, 0);
@@ -48,6 +48,12 @@ void VGA::update_gui() {
 }
 
 void VGA::update_state() {
+  extern int vga_cycles;
+  if(vga_clk_cnt != vga_cycles){
+    vga_clk_cnt ++;
+    return;
+  }
+  vga_clk_cnt = 1;
   int vga_vsync = output_map[VGA_VSYNC];
   int vga_hsync = output_map[VGA_HSYNC];
   int vga_blank_n = output_map[VGA_BLANK_N];

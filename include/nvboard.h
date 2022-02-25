@@ -9,3 +9,4 @@ void nvboard_init();
 void nvboard_quit();
 void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...);
 void nvboard_update();
+void nvboard_set_vga_cycles(int cycles); //default: 1

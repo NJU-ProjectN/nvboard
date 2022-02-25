@@ -103,7 +103,7 @@ static void nvboard_update_output(PinMap *p) {
 }
 
 void nvboard_update() {
-#ifdef CALCULATE_CLOCK_FREQUENCY
+#ifdef DEBUG
   calculate_clock_frequency();
 #endif
 
@@ -194,4 +194,10 @@ void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...) {
   p->signal = signal;
   if (is_rt) { p->next = rt_pin_map; rt_pin_map = p; }
   else { p->next = pin_map; pin_map = p; }
+}
+
+int vga_cycles = 1;
+
+void nvboard_set_vga_cycles(int cycles) {
+  vga_cycles = cycles;
 }
