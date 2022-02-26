@@ -126,7 +126,6 @@ output SEG7F
 output SEG7G
 output DEC7P
 
-rt_output VGA_CLK
 rt_output VGA_VSYNC
 rt_output VGA_HSYNC
 rt_output VGA_BLANK_N

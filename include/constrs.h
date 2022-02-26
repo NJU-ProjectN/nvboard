@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#define CLK_INPUT CLK
-
 #define BTN_INPUT BTNC, BTNU, BTND, BTNL, BTNR, RST
 
 #define SW_INPUT SW0, SW1, SW2, SW3, \
@@ -31,7 +29,7 @@
 
 //#define UART_OUTPUT
 
-#define VGA_OUTPUT VGA_CLK, VGA_VSYNC, VGA_HSYNC, VGA_BLANK_N,  \
+#define VGA_OUTPUT VGA_VSYNC, VGA_HSYNC, VGA_BLANK_N,  \
                    VGA_R0, VGA_R1, VGA_R2, VGA_R3, VGA_R4, VGA_R5, VGA_R6, VGA_R7, \
                    VGA_G0, VGA_G1, VGA_G2, VGA_G3, VGA_G4, VGA_G5, VGA_G6, VGA_G7, \
                    VGA_B0, VGA_B1, VGA_B2, VGA_B3, VGA_B4, VGA_B5, VGA_B6, VGA_B7
@@ -41,7 +39,6 @@
 enum {
   BTN_INPUT,
   SW_INPUT,
-  CLK_INPUT,
   KEYBOARD_INPUT,
   NR_INPUT_PINS,
 };

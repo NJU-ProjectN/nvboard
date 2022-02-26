@@ -253,7 +253,7 @@ void init_components(SDL_Renderer *renderer) {
   rect_ptr = new SDL_Rect;
   *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
   ptr->set_rect(rect_ptr, 0);
-  for (int p = VGA_CLK; p <= VGA_B7; p ++) {
+  for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
     ptr->add_output(p);
   }
   rt_components.push_back(ptr);
