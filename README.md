@@ -116,7 +116,7 @@ nvboard_quit();
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 ```
 * 通过`make nvboard-archive`生成NVBoard的库文件
-* 在生成verilator仿真可执行文件(即`$(NVBOARD_ARCHIEVE)`)将这个库文件加入链接过程，并添加链接选项`-lSDL2 -lSDL2_image`
+* 在生成verilator仿真可执行文件(即`$(NVBOARD_ARCHIVE)`)将这个库文件加入链接过程，并添加链接选项`-lSDL2 -lSDL2_image`
 
 可以参考示例项目中的Makefile文件，即`example/Makefile`
 
