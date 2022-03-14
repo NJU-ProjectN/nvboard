@@ -118,19 +118,19 @@ void load_texture(SDL_Renderer *renderer) {
   ssegled_ver_on = SDL_CreateRGBSurface(0, SEG_VER_WIDTH, SEG_VER_HEIGHT, 32, 0, 0, 0, 0);
   fill_rect_texture(renderer, &ssegled_ver_on, &tsegled_ver_on, 0xff, 0x00, 0x00);
   ssegled_ver_off = SDL_CreateRGBSurface(0, SEG_VER_WIDTH, SEG_VER_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_ver_off, &tsegled_ver_off, 0x7f, 0x7f, 0x7f);
+  fill_rect_texture(renderer, &ssegled_ver_off, &tsegled_ver_off, 0x2b, 0x2b, 0x2b);
 
   // horizontal
   ssegled_hor_on = SDL_CreateRGBSurface(0, SEG_HOR_WIDTH, SEG_HOR_HEIGHT, 32, 0, 0, 0, 0);
   fill_rect_texture(renderer, &ssegled_hor_on, &tsegled_hor_on, 0xff, 0x00, 0x00);
   ssegled_hor_off = SDL_CreateRGBSurface(0, SEG_HOR_WIDTH, SEG_HOR_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_hor_off, &tsegled_hor_off, 0x7f, 0x7f, 0x7f);
+  fill_rect_texture(renderer, &ssegled_hor_off, &tsegled_hor_off, 0x2b, 0x2b, 0x2b);
   
   // dot
   ssegled_dot_on = SDL_CreateRGBSurface(0, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 32, 0, 0, 0, 0);
   fill_rect_texture(renderer, &ssegled_dot_on, &tsegled_dot_on, 0xff, 0x00, 0x00);
   ssegled_dot_off = SDL_CreateRGBSurface(0, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_dot_off, &tsegled_dot_off, 0x7f, 0x7f, 0x7f);
+  fill_rect_texture(renderer, &ssegled_dot_off, &tsegled_dot_off, 0x2b, 0x2b, 0x2b);
   
   // LEDs
   sled_off = SDL_CreateRGBSurface(0, LED_WIDTH, LED_HEIGHT, 32, 0, 0, 0, 0);
