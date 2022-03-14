@@ -27,14 +27,14 @@
 #define SEG_X          40
 #define SEG_Y          240
 
-#define SEG_VER_WIDTH  2
-#define SEG_VER_HEIGHT 40
-#define SEG_HOR_WIDTH  40
-#define SEG_HOR_HEIGHT 2
+#define SEG_VER_WIDTH  3
+#define SEG_VER_HEIGHT 30
+#define SEG_HOR_WIDTH  30
+#define SEG_HOR_HEIGHT 3
 #define SEG_DOT_WIDTH  SEG_VER_WIDTH
 #define SEG_DOT_HEIGHT SEG_HOR_HEIGHT
 
-#define SEG_SEP        2
+#define SEG_SEP        3
 
 #define SEG_TOT_WIDTH  (SEG_SEP * 17 + SEG_VER_WIDTH * 24 + SEG_HOR_WIDTH * 8)
 #define SEG_TOT_HEIGHT (SEG_SEP * 2 + SEG_VER_HEIGHT * 2 + SEG_HOR_HEIGHT * 3)
