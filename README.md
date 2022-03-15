@@ -22,18 +22,19 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 │   ├── nvboard.h
 │   ├── render.h
 │   └── vga.h
-├── LICENSE
 ├── pic                     # NVBoard图片资源
-├── README.md
+│   └── ...
 ├── scripts
 │   ├── auto_pin_bind.py    # 生成引脚绑定代码的脚本
 │   └── nvboard.mk          # NVBoard构建规则
-└── src                     NVBorad源码
-    ├── component.cpp
-    ├── event.cpp
-    ├── nvboard.cpp
-    ├── render.cpp
-    └── vga.cpp
+└── src                     # NVBoard源码
+│   ├── component.cpp
+│   ├── event.cpp
+│   ├── nvboard.cpp
+│   ├── render.cpp
+│   └── vga.cpp
+├── LICENSE
+└── README.md
 ```
 
 ## 安装教程
@@ -70,18 +71,21 @@ NVBoard提供了以下几组API
 ```
 top=top_name
 
+# Line comment inside nxdc
 signal pin
-signal (pin1,pin2,... pink)
+signal (pin1, pin2, ..., pink)
 ```
-在约束文件的开头，需要指定顶层模块名为`top_name`。约束文件支持两种信号绑定方式，`signal pin`表示将顶层模块的`signal`端口信号绑定到引脚`pin`上，
-`signal (pin1,pin2,...,pink)`表示将顶层模块的`signal`信号的每一位从高到低依次绑定到`pin1,pin2,...,pink`上。
-约束文件支持空行。
+在约束文件的第一行，需要指定顶层模块名（上文中为`top_name`）。
+约束文件支持两种信号绑定方式，`signal pin`表示将顶层模块的`signal`端口信号绑定到引脚`pin`上，
+`signal (pin1, pin2, ..., pink)`表示将顶层模块的`signal`信号的每一位从高到低依次绑定到`pin1, pin2, ..., pink`上。
+约束文件支持空行与行注释。
 
-2. 通过命令`python $(NVBOARD_HOME)/scripts/auto_pin_bind.py 约束文件 auto_bind.cpp`来生成C++文件。
+2. 通过命令`python $(NVBOARD_HOME)/scripts/auto_pin_bind.py <.nxdc约束文件路径> <auto_bind.cpp输出路径>`来生成C++文件。
 
 调用该文件中的`nvboard_bind_all_pins(dut)`函数即可完成所有信号的绑定。
 
-注意，该脚本的错误处理并不完善，若自定义约束文件中存在错误，则可能无法生成正确的C++文件。
+注意，该脚本的错误处理并不完善，若自定义约束文件中存在错误，则可能无法生成正确的报错信息与C++文件。
+~~如果发现脚本中的错误也可以尝试修复一下然后丢pr~~
 
 可以在`board`目录下的引脚说明文件中查看引脚信息。
 
