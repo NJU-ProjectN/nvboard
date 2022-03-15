@@ -228,7 +228,7 @@ void init_components(SDL_Renderer *renderer) {
 
   // init 7-segment display
   for (int i = 0; i < 8; ++i) {
-    SDL_Rect mv = {(7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_SEP * 4), 0, 0, 0};
+    SDL_Rect mv = {SEG_X + SEG_SEP + (7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_VER_WIDTH * 2 + SEG_SEP * 2), SEG_Y + SEG_SEP, 0, 0};
     ptr = new SEGS7(renderer, 16, 0x5555, OUTPUT_TYPE, SEGS7_TYPE);
     for (int j = 0; j < 8; ++j) {
       rect_ptr = new SDL_Rect;

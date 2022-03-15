@@ -29,14 +29,14 @@ SDL_Texture *tled_off, *tled_r, *tled_g, *tled_b,
 SDL_Texture *tfpga_background, *tseg7_background;
 
 SDL_Rect segs_rect[8] = {
-  {SEG_X + SEG_SEP + SEG_VER_WIDTH, SEG_Y + SEG_SEP, SEG_HOR_WIDTH, SEG_HOR_HEIGHT},
-  {SEG_X + SEG_SEP + SEG_VER_WIDTH + SEG_HOR_WIDTH, SEG_Y + SEG_SEP + SEG_HOR_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
-  {SEG_X + SEG_SEP + SEG_VER_WIDTH + SEG_HOR_WIDTH, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + SEG_VER_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
-  {SEG_X + SEG_SEP + SEG_VER_WIDTH, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + 2 * SEG_VER_HEIGHT, SEG_HOR_WIDTH, SEG_HOR_HEIGHT},
-  {SEG_X + SEG_SEP, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + SEG_VER_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
-  {SEG_X + SEG_SEP, SEG_Y + SEG_SEP + SEG_HOR_HEIGHT, SEG_VER_WIDTH, SEG_VER_HEIGHT},
-  {SEG_X + SEG_SEP + SEG_VER_WIDTH, SEG_Y + SEG_SEP + SEG_HOR_HEIGHT + SEG_VER_HEIGHT, SEG_HOR_WIDTH, SEG_HOR_HEIGHT},
-  {SEG_X + 2 * SEG_SEP + 2 * SEG_VER_WIDTH + SEG_HOR_WIDTH, SEG_Y + SEG_SEP + 2 * SEG_HOR_HEIGHT + 2 * SEG_VER_HEIGHT, SEG_DOT_WIDTH, SEG_DOT_HEIGHT}
+  {SEG_SEP + SEG_VER_WIDTH,                     SEG_SEP                                                         , SEG_HOR_WIDTH, SEG_HOR_HEIGHT },
+  {SEG_SEP + SEG_VER_WIDTH + SEG_HOR_WIDTH,     SEG_SEP + SEG_HOR_HEIGHT                                        , SEG_VER_WIDTH, SEG_VER_HEIGHT },
+  {SEG_SEP + SEG_VER_WIDTH + SEG_HOR_WIDTH,     SEG_SEP + 2*SEG_HOR_HEIGHT + SEG_VER_HEIGHT                     , SEG_VER_WIDTH, SEG_VER_HEIGHT },
+  {SEG_SEP + SEG_VER_WIDTH,                     SEG_SEP + 2*SEG_HOR_HEIGHT + 2*SEG_VER_HEIGHT                   , SEG_HOR_WIDTH, SEG_HOR_HEIGHT },
+  {SEG_SEP,                                     SEG_SEP + 2*SEG_HOR_HEIGHT + SEG_VER_HEIGHT                     , SEG_VER_WIDTH, SEG_VER_HEIGHT },
+  {SEG_SEP,                                     SEG_SEP + SEG_HOR_HEIGHT                                        , SEG_VER_WIDTH, SEG_VER_HEIGHT },
+  {SEG_SEP + SEG_VER_WIDTH,                     SEG_SEP + SEG_HOR_HEIGHT + SEG_VER_HEIGHT                       , SEG_HOR_WIDTH, SEG_HOR_HEIGHT },
+  {2*SEG_SEP + 2*SEG_VER_WIDTH + SEG_HOR_WIDTH, SEG_SEP + 3*SEG_HOR_HEIGHT + 2*SEG_VER_HEIGHT - SEG_DOT_HEIGHT  , SEG_DOT_WIDTH, SEG_DOT_HEIGHT }
 };
 
 SDL_Texture *segs_texture(int index, int val) {
@@ -63,12 +63,12 @@ SDL_Texture *segs_texture(int index, int val) {
 }
 
 SDL_Rect btn_rects[6] = {
-  {BTNC_X, BTNC_Y, BTNC_WIDTH, BTNC_HEIGHT},
-  {BTNC_X, BTNC_Y - BTNC_HEIGHT - BTNC_SEP, BTNC_WIDTH, BTNC_HEIGHT},
-  {BTNC_X, BTNC_Y + BTNC_HEIGHT + BTNC_SEP, BTNC_WIDTH, BTNC_HEIGHT},
-  {BTNC_X - BTNC_WIDTH - BTNC_SEP, BTNC_Y, BTNC_WIDTH, BTNC_HEIGHT},
-  {BTNC_X + BTNC_WIDTH + BTNC_SEP, BTNC_Y, BTNC_WIDTH, BTNC_HEIGHT},
-  {BTNC_X, BTNC_Y - 2 * (BTNC_HEIGHT + BTNC_SEP), BTNC_WIDTH, BTNC_HEIGHT}
+  {BTNC_X,                            BTNC_Y,                                 BTNC_WIDTH, BTNC_HEIGHT },
+  {BTNC_X,                            BTNC_Y - BTNC_HEIGHT - BTNC_SEP,        BTNC_WIDTH, BTNC_HEIGHT },
+  {BTNC_X,                            BTNC_Y + BTNC_HEIGHT + BTNC_SEP,        BTNC_WIDTH, BTNC_HEIGHT },
+  {BTNC_X - BTNC_WIDTH - BTNC_SEP,    BTNC_Y,                                 BTNC_WIDTH, BTNC_HEIGHT },
+  {BTNC_X + BTNC_WIDTH + BTNC_SEP,    BTNC_Y,                                 BTNC_WIDTH, BTNC_HEIGHT },
+  {BTNC_X + BTNC_WIDTH + BTNC_SEP/2,  BTNC_Y - 2 * (BTNC_HEIGHT + BTNC_SEP),  BTNC_WIDTH, BTNC_HEIGHT }
 };
 
 extern std::string nvboard_home;
