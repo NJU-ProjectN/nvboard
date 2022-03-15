@@ -1,6 +1,121 @@
 import sys
 import os
 
+class BoardDescParser():
+  def __init__(self):
+      self.pins = {}
+  
+  def parseLine(self, lid, lineseg):
+    direction = lineseg[0].strip()
+    pinname = lineseg[1].strip()
+    if direction.startswith('rt_'):
+      is_realtime = True
+      direction = direction[3:]
+    else:
+      is_realtime = False
+    
+    if direction == "input":
+      is_output = False
+    elif direction == "output":
+      is_output = True
+    else:
+      print(f"Board Line {lid}: Error: Invalid pin direction \"{direction}\"")
+      exit(-1)
+    
+    self.pins[pinname] = (is_realtime, is_output)
+  
+  def parseFile(self, path):
+    self.pins = {}
+    with open(path, "r") as f:
+      for i, line in enumerate(f):    
+        # Remove comment
+        if '#' in line:
+          line = line[:line.find('#')]
+        line = line.strip()
+        
+        # Skip empty lines
+        if line == '':
+          continue
+        
+        lineseg = line.split()
+        if len(lineseg) == 2:
+          self.parseLine(i, lineseg)
+        else:
+          print(f"Board Line {i}: Error: Invalid line \"{line}\"")
+          exit(-1)
+  
+  def checkPinValid(self, pin):
+    return pin in self.pins
+  
+  def getPinRateStr(self, pin):
+    return "BIND_RATE_RT " if self.pins[pin][0] else "BIND_RATE_SCR"
+  
+  def getPinDirStr(self, pin):
+    return "BIND_DIR_OUT" if self.pins[pin][1] else "BIND_DIR_IN "
+
+
+class NxdcParser():
+  def __init__(self) -> None:
+      self.toplevel = ""
+      self.binds = []
+  
+  def parseToplevel(self, topline):
+    sptopline = topline.split('=')
+    if not '=' in topline or sptopline[0].strip() != 'top' or len(sptopline) != 2:
+      print("Line 1: Error: Invalid top module specification")
+      print("        Usage: in line 1: top=module_name")
+      exit(1)
+    
+    self.toplevel = sptopline[1].strip(' \n')
+  
+  def parseVec(self, lid, line):
+    # Stupid method to check missing bracelet
+    if ' (' in line and line.endswith(')'):
+      signal = line[:line.find('(')].strip()
+      pins = [u.strip() for u in line[line.find('(')+1:-1].split(',') if u.strip() != '']
+      
+      self.binds.append( (signal, pins) )
+    else:
+      print(f"Line {lid+1}: Error: Invalid multi-pin assignment")
+      exit(1)
+  
+  def parsePin(self, lid, line):
+    spline = line.split(' ')
+    if len(spline) == 2:
+      signal = spline[0].strip()
+      pin = spline[1].strip()
+      
+      self.binds.append( (signal, pin) )
+    else:
+      print(f"Line {lid+1}: Error: Invalid line")
+      exit(1)
+    
+  def parseFile(self, path):
+    cons_f = open(path, "r")
+    
+    self.parseToplevel(cons_f.readline())
+    
+    for i, line in enumerate(cons_f):
+      # Remove comment
+      if '#' in line:
+        line = line[:line.find('#')]
+      line = line.strip()
+      
+      # Skip empty lines
+      if line == '':
+        continue
+      
+      # Multi-pin assignment
+      if ' (' in line or ')' in line:
+        self.parseVec(i, line)
+      # Single pin assignment
+      elif ' ' in line:
+        self.parsePin(i, line)
+      else:
+      # Single word line, ignore to comply with previous version
+        pass
+
+
 class IndentWriter():
   def __init__(self):
     self.fp = None
@@ -45,83 +160,57 @@ class IndentWriter():
     self.writeline(wrlines[-1])
 
 
-
-def inout_dict(board_file_path):
-  inout = {}
-  with open(board_file_path, "r") as f:
-    for i, line in enumerate(f):    
-      # Remove comment
-      if '#' in line:
-        line = line[:line.find('#')]
-      line = line.strip()
-      
-      # Skip empty lines
-      if line == '':
-        continue
-      
-      lineseg = line.split()
-      if len(lineseg) == 2:
-        direction = lineseg[0].strip()
-        pinname = lineseg[1].strip()
-        
-        if direction.startswith('rt_'):
-          is_real_time_str = 'true'
-          direction = direction[3:]
-        else:
-          is_real_time_str = 'false'
-        
-        if direction == "input":
-          is_output_str = 'false'
-        elif direction == "output":
-          is_output_str = 'true'
-        else:
-          print(f"Board Line {i}: Error: Invalid pin direction \"{direction}\"")
-          exit(-1)
-        
-        inout[pinname] = (is_output_str, is_real_time_str)
-        
-      else:
-        print(f"Board Line {i}: Error: Invalid line \"{line}\"")
-        exit(-1)
-
-  return inout
-
-def check_pin_valid(inout, pin):
-  if not pin in inout:
-    print(f"Error: Invalid pin {pin}")
-    exit(1)
+class AutoBindWriter():
+  def __init__(self, iwriter, board):
+    self.iw = iwriter
+    self.board = board
+  
+  def bindPin(self, signal, pin):
+    if not self.board.checkPinValid(pin):
+      print(f"Error: Invalid pin {pin}")
+      exit(1)
+    ratestr = self.board.getPinRateStr(pin)
+    dirstr = self.board.getPinDirStr(pin)
     
-def bind_pin(wr, inout, signal, pin):
-  check_pin_valid(inout, pin)
-  pinDesc = inout[pin]
-  wr.write(f"nvboard_bind_pin( &top->{signal}, {pinDesc[1]}, {pinDesc[0]}, 1, {pin});\n")
+    self.iw.write(f"nvboard_bind_pin( &top->{signal}, {ratestr}, {dirstr}, 1, {pin});\n")
+  
+  def bindVec(self, signal, pins):
+    for pin in pins:
+      if not self.board.checkPinValid(pin):
+        print(f"Error: Invalid pin {pin}")
+        exit(1)
+    ratestr = self.board.getPinRateStr(pins[0])
+    dirstr = self.board.getPinDirStr(pins[0])
+    
+    self.iw.write(f"nvboard_bind_pin( &top->{signal}, {ratestr}, {dirstr}, {len(pins)}")
+    for pin in pins:
+      self.iw.write(f", {pin}")
+    self.iw.write(");\n")
+  
+  def bind(self, signal, pin):
+    if type(pin) is list:
+      self.bindVec(signal, pin)
+    elif type(pin) is str:
+      self.bindPin(signal, pin)
+    else:
+      print(f"Error: Invalid bind from {signal} to {pin}")
+      exit(-1)
 
-def bind_vec_pins(wr, inout, signal, pins):
-  for pin in pins:
-    check_pin_valid(inout, pin)
-  pinDesc = inout[pins[0]]
-  wr.write(f"nvboard_bind_pin( &top->{signal}, {pinDesc[1]}, {pinDesc[0]}, {len(pins)}")
-  for pin in pins:
-    wr.write(f", {pin}")
-  wr.write(");\n")
-
-def init_info(wr, top):
-  wr.write( (
-  "#include <nvboard.h>\n"
-  f'#include "V{top}.h"\n'
-  "\n"
-  f"void nvboard_bind_all_pins(V{top}* top) {{\n"
-  ) )
-
+  def writeHead(self, top):
+    self.iw.write( (
+    "#include <nvboard.h>\n"
+    f'#include "V{top}.h"\n'
+    "\n"
+    f"void nvboard_bind_all_pins(V{top}* top) {{\n"
+    ) )
+  
+  def writeTail(self):
+    self.iw.write("}\n")
 
 def print_usage():
   print("Usage: python3 auto_pin_bind.py <.nxdc constraint file path> <auto_bind.c output file path>")
 
 if __name__ == "__main__":
-  # Parse board descriptor for pin list
-  nvboard_path = os.environ.get('NVBOARD_HOME')
-  inout = inout_dict(nvboard_path + "/board/N4")
-  
   if len(sys.argv) != 3:
     print("Error: Bad command line arguments")
     print_usage()
@@ -130,56 +219,23 @@ if __name__ == "__main__":
   cons_path = sys.argv[1]
   output_path = sys.argv[2]
   
-  cons_f = open(cons_path, "r")
+  # Parse board descriptor for pin list
+  nvboard_path = os.environ.get('NVBOARD_HOME')
+  board = BoardDescParser()
+  board.parseFile(nvboard_path + "/board/N4")
+  
+  # Parse nxdc constraint file
+  constr = NxdcParser()
+  constr.parseFile(cons_path)
+  # Write bind file with indent
   bind_wr = IndentWriter()
   bind_wr.open(output_path)
-
-  # Parse toplevel module name
-  topline = cons_f.readline()
-  sptopline = topline.split('=')
-  if not '=' in topline or sptopline[0].strip() != 'top' or len(sptopline) != 2:
-    print("Line 1: Error: Invalid top module specification")
-    print("        Usage: in line 1: top=module_name")
-    exit(1)
   
-  top = sptopline[1].strip(' \n')
-
-  init_info(bind_wr, top)
-
-  for i, line in enumerate(cons_f):
-    # Remove comment
-    if '#' in line:
-      line = line[:line.find('#')]
-    line = line.strip()
-
-    # Skip empty lines
-    if line == '':
-      continue
-    
-    # Multi-pin assignment
-    if ' (' in line or ')' in line:
-      # Stupid method to check missing bracelet
-      if ' (' in line and line.endswith(')'):
-        signal = line[:line.find('(')].strip()
-        pins = [u.strip() for u in line[line.find('(')+1:-1].split(',') if u.strip() != '']
-        
-        bind_vec_pins(bind_wr, inout, signal, pins)
-      else:
-        print(f"Line {i+1}: Error: Invalid multi-pin assignment")
-        exit(1)
-    # Single pin assignment
-    elif ' ' in line:
-      spline = line.split(' ')
-      if len(spline) == 2:
-        signal = spline[0].strip()
-        pin = spline[1].strip()
-
-        bind_pin(bind_wr, inout, signal, pin)
-      else:
-        print(f"Line {i+1}: Error: Invalid line")
-        exit(1)
-
-    # Single word line, ignore to comply with previous version
-
-  bind_wr.write("}\n")
+  abw = AutoBindWriter(bind_wr, board)
+  
+  abw.writeHead(constr.toplevel)
+  for signal, pin in constr.binds:
+    abw.bind(signal, pin)
+  abw.writeTail()
+  
   bind_wr.close()
