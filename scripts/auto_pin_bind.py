@@ -121,6 +121,7 @@ class IndentWriter():
     self.fp = None
     self.indent_level = 0
     self.newline = True
+    self.inside_comment = False
   
   def open(self, filename):
     self.fp = open(filename, 'w')
@@ -131,27 +132,38 @@ class IndentWriter():
     self.fp.close()
     self.fp = None
 
-  # TODO:: Add '{', '}' in comment detection
   def writeline(self, wrline):
     if len(wrline) == 0:
       return
     
-    if '{' in wrline:
-      indclose = wrline[:wrline.find('{')].count('}')
-    else:
-      indclose = wrline.count('}')
+    if '//' in wrline:
+      # Check indent before comment and proceed
+      cmtInd = wrline.find('//')
+      self.writeline(wrline[:cmtInd])
+      self.inside_comment = True
+      wrline = wrline[cmtInd:]
     
-    if indclose > self.indent_level:
-      print("Internal Error: Indent level closed beyond 0")
-      exit(-1)
+    if not self.inside_comment:
+        if '{' in wrline:
+          indclose = wrline[:wrline.find('{')].count('}')
+        else:
+          indclose = wrline.count('}')
+        
+        if indclose > self.indent_level:
+          print("Internal Error: Indent level closed beyond 0")
+          exit(-1)
     
     if self.newline:
       self.fp.write('\t'*(self.indent_level-indclose) )
     
     self.fp.write(wrline)
     
-    self.indent_level += wrline.count('{') - wrline.count('}')
+    if not self.inside_comment:
+      self.indent_level += wrline.count('{') - wrline.count('}')
+    
     self.newline = wrline[-1] == '\n'
+    if self.newline:
+      self.inside_comment = False
   
   def write(self, wrstr):
     wrlines = wrstr.split('\n')
