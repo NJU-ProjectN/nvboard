@@ -11,3 +11,5 @@
 !*.v
 !*.cpp
 build/
+!CMakeLists.txt
+
