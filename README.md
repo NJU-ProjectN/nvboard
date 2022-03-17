@@ -80,7 +80,7 @@ signal (pin1, pin2, ..., pink)
 `signal (pin1, pin2, ..., pink)`表示将顶层模块的`signal`信号的每一位从高到低依次绑定到`pin1, pin2, ..., pink`上。
 约束文件支持空行与行注释。
 
-2. 通过命令`python $(NVBOARD_HOME)/scripts/auto_pin_bind.py <.nxdc约束文件路径> <auto_bind.cpp输出路径>`来生成C++文件。
+2. 通过命令`python $(NVBOARD_HOME)/scripts/auto_pin_bind.py nxdc约束文件路径 auto_bind.cpp输出路径`来生成C++文件。
 
 调用该文件中的`nvboard_bind_all_pins(dut)`函数即可完成所有信号的绑定。
 

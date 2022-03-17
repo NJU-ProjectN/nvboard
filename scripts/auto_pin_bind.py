@@ -220,7 +220,7 @@ class AutoBindWriter():
     self.iw.write("}\n")
 
 def print_usage():
-  print("Usage: python3 auto_pin_bind.py <.nxdc constraint file path> <auto_bind.c output file path>")
+  print("Usage: python3 auto_pin_bind.py nxdc_constraint_file_path auto_bind_c_output_file_path")
 
 if __name__ == "__main__":
   if len(sys.argv) != 3:
@@ -228,13 +228,28 @@ if __name__ == "__main__":
     print_usage()
     exit(-1)
   
+  nvboard_path = os.environ.get('NVBOARD_HOME')
+  if nvboard_path is None:
+    print("Error: NVBOARD_HOME is not set")
+    exit(-1)
+  
   cons_path = sys.argv[1]
   output_path = sys.argv[2]
+  boardfile_path = os.path.join(nvboard_path, "board/N4")
+
+  if not os.path.exists(cons_path):
+    print(f"Error: Constraint file doesn't exist:")
+    print(f"       {cons_path}")
+    exit(-1)
+  
+  if not os.path.exists(boardfile_path):
+    print(f"Error: Board file doesn't exist:")
+    print(f"       {boardfile_path}")
+    exit(-1)
   
   # Parse board descriptor for pin list
-  nvboard_path = os.environ.get('NVBOARD_HOME')
   board = BoardDescParser()
-  board.parseFile(nvboard_path + "/board/N4")
+  board.parseFile(boardfile_path)
   
   # Parse nxdc constraint file
   constr = NxdcParser()
