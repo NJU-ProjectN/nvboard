@@ -3,6 +3,7 @@ input BTNU
 input BTND
 input BTNL
 input BTNR
+input RST
 
 input SW0
 input SW1
