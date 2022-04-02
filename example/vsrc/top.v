@@ -1,6 +1,7 @@
-module top (
+module top(
     input clk,
     input rst,
+    input [4:0] btn,
     input [7:0] sw,
     input ps2_clk,
     input ps2_data,
@@ -22,9 +23,10 @@ module top (
     output [7:0] seg7
 );
 
-led led1(
+led my_led(
     .clk(clk),
     .rst(rst),
+    .btn(btn),
     .sw(sw),
     .ledr(ledr)
 );
@@ -56,7 +58,7 @@ ps2_keyboard my_keyboard(
     .ps2_data(ps2_data)
 );
 
-seg mu_seg(
+seg my_seg(
     .clk(clk),
     .rst(rst),
     .o_seg0(seg0),
@@ -77,7 +79,7 @@ vmem my_vmem(
 
 endmodule
 
-module vmem (
+module vmem(
     input [9:0] h_addr,
     input [8:0] v_addr,
     output [23:0] vga_data
