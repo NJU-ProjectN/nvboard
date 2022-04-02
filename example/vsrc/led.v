@@ -1,6 +1,7 @@
 module led(
   input clk,
   input rst,
+  input [4:0] btn,
   input [7:0] sw,
   output [15:0] ledr
 );
@@ -14,5 +15,5 @@ module led(
     end
   end
 
-  assign ledr = {led, sw};
+  assign ledr = {led[7:5], led[4:0] ^ btn, sw};
 endmodule
