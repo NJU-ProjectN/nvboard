@@ -45,15 +45,6 @@ output R17
 output G17
 output B17
 
-output AN0
-output AN1
-output AN2
-output AN3
-output AN4
-output AN5
-output AN6
-output AN7
-
 output SEG0A
 output SEG0B
 output SEG0C
