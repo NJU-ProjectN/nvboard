@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+// RST is defined but not used. NVBoard contains some internal states in *.cpp
+// file. Only resetting the RTL design in *.v file may make the RTL design and
+// NVBoard inconsistent. The easy way to reset the whole system is to exit
+// NVBoard and re-run. The reset work for RTL design is done by the verilator
+// wrapper. See `example/csrc/main.cpp` for more details.
 #define BTN_INPUT BTNC, BTNU, BTND, BTNL, BTNR, RST
 
 #define SW_INPUT SW0, SW1, SW2, SW3, \

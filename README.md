@@ -89,6 +89,9 @@ signal (pin1, pin2, ..., pink)
 
 可以在`board`目录下的引脚说明文件中查看引脚信息。
 
+其中，复位引脚`RST`不使用，因为NVBoard在cpp文件中包含一些内部状态，仅复位RTL设计部分会使其与NVBoard状态不一致。
+一个实现全系统复位效果的简单方法是退出NVBoard并重新运行。RTL设计的复位工作由verilator的wrapper完成，具体见`example/csrc/main.cpp`。
+
 ### 调用API
 
 在C++仿真代码中调用NVBoard提供的API
