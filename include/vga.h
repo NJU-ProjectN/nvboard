@@ -3,7 +3,7 @@
 
 #include <component.h>
 #include <constrs.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #define VGA_DEFAULT_WIDTH  640
 #define VGA_DEFAULT_HEIGHT 480
