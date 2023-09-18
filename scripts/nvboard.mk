@@ -1,8 +1,8 @@
 # files of NVBoard
 NVBOARD_SRC = $(NVBOARD_HOME)/src
 NVBOARD_SRCS := $(shell find $(NVBOARD_SRC) -name "*.cpp")
-NVBOARD_INC = $(NVBOARD_HOME)/include
-INC_PATH += $(NVBOARD_INC)
+NVBOARD_INC = $(NVBOARD_HOME)/include $(shell sdl2-config --cflags)
+INC_PATH += $(NVBOARD_INC) 
 
 NVBOARD_BUILD_DIR = $(NVBOARD_HOME)/build
 NVBOARD_OBJS := $(addprefix $(NVBOARD_BUILD_DIR)/, $(addsuffix .o, $(basename $(notdir $(NVBOARD_SRCS)))))

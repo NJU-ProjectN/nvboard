@@ -28,9 +28,9 @@ CSRCS += $(SRC_AUTO_BIND)
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 # rules for verilator
-INCFLAGS = $(addprefix -I, $(INC_PATH))
+INCFLAGS = $(addprefix -I, $(INC_PATH)) $(shell sdl2-config --cflags)
 CFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
-LDFLAGS += -lSDL2 -lSDL2_image
+LDFLAGS += $(shell sdl2-config --libs) -lSDL2_image
 
 $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
