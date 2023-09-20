@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 extern uint64_t input_map [];
 extern uint64_t output_map [];

@@ -1,7 +1,7 @@
 #ifndef _VFPGA_COMPONENT_H
 #define _VFPGA_COMPONENT_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <vector>
 #include <constrs.h>
 
