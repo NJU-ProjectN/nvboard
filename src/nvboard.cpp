@@ -94,20 +94,28 @@ void nvboard_update() {
   update_rt_components(main_renderer);
 
   static uint64_t last = 0;
-  uint64_t now = get_time();
-  if (now - last > 1000000 / FPS) {
-    last = now;
+  static uint32_t cpf = 0; // count per frame
+  static uint32_t cnt = 0;
+  cnt ++;
+  if (cnt > cpf) {
+    uint64_t now = get_time();
+    uint64_t diff = now - last;
+    cpf = ((uint64_t)cnt * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
+    if (diff > 1000000 / FPS) {
+      last = now;
+      cnt = 0;
 
-    for (auto p = pin_map; p != NULL; p = p->next) {
-      if (p->is_output) nvboard_update_output(p);
-      else nvboard_update_input(p);
+      for (auto p = pin_map; p != NULL; p = p->next) {
+        if (p->is_output) nvboard_update_output(p);
+        else nvboard_update_input(p);
+      }
+
+      int ev = read_event();
+      if (ev == -1) { exit(0); }
+
+      update_components(main_renderer);
+      SDL_RenderPresent(main_renderer);
     }
-
-    int ev = read_event();
-    if (ev == -1) { exit(0); }
-
-    update_components(main_renderer);
-    SDL_RenderPresent(main_renderer);
   }
 }
 
