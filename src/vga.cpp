@@ -60,6 +60,7 @@ void VGA::update_state() {
   static bool has_init = false;
   static bool is_r_len8, is_g_len8, is_b_len8;
   static bool is_all_len8;
+  static bool is_pixels_same;
   if (!has_init) {
     is_r_len8 = pin_array[VGA_R0].vector_len == 8;
     is_g_len8 = pin_array[VGA_G0].vector_len == 8;
@@ -90,12 +91,19 @@ void VGA::update_state() {
       b = is_b_len8 ? pin_peek8(VGA_B0) : GET_COLOR(B);
     }
     assert(vga_pos < vga_screen_width * vga_screen_height);
-    pixels[vga_pos] = (r << 16) | (g << 8) | b;
+    uint32_t color = (r << 16) | (g << 8) | b;
+    if (pixels[vga_pos] != color) {
+      pixels[vga_pos] = color;
+      is_pixels_same = false;
+    }
     vga_pos ++;
   }
   if (VGA_NEG_EDGE(vsync)) {
     vga_pos = 0;
-    update_gui();
+    if (!is_pixels_same) {
+      update_gui();
+      is_pixels_same = true;
+    }
   }
   vga_pre_vsync = vga_vsync;
 }
