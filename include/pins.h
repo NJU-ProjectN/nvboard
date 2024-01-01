@@ -70,7 +70,7 @@ static inline bool is_input_pin(int pin) {
 
 static inline uint8_t pin_peek(int pin) {
   PinNode *p = &pin_array[pin];
-  if (p->vector_len == 1 || is_input_pin(pin)) {
+  if (p->vector_len == 1) {
     return *(uint8_t *)p->ptr & 1;
   } else {
     uint64_t v = *(uint64_t *)p->ptr;
@@ -78,8 +78,15 @@ static inline uint8_t pin_peek(int pin) {
   }
 }
 
-static inline void pin_poke(int pin, uint8_t v) {
-  *(uint8_t *)pin_array[pin].ptr = v & 1;
+static inline void pin_poke(int pin, uint64_t v) {
+  PinNode *p = &pin_array[pin];
+  if (p->vector_len == 1) {
+    *(uint8_t *)p->ptr = v & 1;
+  } else {
+    uint64_t x = *(uint64_t *)p->ptr;
+    uint64_t mask = 1 << p->bit_offset;
+    *(uint64_t *)p->ptr = (x & ~mask) | ((v & 1) << p->bit_offset);
+  }
 }
 
 #endif

@@ -48,31 +48,7 @@ void set_redraw() { need_redraw = true; }
 
 int read_event();
 
-static void nvboard_update_input(PinMap *p) {
-  void *ptr = p->signal;
-  if (p->len == 1) {
-    uint8_t val = pin_peek(p->pin);
-    *(uint8_t *)ptr = val;
-    return;
-  }
-
-  int len = p->len;
-  uint64_t val = 0;
-  for (int i = 0; i < len; i ++) {
-    val <<= 1;
-    val |= pin_peek(p->pins[i]);
-  }
-  if (len <= 8) { *(uint8_t *)ptr = val; }
-  else if (len <= 16) { *(uint16_t *)ptr = val; }
-  else if (len <= 32) { *(uint32_t *)ptr = val; }
-  else if (len <= 64) { *(uint64_t *)ptr = val; }
-}
-
 void nvboard_update() {
-  for (auto p = rt_pin_map; p != NULL; p = p->next) {
-    if (!p->is_output) nvboard_update_input(p);
-  }
-
   update_rt_components(main_renderer);
 
   static uint64_t last = 0;
@@ -86,10 +62,6 @@ void nvboard_update() {
     if (diff > 1000000 / FPS) {
       last = now;
       cnt = 0;
-
-      for (auto p = pin_map; p != NULL; p = p->next) {
-        if (!p->is_output) nvboard_update_input(p);
-      }
 
       int ev = read_event();
       if (ev == -1) { exit(0); }
@@ -159,9 +131,7 @@ void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...) {
   va_start(ap, len);
   if (len == 1) {
     p->pin = (uint16_t)va_arg(ap, int);
-    if (is_output) {
-      pin_array[p->pin].ptr = signal;
-    }
+    pin_array[p->pin].ptr = signal;
     pin_array[p->pin].vector_len = 1;
     pin_array[p->pin].bit_offset = 0;
   }
@@ -169,12 +139,10 @@ void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...) {
     p->pins = new uint16_t[p->len];
     for (int i = 0; i < len; i ++) {
       uint16_t pin = va_arg(ap, int);
+      pin_array[pin].ptr = signal;
       pin_array[pin].vector_len = len;
       pin_array[pin].bit_offset = len - 1 - i;
-      if (is_output) {
-        p->pins[len - 1 - i] = pin;
-        pin_array[pin].ptr = signal;
-      }
+      if (is_output) p->pins[len - 1 - i] = pin;
       else p->pins[i] = pin;
     }
   }
