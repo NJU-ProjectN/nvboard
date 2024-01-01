@@ -38,15 +38,13 @@ static void key_handler(uint8_t scancode, int is_keydown){
   kb->push_key(scancode, is_keydown);
 }
 
-// Return -1 when esc is pressed.
-// Else return whether buttons / switches are pressed.
-int read_event() {
+void read_event() {
   SDL_Event ev;
   SDL_PollEvent(&ev);
   switch (ev.type) {
-    case SDL_QUIT: return -1;
+    case SDL_QUIT: exit(0);
     case SDL_WINDOWEVENT:
-      if(ev.window.event == SDL_WINDOWEVENT_CLOSE) { return -1; }
+      if (ev.window.event == SDL_WINDOWEVENT_CLOSE) { exit(0); }
       break;
     case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
     case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
@@ -54,5 +52,4 @@ int read_event() {
     case SDL_KEYUP:
       key_handler(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN); break;
   }
-  return 0;
 }

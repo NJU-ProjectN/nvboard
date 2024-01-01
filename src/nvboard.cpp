@@ -31,8 +31,6 @@ PinNode pin_array[NR_PINS];
 static bool need_redraw = true;
 void set_redraw() { need_redraw = true; }
 
-int read_event();
-
 void nvboard_update() {
   update_rt_components(main_renderer);
 
@@ -48,9 +46,8 @@ void nvboard_update() {
       last = now;
       cnt = 0;
 
-      int ev = read_event();
-      if (ev == -1) { exit(0); }
-
+      void read_event();
+      read_event();
       update_components(main_renderer);
       if (need_redraw) {
         SDL_RenderPresent(main_renderer);
