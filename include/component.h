@@ -19,11 +19,6 @@ enum {
   COMB_TYPE = 1, SEQ_TYPE = 2
 };
 
-union Pin {
-  uint16_t m_in;
-  uint16_t m_out;
-};
-
 class Component{
 private:
   SDL_Renderer *m_renderer;
@@ -32,7 +27,7 @@ private:
   std::vector<SDL_Rect *> m_rects;
   std::vector<SDL_Texture *> m_textures;
   int m_state;
-  std::vector<Pin> pins;
+  std::vector<uint16_t> pins;
 
 public:
   Component(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
@@ -44,14 +39,12 @@ public:
   SDL_Rect *get_rect(int idx) const;
   SDL_Texture *get_texture(int idx) const;
   int get_state() const;
-  uint16_t get_input(int idx = 0) const;
-  uint16_t get_output(int idx = 0) const;
+  uint16_t get_pin(int idx = 0) const;
 
   void set_rect(SDL_Rect *rect, int val);
   void set_texture(SDL_Texture *texture, int val);
   void set_state(int val);
-  void add_input(const uint16_t in);
-  void add_output(const uint16_t out);
+  void add_pin(const uint16_t pin);
   virtual void update_gui();
   virtual void update_state();
   void remove();

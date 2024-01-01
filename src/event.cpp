@@ -14,8 +14,8 @@ static void mousedown_handler(const SDL_Event &ev) {
   for (auto i : components) {
     if (i->in_rect(x_pos, y_pos) && (i->get_interface_type() == INPUT_TYPE)) {
       switch (i->get_component_type()) {
-        case BUTTON_TYPE: pin_value[i->get_input()] = 1; break;
-        case SWITCH_TYPE: pin_value[i->get_input()] = i->get_state() ^ 1; break;
+        case BUTTON_TYPE: pin_value[i->get_pin()] = 1; break;
+        case SWITCH_TYPE: pin_value[i->get_pin()] = i->get_state() ^ 1; break;
       }
     }
   }
@@ -27,7 +27,7 @@ static void mouseup_handler(const SDL_Event &ev) {
   for (auto i : components) {
     if (i->in_rect(x_pos, y_pos) && i->get_interface_type() == INPUT_TYPE) {
       switch (i->get_component_type()) {
-        case BUTTON_TYPE: pin_value[i->get_input()] = 0; break;
+        case BUTTON_TYPE: pin_value[i->get_pin()] = 0; break;
       }
     }
   }

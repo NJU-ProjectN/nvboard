@@ -47,12 +47,8 @@ int Component::get_state() const{
   return m_state;
 }
 
-uint16_t Component::get_input(int idx) const{
-  return pins[idx].m_in;
-}
-
-uint16_t Component::get_output(int idx) const{
-  return pins[idx].m_out;
+uint16_t Component::get_pin(int idx) const{
+  return pins[idx];
 }
 
 void Component::set_rect(SDL_Rect *rect, int val) {
@@ -67,16 +63,8 @@ void Component::set_state(int val) {
   m_state = val;
 }
 
-void Component::add_input(const uint16_t in) {
-  Pin temp;
-  temp.m_in = in;
-  pins.push_back(temp);
-}
-
-void Component::add_output(const uint16_t out) {
-  Pin temp;
-  temp.m_out = out;
-  pins.push_back(temp);
+void Component::add_pin(const uint16_t pin) {
+  pins.push_back(pin);
 }
 
 void Component::update_gui() {
@@ -85,8 +73,8 @@ void Component::update_gui() {
 }
 
 void Component::update_state() {
-  Pin pin = *(pins.begin());
-  int newval = (m_interface_type == INPUT_TYPE) ? pin_value[pin.m_in] : pin_value[pin.m_out];
+  uint16_t pin = *(pins.begin());
+  int newval = pin_value[pin];
   if (newval != m_state) {
     set_state(newval);
     update_gui();
@@ -108,7 +96,7 @@ void RGB_LED::update_gui() {
 void RGB_LED::update_state() {
   int newval = 0;
   for (int i = 0; i < 3; ++i) {
-    newval = (newval << 1) | pin_value[get_output(i)];
+    newval = (newval << 1) | pin_value[get_pin(i)];
   }
   if (newval != get_state()) {
     set_state(newval);
@@ -132,7 +120,7 @@ void SEGS7::update_gui() {
 void SEGS7::update_state() {
   int newval = 0;
   for (int i = 0; i < 8; ++i) {
-    newval |= (pin_value[get_output(i)]) ? (1 << (i << 1)) : (1 << (i << 1 | 1));
+    newval |= (pin_value[get_pin(i)]) ? (1 << (i << 1)) : (1 << (i << 1 | 1));
   }
   if (newval != get_state()) {
     set_state(newval);
@@ -182,7 +170,7 @@ void init_components(SDL_Renderer *renderer) {
     ptr->set_rect(rect_ptr, 1);
     ptr->set_texture(tbutton_on, 1);
     
-    ptr->add_input(BTNC + i);
+    ptr->add_pin(BTNC + i);
     components.push_back(ptr);
   }
 
@@ -202,7 +190,7 @@ void init_components(SDL_Renderer *renderer) {
     ptr->set_rect(rect_ptr, 1);
     ptr->set_texture(tswitch_on, 1);
 
-    ptr->add_input(SW0 + i);
+    ptr->add_pin(SW0 + i);
     components.push_back(ptr);
   }
   
@@ -222,7 +210,7 @@ void init_components(SDL_Renderer *renderer) {
     ptr->set_rect(rect_ptr, 1);
     ptr->set_texture(tled_g, 1);
 
-    ptr->add_output(LD0 + i);
+    ptr->add_pin(LD0 + i);
     components.push_back(ptr);
   }
 
@@ -242,7 +230,7 @@ void init_components(SDL_Renderer *renderer) {
     }
 
     for (int p = GET_SEGA(i); p <= GET_DECP(i); p ++) {
-      ptr->add_output(p);
+      ptr->add_pin(p);
     }
     components.push_back(ptr);
   }
@@ -254,7 +242,7 @@ void init_components(SDL_Renderer *renderer) {
   *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
   ptr->set_rect(rect_ptr, 0);
   for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
-    ptr->add_output(p);
+    ptr->add_pin(p);
   }
   rt_components.push_back(ptr);
 #endif
@@ -263,7 +251,7 @@ void init_components(SDL_Renderer *renderer) {
   extern KEYBOARD* kb;
   kb = new KEYBOARD(renderer, 0, 0, INPUT_TYPE, KEYBOARD_TYPE);
   for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
-    kb->add_input(p);
+    kb->add_pin(p);
   }
   rt_components.push_back(kb);
 }
