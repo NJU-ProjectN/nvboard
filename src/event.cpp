@@ -15,7 +15,7 @@ static void mousedown_handler(const SDL_Event &ev) {
     if (i->in_rect(x_pos, y_pos) && (i->get_interface_type() == INPUT_TYPE)) {
       switch (i->get_component_type()) {
         case BUTTON_TYPE: input_map[i->get_input()] = 1; break;
-        case SWICTH_TYPE: input_map[i->get_input()] = i->get_state() ^ 1; break;
+        case SWITCH_TYPE: input_map[i->get_input()] = i->get_state() ^ 1; break;
       }
     }
   }

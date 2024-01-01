@@ -191,7 +191,7 @@ void init_components(SDL_Renderer *renderer) {
 
   // init switches
   for (int i = 0; i < 16; ++i) {
-    ptr = new Component(renderer, 2, 0, INPUT_TYPE, SWICTH_TYPE);
+    ptr = new Component(renderer, 2, 0, INPUT_TYPE, SWITCH_TYPE);
     
     // off
     rect_ptr = new SDL_Rect;
