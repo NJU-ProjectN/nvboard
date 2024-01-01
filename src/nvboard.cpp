@@ -23,25 +23,10 @@ static uint64_t get_time() {
   return now - boot_time;
 }
 
-typedef struct PinMap {
-  int len;
-  bool is_output;
-  union {
-    uint16_t pin;
-    uint16_t *pins;
-  };
-  void *signal;
-  PinMap *next;
-} PinMap;
-
-PinNode pin_array[NR_PINS];
-
-static PinMap *pin_map = NULL;
-static PinMap *rt_pin_map = NULL; // real-time pins
-
 static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
 std::string nvboard_home;
+PinNode pin_array[NR_PINS];
 
 static bool need_redraw = true;
 void set_redraw() { need_redraw = true; }
@@ -122,33 +107,14 @@ void nvboard_quit(){
 }
 
 void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...) {
-  PinMap *p = new PinMap;
-  p->is_output = is_output;
-  p->len = len;
   assert(len < 64);
-
   va_list ap;
   va_start(ap, len);
-  if (len == 1) {
-    p->pin = (uint16_t)va_arg(ap, int);
-    pin_array[p->pin].ptr = signal;
-    pin_array[p->pin].vector_len = 1;
-    pin_array[p->pin].bit_offset = 0;
-  }
-  else {
-    p->pins = new uint16_t[p->len];
-    for (int i = 0; i < len; i ++) {
-      uint16_t pin = va_arg(ap, int);
-      pin_array[pin].ptr = signal;
-      pin_array[pin].vector_len = len;
-      pin_array[pin].bit_offset = len - 1 - i;
-      if (is_output) p->pins[len - 1 - i] = pin;
-      else p->pins[i] = pin;
-    }
+  for (int i = 0; i < len; i ++) {
+    uint16_t pin = va_arg(ap, int);
+    pin_array[pin].ptr = signal;
+    pin_array[pin].vector_len = len;
+    pin_array[pin].bit_offset = len - 1 - i;
   }
   va_end(ap);
-
-  p->signal = signal;
-  if (is_rt) { p->next = rt_pin_map; rt_pin_map = p; }
-  else { p->next = pin_map; pin_map = p; }
 }
