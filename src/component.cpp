@@ -154,7 +154,7 @@ void init_components(SDL_Renderer *renderer) {
   SDL_Rect *rect_ptr = nullptr;
 
   // init buttons
-  for (int i = 0; i < 6; ++i) {
+  for (int i = 0; i < 5; ++i) {
     ptr = new Component(renderer, 2, 0, BUTTON_TYPE);
 
     // off

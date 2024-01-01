@@ -68,7 +68,7 @@ SDL_Rect btn_rects[6] = {
   {BTNC_X,                            BTNC_Y + BTNC_HEIGHT + BTNC_SEP,        BTNC_WIDTH, BTNC_HEIGHT },
   {BTNC_X - BTNC_WIDTH - BTNC_SEP,    BTNC_Y,                                 BTNC_WIDTH, BTNC_HEIGHT },
   {BTNC_X + BTNC_WIDTH + BTNC_SEP,    BTNC_Y,                                 BTNC_WIDTH, BTNC_HEIGHT },
-  {BTNC_X + BTNC_WIDTH + BTNC_SEP/2,  BTNC_Y - 2 * (BTNC_HEIGHT + BTNC_SEP),  BTNC_WIDTH, BTNC_HEIGHT }
+  {BTNC_X + BTNC_WIDTH + BTNC_SEP/2,  BTNC_Y - 2 * (BTNC_HEIGHT + BTNC_SEP),  BTNC_WIDTH, BTNC_HEIGHT }  // RST, but not draw
 };
 
 extern std::string nvboard_home;
