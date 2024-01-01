@@ -100,23 +100,26 @@ void RGB_LED::update_state() {
 }
 #endif
 
-SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct)
-  : Component(rend, cnt, init_val, ct){}
+SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct, bool is_len8)
+  : Component(rend, cnt, init_val, ct), is_len8(is_len8) {}
 
 void SEGS7::update_gui() {
   int newval = get_state();
-  for (int i = 0; i < 16; ++i) {
-    if ((newval >> i) & 1) {
-      SDL_RenderCopy(get_renderer(), get_texture(i), NULL, get_rect(i));
-      set_redraw();
-    }
+  for (int i = 0; i < 8; ++i) {
+    int texture_idx = (7 - i) * 2 + (((newval >> i) & 1) ? 0 : 1);
+    SDL_RenderCopy(get_renderer(), get_texture(texture_idx), NULL, get_rect(texture_idx));
   }
+  set_redraw();
 }
 
 void SEGS7::update_state() {
   int newval = 0;
-  for (int i = 0; i < 8; ++i) {
-    newval |= 1 << (i << 1 | (pin_peek(get_pin(i)) ? 0 : 1));
+  if (is_len8) {
+    newval = pin_peek8(get_pin());
+  } else {
+    for (int i = 0; i < 8; ++i) {
+      newval |= (pin_peek(get_pin(7 - i)) << i);
+    }
   }
   if (newval != get_state()) {
     set_state(newval);
@@ -213,7 +216,8 @@ void init_components(SDL_Renderer *renderer) {
   // init 7-segment display
   for (int i = 0; i < 8; ++i) {
     SDL_Rect mv = {SEG_X + SEG_SEP + (7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_VER_WIDTH * 2 + SEG_SEP * 2), SEG_Y + SEG_SEP, 0, 0};
-    ptr = new SEGS7(renderer, 16, 0x5555, SEGS7_TYPE);
+    bool is_len8 = (pin_array[GET_SEGA(i)].vector_len == 8);
+    ptr = new SEGS7(renderer, 16, 0x5555, SEGS7_TYPE, is_len8);
     for (int j = 0; j < 8; ++j) {
       rect_ptr = new SDL_Rect;
       *rect_ptr = mv + segs_rect[j];

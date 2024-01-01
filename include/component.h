@@ -55,8 +55,10 @@ public:
 #endif
 
 class SEGS7 : public Component{
+private:
+  bool is_len8;
 public:
-  SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct);
+  SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct, bool is_len8);
   virtual void update_gui();
   virtual void update_state();
 };
