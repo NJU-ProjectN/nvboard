@@ -22,8 +22,7 @@ int sdl2at(int scancode, int is_first){
 
 KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int ct):
   Component(rend, cnt, init_val, ct),
-  data_idx(0), left_clk(0), cur_key(NOT_A_KEY),
-  ps2_clk(&pin_value[PS2_CLK]), ps2_dat(&pin_value[PS2_DAT]){
+  data_idx(0), left_clk(0), cur_key(NOT_A_KEY) {
     keymap_init();
   }
 
@@ -44,17 +43,19 @@ void KEYBOARD::update_state(){
     cur_key = all_keys.front();
     assert(data_idx == 0);
     left_clk = CLK_NUM;
-    *ps2_clk == 1;
   }
 
   if(left_clk == 0){
-    *ps2_clk = !*ps2_clk;
+    uint8_t ps2_clk = pin_peek(PS2_CLK);
+    ps2_clk = !ps2_clk;
+    pin_poke(PS2_CLK, ps2_clk);
     left_clk = CLK_NUM;
-    if(*ps2_clk){
+    if(ps2_clk){
       assert(!all_keys.empty());
-      *ps2_dat = (data_idx == PS2_PARTIAL) ? !UINT8_XOR(all_keys.front()) : \
+      uint8_t ps2_dat = (data_idx == PS2_PARTIAL) ? !UINT8_XOR(all_keys.front()) : \
                  (data_idx == PS2_STOP) ? 1 : \
                  ((data_idx >= PS2_DATA_0) && (data_idx <= PS2_DATA_7)) ? (cur_key & 1) : 0;
+      pin_poke(PS2_DAT, ps2_dat);
       if((data_idx >= PS2_DATA_0) && (data_idx <= PS2_DATA_7)) cur_key >>= 1;
       data_idx ++;
     } else if(data_idx == 11){

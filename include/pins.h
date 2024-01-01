@@ -59,6 +59,14 @@ static inline bool is_input_pin(int pin) {
   return (pin < NR_INPUT_PINS);
 }
 
-extern uint64_t pin_value[];
+static inline uint64_t pin_peek(int pin) {
+  extern uint64_t pin_value[];
+  return pin_value[pin];
+}
+
+static inline void pin_poke(int pin, uint64_t v) {
+  extern uint64_t pin_value[];
+  pin_value[pin] = v & 1;
+}
 
 #endif

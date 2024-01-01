@@ -50,7 +50,7 @@ int read_event();
 static void nvboard_update_input(PinMap *p) {
   void *ptr = p->signal;
   if (p->len == 1) {
-    uint8_t val = pin_value[p->pin];
+    uint8_t val = pin_peek(p->pin);
     *(uint8_t *)ptr = val;
     return;
   }
@@ -59,7 +59,7 @@ static void nvboard_update_input(PinMap *p) {
   uint64_t val = 0;
   for (int i = 0; i < len; i ++) {
     val <<= 1;
-    val |= pin_value[p->pins[i]];
+    val |= pin_peek(p->pins[i]);
   }
   if (len <= 8) { *(uint8_t *)ptr = val; }
   else if (len <= 16) { *(uint16_t *)ptr = val; }
@@ -71,7 +71,7 @@ static void nvboard_update_output(PinMap *p) {
   void *ptr = p->signal;
   if (p->len == 1) {
     uint8_t val = *(uint8_t *)ptr;
-    pin_value[p->pin] = val & 1;
+    pin_poke(p->pin, val);
     return;
   }
 
@@ -82,7 +82,7 @@ static void nvboard_update_output(PinMap *p) {
   else if (len <= 32) { val = *(uint32_t *)ptr; }
   else if (len <= 64) { val = *(uint64_t *)ptr; }
   for (int i = 0; i < len; i ++) {
-    pin_value[p->pins[i]] = val & 1;
+    pin_poke(p->pins[i], val);
     val >>= 1;
   }
 }

@@ -69,7 +69,7 @@ void Component::update_gui() {
 
 void Component::update_state() {
   uint16_t pin = *(pins.begin());
-  int newval = pin_value[pin];
+  int newval = pin_peek(pin);
   if (newval != m_state) {
     set_state(newval);
     update_gui();
@@ -91,7 +91,7 @@ void RGB_LED::update_gui() {
 void RGB_LED::update_state() {
   int newval = 0;
   for (int i = 0; i < 3; ++i) {
-    newval = (newval << 1) | pin_value[get_pin(i)];
+    newval = (newval << 1) | pin_peek(get_pin(i));
   }
   if (newval != get_state()) {
     set_state(newval);
@@ -115,7 +115,7 @@ void SEGS7::update_gui() {
 void SEGS7::update_state() {
   int newval = 0;
   for (int i = 0; i < 8; ++i) {
-    newval |= (pin_value[get_pin(i)]) ? (1 << (i << 1)) : (1 << (i << 1 | 1));
+    newval |= 1 << (i << 1 | (pin_peek(get_pin(i)) ? 0 : 1));
   }
   if (newval != get_state()) {
     set_state(newval);
