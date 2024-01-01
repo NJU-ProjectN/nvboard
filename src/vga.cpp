@@ -23,13 +23,19 @@ static int vga_clk_cycle = 0;
 VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int ct):
     Component(rend, cnt, init_val, ct),
     vga_screen_width(VGA_DEFAULT_WIDTH), vga_screen_height(VGA_DEFAULT_HEIGHT),
-    vga_pre_clk(0), vga_pre_hsync(0), vga_pre_vsync(0),
-    vga_pos(0), vga_vaddr(0), vga_haddr(0), vga_clk_cnt(1) {
+    vga_clk_cnt(1) {
   SDL_Texture *temp_texture = SDL_CreateTexture(rend, SDL_PIXELFORMAT_ARGB8888,
     SDL_TEXTUREACCESS_STATIC, vga_screen_width, vga_screen_height);
   set_texture(temp_texture, 0);
   pixels = new uint32_t[vga_screen_width * vga_screen_height];
   memset(pixels, 0, vga_screen_width * vga_screen_height * sizeof(uint32_t));
+
+  is_r_len8 = pin_array[VGA_R0].vector_len == 8;
+  is_g_len8 = pin_array[VGA_G0].vector_len == 8;
+  is_b_len8 = pin_array[VGA_B0].vector_len == 8;
+  is_all_len8 = is_r_len8 && is_g_len8 && is_b_len8;
+  p_pixel = pixels;
+  p_pixel_end = pixels + vga_screen_width * vga_screen_height;
 }
 
 VGA::~VGA() {
@@ -59,22 +65,6 @@ void VGA::update_state() {
       return;
     }
     vga_clk_cnt = 1;
-  }
-
-  static bool has_init = false;
-  static bool is_r_len8, is_g_len8, is_b_len8;
-  static bool is_all_len8;
-  static bool is_pixels_same;
-  static uint32_t *p_pixel;
-  static uint32_t *p_pixel_end;
-  if (!has_init) {
-    is_r_len8 = pin_array[VGA_R0].vector_len == 8;
-    is_g_len8 = pin_array[VGA_G0].vector_len == 8;
-    is_b_len8 = pin_array[VGA_B0].vector_len == 8;
-    is_all_len8 = is_r_len8 && is_g_len8 && is_b_len8;
-    p_pixel = pixels;
-    p_pixel_end = pixels + vga_screen_width * vga_screen_height;
-    has_init = true;
   }
 
   int r = 0, g = 0, b = 0;

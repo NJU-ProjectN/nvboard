@@ -20,10 +20,12 @@ class VGA : public Component{
 private:
   int vga_screen_width, vga_screen_height;
   uint32_t *pixels;
-  int vga_pos;
-  int vga_pre_clk, vga_pre_vsync, vga_pre_hsync;
-  int vga_vaddr, vga_haddr;
   int vga_clk_cnt;
+  uint32_t *p_pixel;
+  uint32_t *p_pixel_end;
+  bool is_r_len8, is_g_len8, is_b_len8;
+  bool is_all_len8;
+  bool is_pixels_same;
 public:
   VGA(SDL_Renderer *rend, int cnt, int init_val, int ct);
   ~VGA();
