@@ -4,9 +4,6 @@
 #include <map>
 #include <SDL.h>
 
-extern uint64_t input_map [];
-extern uint64_t output_map [];
-
 std::vector<Component *> components;
 std::vector<Component *> rt_components; // real-time components
 
@@ -89,7 +86,7 @@ void Component::update_gui() {
 
 void Component::update_state() {
   Pin pin = *(pins.begin());
-  int newval = (m_interface_type == INPUT_TYPE) ? input_map[pin.m_in] : output_map[pin.m_out];
+  int newval = (m_interface_type == INPUT_TYPE) ? pin_value[pin.m_in] : pin_value[pin.m_out];
   if (newval != m_state) {
     set_state(newval);
     update_gui();
@@ -111,7 +108,7 @@ void RGB_LED::update_gui() {
 void RGB_LED::update_state() {
   int newval = 0;
   for (int i = 0; i < 3; ++i) {
-    newval = (newval << 1) | output_map[get_output(i)];
+    newval = (newval << 1) | pin_value[get_output(i)];
   }
   if (newval != get_state()) {
     set_state(newval);
@@ -135,7 +132,7 @@ void SEGS7::update_gui() {
 void SEGS7::update_state() {
   int newval = 0;
   for (int i = 0; i < 8; ++i) {
-    newval |= (output_map[get_output(i)]) ? (1 << (i << 1)) : (1 << (i << 1 | 1));
+    newval |= (pin_value[get_output(i)]) ? (1 << (i << 1)) : (1 << (i << 1 | 1));
   }
   if (newval != get_state()) {
     set_state(newval);

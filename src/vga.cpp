@@ -57,13 +57,13 @@ void VGA::update_state() {
   }
   vga_clk_cnt = 1;
 
-  int vga_vsync = output_map[VGA_VSYNC];
-  int vga_hsync = output_map[VGA_HSYNC];
-  int vga_blank_n = output_map[VGA_BLANK_N];
+  int vga_vsync = pin_value[VGA_VSYNC];
+  int vga_hsync = pin_value[VGA_HSYNC];
+  int vga_blank_n = pin_value[VGA_BLANK_N];
   if(vga_blank_n) {
 #define concat3(a, b, c) concat(concat(a, b), c)
 #define MAP2(c, f, x)  c(f, x)
-#define GET_COLOR_BIT(color, n) (output_map[concat3(VGA_, color, n)] << n)
+#define GET_COLOR_BIT(color, n) (pin_value[concat3(VGA_, color, n)] << n)
 #define BITS(f, color) f(color, 0) f(color, 1) f(color, 2) f(color, 3) \
                        f(color, 4) f(color, 5) f(color, 6) f(color, 7)
 #define GET_COLOR_BIT_REDUCE(color, n) GET_COLOR_BIT(color, n) |

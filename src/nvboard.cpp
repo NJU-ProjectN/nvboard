@@ -39,8 +39,7 @@ static PinMap *rt_pin_map = NULL; // real-time pins
 
 static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
-uint64_t input_map[NR_INPUT_PINS] = {0};
-uint64_t output_map[NR_OUTPUT_PINS] = {0};
+uint64_t pin_value[NR_PINS] = {0};
 std::string nvboard_home;
 
 static bool need_redraw = true;
@@ -51,7 +50,7 @@ int read_event();
 static void nvboard_update_input(PinMap *p) {
   void *ptr = p->signal;
   if (p->len == 1) {
-    uint8_t val = input_map[p->pin];
+    uint8_t val = pin_value[p->pin];
     *(uint8_t *)ptr = val;
     return;
   }
@@ -60,7 +59,7 @@ static void nvboard_update_input(PinMap *p) {
   uint64_t val = 0;
   for (int i = 0; i < len; i ++) {
     val <<= 1;
-    val |= input_map[p->pins[i]];
+    val |= pin_value[p->pins[i]];
   }
   if (len <= 8) { *(uint8_t *)ptr = val; }
   else if (len <= 16) { *(uint16_t *)ptr = val; }
@@ -72,7 +71,7 @@ static void nvboard_update_output(PinMap *p) {
   void *ptr = p->signal;
   if (p->len == 1) {
     uint8_t val = *(uint8_t *)ptr;
-    output_map[p->pin] = val & 1;
+    pin_value[p->pin] = val & 1;
     return;
   }
 
@@ -83,7 +82,7 @@ static void nvboard_update_output(PinMap *p) {
   else if (len <= 32) { val = *(uint32_t *)ptr; }
   else if (len <= 64) { val = *(uint64_t *)ptr; }
   for (int i = 0; i < len; i ++) {
-    output_map[p->pins[i]] = val & 1;
+    pin_value[p->pins[i]] = val & 1;
     val >>= 1;
   }
 }

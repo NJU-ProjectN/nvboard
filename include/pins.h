@@ -46,18 +46,19 @@ enum {
   SW_INPUT,
   KEYBOARD_INPUT,
   NR_INPUT_PINS,
-};
-
-enum {
   NAIVE_LEDS_OUTPUT,
   RGB_LEDS_OUTPUT,
   SEG7_ENBS_OUTPUT,
   SEG7_SEGS_OUTPUT,
   VGA_OUTPUT,
-  NR_OUTPUT_PINS
+  NR_PINS,
+  NR_OUTPUT_PINS = NR_PINS - NR_INPUT_PINS
 };
 
-extern uint64_t input_map [];
-extern uint64_t output_map[];
+static inline bool is_input_pin(int pin) {
+  return (pin < NR_INPUT_PINS);
+}
+
+extern uint64_t pin_value[];
 
 #endif
