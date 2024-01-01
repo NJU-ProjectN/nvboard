@@ -25,7 +25,7 @@ VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int ct):
     vga_screen_width(VGA_DEFAULT_WIDTH), vga_screen_height(VGA_DEFAULT_HEIGHT),
     vga_clk_cnt(1) {
   SDL_Texture *temp_texture = SDL_CreateTexture(rend, SDL_PIXELFORMAT_ARGB8888,
-    SDL_TEXTUREACCESS_STATIC, vga_screen_width, vga_screen_height);
+    SDL_TEXTUREACCESS_STREAMING, vga_screen_width, vga_screen_height);
   set_texture(temp_texture, 0);
   pixels = new uint32_t[vga_screen_width * vga_screen_height];
   memset(pixels, 0, vga_screen_width * vga_screen_height * sizeof(uint32_t));
