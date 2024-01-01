@@ -108,7 +108,7 @@ void nvboard_quit(){
     SDL_Quit();
 }
 
-void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...) {
+void nvboard_bind_pin(void *signal, int len, ...) {
   assert(len < 64);
   va_list ap;
   va_start(ap, len);

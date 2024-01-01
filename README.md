@@ -16,10 +16,10 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 │   ├── at_scancode.h
 │   ├── component.h
 │   ├── configs.h
-│   ├── constrs.h
 │   ├── keyboard.h
 │   ├── macro.h
 │   ├── nvboard.h
+│   ├── pins.h
 │   ├── render.h
 │   └── vga.h
 ├── pic                     # NVBoard图片资源
@@ -27,9 +27,10 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 ├── scripts
 │   ├── auto_pin_bind.py    # 生成引脚绑定代码的脚本
 │   └── nvboard.mk          # NVBoard构建规则
-└── src                     # NVBoard源码
+├── src                     # NVBoard源码
 │   ├── component.cpp
 │   ├── event.cpp
+│   ├── keyboard.cpp
 │   ├── nvboard.cpp
 │   ├── render.cpp
 │   └── vga.cpp
@@ -55,10 +56,7 @@ NVBoard提供了以下几组API
 
 - `void nvboard_init()`: 初始化NVBoard
 - `void nvboard_quit()`: 退出NVBoard
-- `void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...)`: 将HDL的信号signal连接到NVBoard里的引脚上，具体地
-  - `is_rt`为`true`时，表示该信号为实时信号，每个周期都要更新才能正确工作，如键盘和VGA相关信号；
-    `is_rt`为`false`时，表示该信号为普通信号，可以在NVBoard更新画面时才更新，从而提升NVBoard的性能，如拨码开关和LED灯等，无需每个周期都更新
-  - `is_output`为`true`时，表示该信号方向为输出方向(从RTL代码到NVBoard)；否则为输入方向(从NVBoard到RTL代码)
+- `void nvboard_bind_pin(void *signal, int len, ...)`: 将HDL的信号signal连接到NVBoard里的引脚上，具体地
   - `len`为信号的长度，大于1时为向量信号
   - 可变参数列表`...`为引脚编号列表，编号为整数；绑定向量信号时，引脚编号列表从MSB到LSB排列
 - `void nvboard_update()`: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数
@@ -88,6 +86,7 @@ signal (pin1, pin2, ..., pink)
 ~~如果发现脚本中的错误也可以尝试修复一下然后丢pr~~
 
 可以在`board`目录下的引脚说明文件中查看引脚信息。
+其中`output`表示该信号方向为输出方向(从RTL代码到NVBoard)，`input`为输入方向(从NVBoard到RTL代码)。
 
 其中，复位引脚`RST`不使用，因为NVBoard在cpp文件中包含一些内部状态，仅复位RTL设计部分会使其与NVBoard状态不一致。
 一个实现全系统复位效果的简单方法是退出NVBoard并重新运行。RTL设计的复位工作由verilator的wrapper完成，具体见`example/csrc/main.cpp`。

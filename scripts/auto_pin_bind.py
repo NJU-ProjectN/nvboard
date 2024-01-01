@@ -9,21 +9,12 @@ class BoardDescParser():
   def parseLine(self, lid, lineseg):
     direction = lineseg[0].strip()
     pinname = lineseg[1].strip()
-    if direction.startswith('rt_'):
-      is_realtime = True
-      direction = direction[3:]
-    else:
-      is_realtime = False
     
-    if direction == "input":
-      is_output = False
-    elif direction == "output":
-      is_output = True
-    else:
+    if direction != "input" and direction != "output":
       print(f"Board Line {lid}: Error: Invalid pin direction \"{direction}\"")
       exit(-1)
     
-    self.pins[pinname] = (is_realtime, is_output)
+    self.pins[pinname] = 1
   
   def parseFile(self, path):
     self.pins = {}
@@ -47,12 +38,6 @@ class BoardDescParser():
   
   def checkPinValid(self, pin):
     return pin in self.pins
-  
-  def getPinRateStr(self, pin):
-    return "BIND_RATE_RT " if self.pins[pin][0] else "BIND_RATE_SCR"
-  
-  def getPinDirStr(self, pin):
-    return "BIND_DIR_OUT" if self.pins[pin][1] else "BIND_DIR_IN "
 
 
 class NxdcParser():
@@ -182,20 +167,14 @@ class AutoBindWriter():
     if not self.board.checkPinValid(pin):
       print(f"Error: Invalid pin {pin}")
       exit(1)
-    ratestr = self.board.getPinRateStr(pin)
-    dirstr = self.board.getPinDirStr(pin)
-    
-    self.iw.write(f"nvboard_bind_pin( &top->{signal}, {ratestr}, {dirstr}, 1, {pin});\n")
+    self.iw.write(f"nvboard_bind_pin( &top->{signal}, 1, {pin});\n")
   
   def bindVec(self, signal, pins):
     for pin in pins:
       if not self.board.checkPinValid(pin):
         print(f"Error: Invalid pin {pin}")
         exit(1)
-    ratestr = self.board.getPinRateStr(pins[0])
-    dirstr = self.board.getPinDirStr(pins[0])
-    
-    self.iw.write(f"nvboard_bind_pin( &top->{signal}, {ratestr}, {dirstr}, {len(pins)}")
+    self.iw.write(f"nvboard_bind_pin( &top->{signal}, {len(pins)}")
     for pin in pins:
       self.iw.write(f", {pin}")
     self.iw.write(");\n")
