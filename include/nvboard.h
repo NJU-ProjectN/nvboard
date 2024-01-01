@@ -2,7 +2,7 @@
 #define __NVBOARD_H__
 
 #include <configs.h>
-#include <constrs.h>
+#include <pins.h>
 #include <render.h>
 #include <component.h>
 #include <vga.h>
