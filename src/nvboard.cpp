@@ -68,30 +68,9 @@ static void nvboard_update_input(PinMap *p) {
   else if (len <= 64) { *(uint64_t *)ptr = val; }
 }
 
-static void nvboard_update_output(PinMap *p) {
-  void *ptr = p->signal;
-  if (p->len == 1) {
-    uint8_t val = *(uint8_t *)ptr;
-    pin_poke(p->pin, val);
-    return;
-  }
-
-  int len = p->len;
-  uint64_t val = 0;
-  if (len <= 8) { val = *(uint8_t *)ptr; }
-  else if (len <= 16) { val = *(uint16_t *)ptr; }
-  else if (len <= 32) { val = *(uint32_t *)ptr; }
-  else if (len <= 64) { val = *(uint64_t *)ptr; }
-  for (int i = 0; i < len; i ++) {
-    pin_poke(p->pins[i], val);
-    val >>= 1;
-  }
-}
-
 void nvboard_update() {
   for (auto p = rt_pin_map; p != NULL; p = p->next) {
-    if (p->is_output) nvboard_update_output(p);
-    else nvboard_update_input(p);
+    if (!p->is_output) nvboard_update_input(p);
   }
 
   update_rt_components(main_renderer);
@@ -109,8 +88,7 @@ void nvboard_update() {
       cnt = 0;
 
       for (auto p = pin_map; p != NULL; p = p->next) {
-        if (p->is_output) nvboard_update_output(p);
-        else nvboard_update_input(p);
+        if (!p->is_output) nvboard_update_input(p);
       }
 
       int ev = read_event();
@@ -179,12 +157,24 @@ void nvboard_bind_pin(void *signal, bool is_rt, bool is_output, int len, ...) {
 
   va_list ap;
   va_start(ap, len);
-  if (len == 1) { p->pin = (uint16_t)va_arg(ap, int); }
+  if (len == 1) {
+    p->pin = (uint16_t)va_arg(ap, int);
+    if (is_output) {
+      pin_array[p->pin].ptr = signal;
+    }
+    pin_array[p->pin].vector_len = 1;
+    pin_array[p->pin].bit_offset = 0;
+  }
   else {
     p->pins = new uint16_t[p->len];
     for (int i = 0; i < len; i ++) {
       uint16_t pin = va_arg(ap, int);
-      if (is_output) p->pins[len - 1 - i] = pin;
+      pin_array[pin].vector_len = len;
+      pin_array[pin].bit_offset = len - 1 - i;
+      if (is_output) {
+        p->pins[len - 1 - i] = pin;
+        pin_array[pin].ptr = signal;
+      }
       else p->pins[i] = pin;
     }
   }

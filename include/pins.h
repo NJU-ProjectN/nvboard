@@ -2,6 +2,7 @@
 #define _VFPGA_CONSTRS_H
 
 #include <stdint.h>
+#include <assert.h>
 
 // RST is defined but not used. NVBoard contains some internal states in *.cpp
 // file. Only resetting the RTL design in *.v file may make the RTL design and
@@ -58,19 +59,26 @@ enum {
 typedef struct PinNode {
   void *ptr;
   uint8_t data;
+  uint8_t vector_len;
+  uint8_t bit_offset;
 } PinNode;
+extern PinNode pin_array[];
 
 static inline bool is_input_pin(int pin) {
   return (pin < NR_INPUT_PINS);
 }
 
-static inline uint64_t pin_peek(int pin) {
-  extern PinNode pin_array[];
-  return *(uint8_t *)pin_array[pin].ptr;
+static inline uint8_t pin_peek(int pin) {
+  PinNode *p = &pin_array[pin];
+  if (p->vector_len == 1 || is_input_pin(pin)) {
+    return *(uint8_t *)p->ptr & 1;
+  } else {
+    uint64_t v = *(uint64_t *)p->ptr;
+    return (v >> p->bit_offset) & 1;
+  }
 }
 
-static inline void pin_poke(int pin, uint64_t v) {
-  extern PinNode pin_array[];
+static inline void pin_poke(int pin, uint8_t v) {
   *(uint8_t *)pin_array[pin].ptr = v & 1;
 }
 
