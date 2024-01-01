@@ -55,18 +55,23 @@ enum {
   NR_OUTPUT_PINS = NR_PINS - NR_INPUT_PINS
 };
 
+typedef struct PinNode {
+  void *ptr;
+  uint8_t data;
+} PinNode;
+
 static inline bool is_input_pin(int pin) {
   return (pin < NR_INPUT_PINS);
 }
 
 static inline uint64_t pin_peek(int pin) {
-  extern uint64_t pin_value[];
-  return pin_value[pin];
+  extern PinNode pin_array[];
+  return *(uint8_t *)pin_array[pin].ptr;
 }
 
 static inline void pin_poke(int pin, uint64_t v) {
-  extern uint64_t pin_value[];
-  pin_value[pin] = v & 1;
+  extern PinNode pin_array[];
+  *(uint8_t *)pin_array[pin].ptr = v & 1;
 }
 
 #endif

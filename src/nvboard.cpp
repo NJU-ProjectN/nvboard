@@ -34,12 +34,13 @@ typedef struct PinMap {
   PinMap *next;
 } PinMap;
 
+PinNode pin_array[NR_PINS];
+
 static PinMap *pin_map = NULL;
 static PinMap *rt_pin_map = NULL; // real-time pins
 
 static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
-uint64_t pin_value[NR_PINS] = {0};
 std::string nvboard_home;
 
 static bool need_redraw = true;
@@ -149,6 +150,10 @@ void nvboard_init(int vga_clk_cycle) {
     load_texture(main_renderer);
     init_components(main_renderer);
     init_gui(main_renderer);
+
+    for (int i = 0; i < NR_PINS; i ++) {
+      if (pin_array[i].ptr == NULL) pin_array[i].ptr = &pin_array[i].data;
+    }
 
     update_components(main_renderer);
     update_rt_components(main_renderer);
