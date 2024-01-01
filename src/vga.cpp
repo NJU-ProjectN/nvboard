@@ -51,34 +51,39 @@ void VGA::update_gui() {
 }
 
 void VGA::update_state() {
-  if (vga_clk_cnt < vga_clk_cycle) {
-    vga_clk_cnt ++;
-    return;
+  int vga_blank_n = pin_peek(VGA_BLANK_N);
+  if (!vga_blank_n) return;
+
+  if (vga_clk_cnt > 1) {
+    if (vga_clk_cnt < vga_clk_cycle) {
+      vga_clk_cnt ++;
+      return;
+    }
+    vga_clk_cnt = 1;
   }
-  vga_clk_cnt = 1;
 
   static bool has_init = false;
   static bool is_r_len8, is_g_len8, is_b_len8;
   static bool is_all_len8;
   static bool is_pixels_same;
+  static uint32_t *p_pixel;
+  static uint32_t *p_pixel_end;
   if (!has_init) {
     is_r_len8 = pin_array[VGA_R0].vector_len == 8;
     is_g_len8 = pin_array[VGA_G0].vector_len == 8;
     is_b_len8 = pin_array[VGA_B0].vector_len == 8;
     is_all_len8 = is_r_len8 && is_g_len8 && is_b_len8;
+    p_pixel = pixels;
+    p_pixel_end = pixels + vga_screen_width * vga_screen_height;
     has_init = true;
   }
 
-  int vga_vsync = pin_peek(VGA_VSYNC);
-  int vga_hsync = pin_peek(VGA_HSYNC);
-  int vga_blank_n = pin_peek(VGA_BLANK_N);
-  if (vga_blank_n) {
-    int r = 0, g = 0, b = 0;
-    if (is_all_len8) {
-      r = pin_peek8(VGA_R0);
-      g = pin_peek8(VGA_G0);
-      b = pin_peek8(VGA_B0);
-    } else {
+  int r = 0, g = 0, b = 0;
+  if (is_all_len8) {
+    r = pin_peek8(VGA_R0);
+    g = pin_peek8(VGA_G0);
+    b = pin_peek8(VGA_B0);
+  } else {
 #define concat3(a, b, c) concat(concat(a, b), c)
 #define MAP2(c, f, x)  c(f, x)
 #define GET_COLOR_BIT(color, n) (pin_peek(concat3(VGA_, color, n)) << n)
@@ -86,26 +91,23 @@ void VGA::update_state() {
                        f(color, 4) f(color, 5) f(color, 6) f(color, 7)
 #define GET_COLOR_BIT_REDUCE(color, n) GET_COLOR_BIT(color, n) |
 #define GET_COLOR(color) MAP2(BITS, GET_COLOR_BIT_REDUCE, color) 0
-      r = is_r_len8 ? pin_peek8(VGA_R0) : GET_COLOR(R);
-      g = is_g_len8 ? pin_peek8(VGA_G0) : GET_COLOR(G);
-      b = is_b_len8 ? pin_peek8(VGA_B0) : GET_COLOR(B);
-    }
-    assert(vga_pos < vga_screen_width * vga_screen_height);
-    uint32_t color = (r << 16) | (g << 8) | b;
-    if (pixels[vga_pos] != color) {
-      pixels[vga_pos] = color;
-      is_pixels_same = false;
-    }
-    vga_pos ++;
+    r = is_r_len8 ? pin_peek8(VGA_R0) : GET_COLOR(R);
+    g = is_g_len8 ? pin_peek8(VGA_G0) : GET_COLOR(G);
+    b = is_b_len8 ? pin_peek8(VGA_B0) : GET_COLOR(B);
   }
-  if (VGA_NEG_EDGE(vsync)) {
-    vga_pos = 0;
+  uint32_t color = (r << 16) | (g << 8) | b;
+  if (*p_pixel != color) {
+    *p_pixel = color;
+    is_pixels_same = false;
+  }
+  p_pixel ++;
+  if (p_pixel == p_pixel_end) {
+    p_pixel = pixels;
     if (!is_pixels_same) {
       update_gui();
       is_pixels_same = true;
     }
   }
-  vga_pre_vsync = vga_vsync;
 }
 
 void vga_set_clk_cycle(int cycle) {
