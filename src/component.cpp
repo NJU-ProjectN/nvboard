@@ -84,6 +84,7 @@ void Component::add_output(const uint16_t out) {
 
 void Component::update_gui() {
   SDL_RenderCopy(m_renderer, m_textures[m_state], NULL, m_rects[m_state]);
+  set_redraw();
 }
 
 void Component::update_state() {
@@ -104,6 +105,7 @@ RGB_LED::RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int it, int ct)
 
 void RGB_LED::update_gui() {
   SDL_RenderCopy(get_renderer(), get_texture(get_state()), NULL, get_rect(get_state()));
+  set_redraw();
 }
 
 void RGB_LED::update_state() {
@@ -125,6 +127,7 @@ void SEGS7::update_gui() {
   for (int i = 0; i < 16; ++i) {
     if ((newval >> i) & 1) {
       SDL_RenderCopy(get_renderer(), get_texture(i), NULL, get_rect(i));
+      set_redraw();
     }
   }
 }

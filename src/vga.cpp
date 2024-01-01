@@ -47,6 +47,7 @@ void VGA::update_gui() {
   SDL_UpdateTexture(temp_texture, NULL, pixels, vga_screen_width * sizeof(uint32_t));
   //SDL_RenderClear(temp_renderer);
   SDL_RenderCopy(temp_renderer, temp_texture, NULL, temp_rect);
+  set_redraw();
 }
 
 void VGA::update_state() {

@@ -43,6 +43,9 @@ uint64_t input_map[NR_INPUT_PINS] = {0};
 uint64_t output_map[NR_OUTPUT_PINS] = {0};
 std::string nvboard_home;
 
+static bool need_redraw = true;
+void set_redraw() { need_redraw = true; }
+
 int read_event();
 
 static void nvboard_update_input(PinMap *p) {
@@ -114,7 +117,10 @@ void nvboard_update() {
       if (ev == -1) { exit(0); }
 
       update_components(main_renderer);
-      SDL_RenderPresent(main_renderer);
+      if (need_redraw) {
+        SDL_RenderPresent(main_renderer);
+        need_redraw = false;
+      }
     }
   }
 }

@@ -40,7 +40,7 @@
 #define SEG_TOT_HEIGHT (SEG_SEP * 4 + SEG_VER_HEIGHT * 2 + SEG_HOR_HEIGHT * 3)
 
 void load_background(SDL_Renderer *renderer);
-
 void load_texture(SDL_Renderer *renderer);
+void set_redraw();
 
 #endif
