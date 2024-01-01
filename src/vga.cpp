@@ -61,33 +61,18 @@ void VGA::update_state() {
   int vga_hsync = output_map[VGA_HSYNC];
   int vga_blank_n = output_map[VGA_BLANK_N];
   if(vga_blank_n) {
-    int vga_r = (output_map[VGA_R7] << 7) |
-                (output_map[VGA_R6] << 6) |
-                (output_map[VGA_R5] << 5) |
-                (output_map[VGA_R4] << 4) |
-                (output_map[VGA_R3] << 3) |
-                (output_map[VGA_R2] << 2) |
-                (output_map[VGA_R1] << 1) |
-                 output_map[VGA_R0];
-    int vga_g = (output_map[VGA_G7] << 7) |
-                (output_map[VGA_G6] << 6) |
-                (output_map[VGA_G5] << 5) |
-                (output_map[VGA_G4] << 4) |
-                (output_map[VGA_G3] << 3) |
-                (output_map[VGA_G2] << 2) |
-                (output_map[VGA_G1] << 1) |
-                 output_map[VGA_G0];
-    int vga_b = (output_map[VGA_B7] << 7) |
-                (output_map[VGA_B6] << 6) |
-                (output_map[VGA_B5] << 5) |
-                (output_map[VGA_B4] << 4) |
-                (output_map[VGA_B3] << 3) |
-                (output_map[VGA_B2] << 2) |
-                (output_map[VGA_B1] << 1) |
-                 output_map[VGA_B0];
-    uint32_t vga_rgb = (vga_r << 16) | (vga_g << 8) | (vga_b);
+#define concat3(a, b, c) concat(concat(a, b), c)
+#define MAP2(c, f, x)  c(f, x)
+#define GET_COLOR_BIT(color, n) (output_map[concat3(VGA_, color, n)] << n)
+#define BITS(f, color) f(color, 0) f(color, 1) f(color, 2) f(color, 3) \
+                       f(color, 4) f(color, 5) f(color, 6) f(color, 7)
+#define GET_COLOR_BIT_REDUCE(color, n) GET_COLOR_BIT(color, n) |
+#define GET_COLOR(color) MAP2(BITS, GET_COLOR_BIT_REDUCE, color) 0
+    int r = GET_COLOR(R);
+    int g = GET_COLOR(G);
+    int b = GET_COLOR(B);
     assert(vga_pos < vga_screen_width * vga_screen_height);
-    pixels[vga_pos] = vga_rgb;
+    pixels[vga_pos] = (r << 16) | (g << 8) | b;
     vga_pos ++;
   }
   if(VGA_NEG_EDGE(vsync)) {
