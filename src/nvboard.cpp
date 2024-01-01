@@ -32,7 +32,13 @@ static bool need_redraw = true;
 void set_redraw() { need_redraw = true; }
 
 void nvboard_update() {
-  update_rt_components(main_renderer);
+  extern VGA *vga;
+  int vga_blank_n = pin_peek(VGA_BLANK_N);
+  if (vga_blank_n) vga->update_state();
+
+  extern KEYBOARD* kb;
+  extern bool is_kb_idle;
+  if (!is_kb_idle) kb->update_state();
 
   static uint64_t last = 0;
   static uint32_t cpf = 0; // count per frame
@@ -88,7 +94,6 @@ void nvboard_init(int vga_clk_cycle) {
     }
 
     update_components(main_renderer);
-    update_rt_components(main_renderer);
 
     boot_time = get_time_internal();
     extern void vga_set_clk_cycle(int cycle);

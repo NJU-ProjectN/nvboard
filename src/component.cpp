@@ -5,7 +5,6 @@
 #include <SDL.h>
 
 std::vector<Component *> components;
-std::vector<Component *> rt_components; // real-time components
 
 Component::Component(SDL_Renderer *rend, int cnt, int init_val, int ct) {
   m_renderer = rend;
@@ -232,14 +231,14 @@ void init_components(SDL_Renderer *renderer) {
 
 #ifdef VGA_ENA
   // init vga
-  ptr = new VGA(renderer, 1, 0, VGA_TYPE);
+  extern VGA* vga;
+  vga = new VGA(renderer, 1, 0, VGA_TYPE);
   rect_ptr = new SDL_Rect;
   *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
-  ptr->set_rect(rect_ptr, 0);
+  vga->set_rect(rect_ptr, 0);
   for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
-    ptr->add_pin(p);
+    vga->add_pin(p);
   }
-  rt_components.push_back(ptr);
 #endif
 
   // init keyboard
@@ -248,7 +247,6 @@ void init_components(SDL_Renderer *renderer) {
   for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
     kb->add_pin(p);
   }
-  rt_components.push_back(kb);
 }
 
 static void delete_components(std::vector<Component *> *c) {
@@ -261,7 +259,6 @@ static void delete_components(std::vector<Component *> *c) {
 
 void delete_components() {
   delete_components(&components);
-  delete_components(&rt_components);
 }
 
 // render buttons, switches, leds and 7-segs
@@ -271,8 +268,4 @@ void init_gui(SDL_Renderer *renderer) {
 
 void update_components(SDL_Renderer *renderer) {
   for (auto ptr : components) { ptr->update_state(); }
-}
-
-void update_rt_components(SDL_Renderer *renderer) {
-  for (auto ptr : rt_components) { ptr->update_state(); }
 }

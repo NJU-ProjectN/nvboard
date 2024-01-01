@@ -3,7 +3,8 @@
 #include <macro.h>
 #include <assert.h>
 
-KEYBOARD* kb;
+KEYBOARD* kb = NULL;
+bool is_kb_idle = true;
 
 #define FILL_KEYMAP_FIRST(a) keymap_first[SDL_PREFIX(a)] = GET_FIRST(AT_PREFIX(a));
 #define FILL_KEYMAP_DECOND(a) keymap_second[SDL_PREFIX(a)] = GET_SECOND(AT_PREFIX(a));
@@ -35,11 +36,15 @@ void KEYBOARD::push_key(uint8_t sdl_key, bool is_keydown){
   }
   if(!is_keydown) all_keys.push(0xf0);
   all_keys.push(at_key);
+  is_kb_idle = false;
 }
 
 void KEYBOARD::update_state(){
   if(cur_key == NOT_A_KEY){
-    if(all_keys.empty()) return;
+    if(all_keys.empty()) {
+      is_kb_idle = true;
+      return;
+    }
     cur_key = all_keys.front();
     assert(data_idx == 0);
     left_clk = CLK_NUM;

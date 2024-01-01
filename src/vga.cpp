@@ -3,6 +3,8 @@
 #include <macro.h>
 #include <assert.h>
 
+VGA* vga = NULL;
+
 VGA_MODE vga_mod_accepted[NR_VGA_MODE] = {
   [VGA_MODE_640_480] = {
     .h_frontporch = 96,
@@ -51,9 +53,6 @@ void VGA::update_gui() {
 }
 
 void VGA::update_state() {
-  int vga_blank_n = pin_peek(VGA_BLANK_N);
-  if (!vga_blank_n) return;
-
   if (vga_clk_cnt > 1) {
     if (vga_clk_cnt < vga_clk_cycle) {
       vga_clk_cnt ++;
