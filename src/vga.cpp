@@ -57,10 +57,27 @@ void VGA::update_state() {
   }
   vga_clk_cnt = 1;
 
+  static bool has_init = false;
+  static bool is_r_len8, is_g_len8, is_b_len8;
+  static bool is_all_len8;
+  if (!has_init) {
+    is_r_len8 = pin_array[VGA_R0].vector_len == 8;
+    is_g_len8 = pin_array[VGA_G0].vector_len == 8;
+    is_b_len8 = pin_array[VGA_B0].vector_len == 8;
+    is_all_len8 = is_r_len8 && is_g_len8 && is_b_len8;
+    has_init = true;
+  }
+
   int vga_vsync = pin_peek(VGA_VSYNC);
   int vga_hsync = pin_peek(VGA_HSYNC);
   int vga_blank_n = pin_peek(VGA_BLANK_N);
-  if(vga_blank_n) {
+  if (vga_blank_n) {
+    int r = 0, g = 0, b = 0;
+    if (is_all_len8) {
+      r = pin_peek8(VGA_R0);
+      g = pin_peek8(VGA_G0);
+      b = pin_peek8(VGA_B0);
+    } else {
 #define concat3(a, b, c) concat(concat(a, b), c)
 #define MAP2(c, f, x)  c(f, x)
 #define GET_COLOR_BIT(color, n) (pin_peek(concat3(VGA_, color, n)) << n)
@@ -68,14 +85,15 @@ void VGA::update_state() {
                        f(color, 4) f(color, 5) f(color, 6) f(color, 7)
 #define GET_COLOR_BIT_REDUCE(color, n) GET_COLOR_BIT(color, n) |
 #define GET_COLOR(color) MAP2(BITS, GET_COLOR_BIT_REDUCE, color) 0
-    int r = GET_COLOR(R);
-    int g = GET_COLOR(G);
-    int b = GET_COLOR(B);
+      r = is_r_len8 ? pin_peek8(VGA_R0) : GET_COLOR(R);
+      g = is_g_len8 ? pin_peek8(VGA_G0) : GET_COLOR(G);
+      b = is_b_len8 ? pin_peek8(VGA_B0) : GET_COLOR(B);
+    }
     assert(vga_pos < vga_screen_width * vga_screen_height);
     pixels[vga_pos] = (r << 16) | (g << 8) | b;
     vga_pos ++;
   }
-  if(VGA_NEG_EDGE(vsync)) {
+  if (VGA_NEG_EDGE(vsync)) {
     vga_pos = 0;
     update_gui();
   }

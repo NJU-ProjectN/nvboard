@@ -78,6 +78,12 @@ static inline uint8_t pin_peek(int pin) {
   }
 }
 
+static inline uint8_t pin_peek8(int pin) {
+  PinNode *p = &pin_array[pin];
+  assert(p->vector_len == 8);
+  return *(uint8_t *)p->ptr;
+}
+
 static inline void pin_poke(int pin, uint64_t v) {
   PinNode *p = &pin_array[pin];
   if (p->vector_len == 1) {
