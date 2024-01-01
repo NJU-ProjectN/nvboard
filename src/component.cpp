@@ -79,6 +79,7 @@ void Component::remove() {
   for (auto rect_ptr : m_rects) { delete rect_ptr; }
 }
 
+#if 0
 RGB_LED::RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int ct)
   : Component(rend, cnt, init_val, ct){}
 
@@ -97,6 +98,7 @@ void RGB_LED::update_state() {
     update_gui();
   }
 }
+#endif
 
 SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct)
   : Component(rend, cnt, init_val, ct){}
