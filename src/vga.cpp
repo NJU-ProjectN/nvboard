@@ -18,8 +18,8 @@ VGA_MODE vga_mod_accepted[NR_VGA_MODE] = {
 
 static int vga_clk_cycle = 0;
 
-VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int it, int ct): 
-    Component(rend, cnt, init_val, it, ct), 
+VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int ct):
+    Component(rend, cnt, init_val, ct),
     vga_screen_width(VGA_DEFAULT_WIDTH), vga_screen_height(VGA_DEFAULT_HEIGHT),
     vga_pre_clk(0), vga_pre_hsync(0), vga_pre_vsync(0),
     vga_pos(0), vga_vaddr(0), vga_haddr(0), vga_clk_cnt(1) {

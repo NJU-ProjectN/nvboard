@@ -4,11 +4,6 @@
 #include <SDL.h>
 #include <vector>
 
-// interface type
-enum {
-  INPUT_TYPE = 1, OUTPUT_TYPE = 2
-};
-
 // component type
 enum {
   BUTTON_TYPE = 1, SWITCH_TYPE, NAIVE_LED_TYPE, RGB_LED_TYPE, SEGS7_TYPE, VGA_TYPE, KEYBOARD_TYPE
@@ -22,7 +17,6 @@ enum {
 class Component{
 private:
   SDL_Renderer *m_renderer;
-  int m_interface_type;
   int m_component_type;
   std::vector<SDL_Rect *> m_rects;
   std::vector<SDL_Texture *> m_textures;
@@ -30,11 +24,10 @@ private:
   std::vector<uint16_t> pins;
 
 public:
-  Component(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
+  Component(SDL_Renderer *rend, int cnt, int init_val, int ct);
   
   bool in_rect(int x, int y) const;
   SDL_Renderer *get_renderer() const;
-  int get_interface_type() const;
   int get_component_type() const;
   SDL_Rect *get_rect(int idx) const;
   SDL_Texture *get_texture(int idx) const;
@@ -54,14 +47,14 @@ public:
 
 class RGB_LED : public Component{
 public:
-  RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
+  RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int ct);
   virtual void update_gui();
   virtual void update_state();
 };
 
 class SEGS7 : public Component{
 public:
-  SEGS7(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
+  SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct);
   virtual void update_gui();
   virtual void update_state();
 };

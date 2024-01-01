@@ -7,9 +7,8 @@
 std::vector<Component *> components;
 std::vector<Component *> rt_components; // real-time components
 
-Component::Component(SDL_Renderer *rend, int cnt, int init_val, int it, int ct) {
+Component::Component(SDL_Renderer *rend, int cnt, int init_val, int ct) {
   m_renderer = rend;
-  m_interface_type = it;
   m_component_type = ct;
   m_rects.resize(cnt);
   m_textures.resize(cnt);
@@ -25,10 +24,6 @@ bool Component::in_rect(int x, int y) const{
 
 SDL_Renderer *Component::get_renderer() const{
   return m_renderer;
-}
-
-int Component::get_interface_type() const{
-  return m_interface_type;
 }
 
 int Component::get_component_type() const{
@@ -85,8 +80,8 @@ void Component::remove() {
   for (auto rect_ptr : m_rects) { delete rect_ptr; }
 }
 
-RGB_LED::RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int it, int ct)
-  : Component(rend, cnt, init_val, it, ct){}
+RGB_LED::RGB_LED(SDL_Renderer *rend, int cnt, int init_val, int ct)
+  : Component(rend, cnt, init_val, ct){}
 
 void RGB_LED::update_gui() {
   SDL_RenderCopy(get_renderer(), get_texture(get_state()), NULL, get_rect(get_state()));
@@ -104,8 +99,8 @@ void RGB_LED::update_state() {
   }
 }
 
-SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int it, int ct)
-  : Component(rend, cnt, init_val, it, ct){}
+SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct)
+  : Component(rend, cnt, init_val, ct){}
 
 void SEGS7::update_gui() {
   int newval = get_state();
@@ -156,7 +151,7 @@ void init_components(SDL_Renderer *renderer) {
 
   // init buttons
   for (int i = 0; i < 6; ++i) {
-    ptr = new Component(renderer, 2, 0, INPUT_TYPE, BUTTON_TYPE);
+    ptr = new Component(renderer, 2, 0, BUTTON_TYPE);
 
     // off
     rect_ptr = new SDL_Rect;
@@ -176,7 +171,7 @@ void init_components(SDL_Renderer *renderer) {
 
   // init switches
   for (int i = 0; i < 16; ++i) {
-    ptr = new Component(renderer, 2, 0, INPUT_TYPE, SWITCH_TYPE);
+    ptr = new Component(renderer, 2, 0, SWITCH_TYPE);
     
     // off
     rect_ptr = new SDL_Rect;
@@ -196,7 +191,7 @@ void init_components(SDL_Renderer *renderer) {
   
   // init naive leds
   for (int i = 0; i < 16; ++i) {
-    ptr = new Component(renderer, 2, 0, OUTPUT_TYPE, NAIVE_LED_TYPE);
+    ptr = new Component(renderer, 2, 0, NAIVE_LED_TYPE);
 
     // off
     rect_ptr = new SDL_Rect;
@@ -217,7 +212,7 @@ void init_components(SDL_Renderer *renderer) {
   // init 7-segment display
   for (int i = 0; i < 8; ++i) {
     SDL_Rect mv = {SEG_X + SEG_SEP + (7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_VER_WIDTH * 2 + SEG_SEP * 2), SEG_Y + SEG_SEP, 0, 0};
-    ptr = new SEGS7(renderer, 16, 0x5555, OUTPUT_TYPE, SEGS7_TYPE);
+    ptr = new SEGS7(renderer, 16, 0x5555, SEGS7_TYPE);
     for (int j = 0; j < 8; ++j) {
       rect_ptr = new SDL_Rect;
       *rect_ptr = mv + segs_rect[j];
@@ -237,7 +232,7 @@ void init_components(SDL_Renderer *renderer) {
 
 #ifdef VGA_ENA
   // init vga
-  ptr = new VGA(renderer, 1, 0, OUTPUT_TYPE, VGA_TYPE);
+  ptr = new VGA(renderer, 1, 0, VGA_TYPE);
   rect_ptr = new SDL_Rect;
   *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
   ptr->set_rect(rect_ptr, 0);
@@ -249,7 +244,7 @@ void init_components(SDL_Renderer *renderer) {
 
   // init keyboard
   extern KEYBOARD* kb;
-  kb = new KEYBOARD(renderer, 0, 0, INPUT_TYPE, KEYBOARD_TYPE);
+  kb = new KEYBOARD(renderer, 0, 0, KEYBOARD_TYPE);
   for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
     kb->add_pin(p);
   }

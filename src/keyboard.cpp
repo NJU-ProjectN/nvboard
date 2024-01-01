@@ -20,8 +20,8 @@ int sdl2at(int scancode, int is_first){
   return is_first? keymap_first[scancode] : keymap_second[scancode];
 }
 
-KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int it, int ct):
-  Component(rend, cnt, init_val, it, ct),
+KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int ct):
+  Component(rend, cnt, init_val, ct),
   data_idx(0), left_clk(0), cur_key(NOT_A_KEY),
   ps2_clk(&pin_value[PS2_CLK]), ps2_dat(&pin_value[PS2_DAT]){
     keymap_init();

@@ -25,7 +25,7 @@ private:
   int vga_vaddr, vga_haddr;
   int vga_clk_cnt;
 public:
-  VGA(SDL_Renderer *rend, int cnt, int init_val, int it, int ct);
+  VGA(SDL_Renderer *rend, int cnt, int init_val, int ct);
   ~VGA();
 
   virtual void update_gui();
