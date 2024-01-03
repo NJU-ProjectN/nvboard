@@ -13,9 +13,10 @@ void init_font(SDL_Renderer *renderer) {
   TTF_SetFontHinting(f, TTF_HINTING_MONO);
   TTF_SetFontStyle(f, TTF_STYLE_BOLD);
 
-  SDL_Color c = {.r = 0x00, .g = 0x00, .b = 0x00 };
+  SDL_Color fg = {.r = 0x00, .g = 0x00, .b = 0x00 };
+  SDL_Color bg = {.r = 0xff, .g = 0xff, .b = 0xff };
   for (int i = 1; i < 128; i ++) {
-    SDL_Surface *s = TTF_RenderGlyph_Solid(f, i, c);
+    SDL_Surface *s = TTF_RenderGlyph_Shaded(f, i, fg, bg);
     if (s == NULL) {
       printf("error = %s\n", SDL_GetError());
     }

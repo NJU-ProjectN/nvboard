@@ -10,6 +10,7 @@ Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
   h_in_char = region.h / 16;
   uint8_t *l = add_line();
   cursor_texture = new_texture(r, 10, 16, 0x10, 0x10, 0x10);
+  clear_screen();
 }
 
 Term::~Term() {
@@ -61,8 +62,6 @@ void Term::draw_cursor() {
 }
 
 void Term::update_gui() {
-  clear_screen();
-
   SDL_Rect rect = region;
   int x_start = rect.x;
   rect.w = 10, rect.h = 16;
