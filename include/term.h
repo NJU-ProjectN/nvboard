@@ -7,14 +7,20 @@ private:
   SDL_Rect region;
   int w_in_char, h_in_char;
   std::vector<uint8_t *> lines;
-  int cursor_x, cursor_y;
+  int cursor_x, cursor_y; // cursor_y start with all history when scrolling is supported
   SDL_Texture *cursor_texture;
   int screen_y;
+  bool dirty_screen;
+  bool *dirty_line;
+  bool *dirty_char;
 
   void clear_screen();
   void newline();
   uint8_t *add_line();
   void draw_cursor();
+  bool is_cursor_on_screen();
+  void set_dirty_char(int y, int x);
+  void init_dirty(bool val);
 
 public:
   Term(SDL_Renderer *r, int x, int y, int w, int h);

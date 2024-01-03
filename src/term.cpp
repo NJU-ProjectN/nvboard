@@ -11,6 +11,15 @@ Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
   uint8_t *l = add_line();
   cursor_texture = new_texture(r, 10, 16, 0x10, 0x10, 0x10);
   clear_screen();
+  dirty_line = new bool[h_in_char];
+  dirty_char = new bool[w_in_char * h_in_char];
+  init_dirty(false);
+}
+
+void Term::init_dirty(bool val) {
+  dirty_screen = val;
+  memset(dirty_line, val, h_in_char);
+  memset(dirty_char, val, w_in_char * h_in_char);
 }
 
 Term::~Term() {
@@ -25,7 +34,10 @@ void Term::newline() {
   cursor_x = 0;
   cursor_y ++;
   if (cursor_y >= lines.size()) add_line();
-  if (cursor_y == screen_y + h_in_char) screen_y ++;  // scroll one line
+  if (cursor_y == screen_y + h_in_char) { // scroll one line
+    screen_y ++;  // TODO: only set dirty if screen_y changes between two draws
+    init_dirty(true);
+  }
 }
 
 uint8_t* Term::add_line() {
@@ -35,8 +47,15 @@ uint8_t* Term::add_line() {
   return l;
 }
 
+void Term::set_dirty_char(int y, int x) {
+  dirty_char[y * w_in_char + x] = true;
+  dirty_line[y] = true;
+  dirty_screen = true;
+}
+
 void Term::feed_ch(uint8_t ch) {
   assert(ch < 128);
+  if (is_cursor_on_screen()) set_dirty_char(cursor_y - screen_y, cursor_x);
   int y = cursor_y;
   assert(y < lines.size());
   if (ch == '\n') {
@@ -49,8 +68,12 @@ void Term::feed_ch(uint8_t ch) {
   if (cursor_x == w_in_char) newline();
 }
 
+bool Term::is_cursor_on_screen() {
+  return cursor_y >= screen_y && cursor_y < screen_y + h_in_char;
+}
+
 void Term::draw_cursor() {
-  if (cursor_y >= screen_y && cursor_y < screen_y + h_in_char) {
+  if (is_cursor_on_screen()) {
     int y = cursor_y - screen_y;
     int x = cursor_x;
     SDL_Rect rect = region;
@@ -62,21 +85,27 @@ void Term::draw_cursor() {
 }
 
 void Term::update_gui() {
+  if (!dirty_screen) return;
   SDL_Rect rect = region;
   int x_start = rect.x;
   rect.w = 10, rect.h = 16;
   for (int y = 0; y < h_in_char; y ++) {
     if (screen_y + y >= lines.size()) break;
+    if (!dirty_line[y]) continue;
+
     uint8_t *l = lines[screen_y + y];
+    rect.y = region.y + rect.h * y;
+    bool *dirty = &dirty_char[y * w_in_char];
     for (int x = 0; x < w_in_char; x ++) {
+      if (!dirty[x]) continue;
+
       uint8_t ch = l[x];
+      rect.x = region.x + rect.w * x;
       SDL_Texture *t  = get_font_texture(ch);
       SDL_RenderCopy(renderer, t, NULL, &rect);
-      rect.x += 10;
     }
-    rect.x = x_start;
-    rect.y += 16;
   }
   draw_cursor();
   set_redraw();
+  init_dirty(false);
 }
