@@ -2,7 +2,8 @@
 NVBOARD_SRC = $(NVBOARD_HOME)/src
 NVBOARD_SRCS := $(shell find $(NVBOARD_SRC) -name "*.cpp")
 NVBOARD_INC = $(NVBOARD_HOME)/include
-INC_PATH += $(NVBOARD_INC)
+NVBOARD_USR_INC = $(NVBOARD_HOME)/usr/include
+INC_PATH += $(NVBOARD_USR_INC)
 
 NVBOARD_BUILD_DIR = $(NVBOARD_HOME)/build
 NVBOARD_OBJS := $(addprefix $(NVBOARD_BUILD_DIR)/, $(addsuffix .o, $(basename $(notdir $(NVBOARD_SRCS)))))
@@ -14,7 +15,7 @@ CXXFLAGS += -MMD -O3 $(shell sdl2-config --cflags)
 $(NVBOARD_BUILD_DIR)/%.o: $(NVBOARD_SRC)/%.cpp
 	@echo + CXX "->" NVBOARD_HOME/$(shell realpath $< --relative-to $(NVBOARD_HOME))
 	@mkdir -p $(dir $@)
-	@$(CXX) $(CXXFLAGS) -I$(NVBOARD_INC) -c -o $@ $<
+	@$(CXX) -I$(NVBOARD_INC) $(CXXFLAGS) -c -o $@ $<
 
 # Build the archive of NVBoard
 $(NVBOARD_ARCHIVE): $(NVBOARD_OBJS)

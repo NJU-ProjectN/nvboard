@@ -1,14 +1,5 @@
-#include <configs.h>
-#include <vga.h>
-#include <keyboard.h>
-#include <render.h>
-#include <pins.h>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <SDL.h>
-
-std::vector<Component *> components;
+#include <nvboard.h>
+#include <macro.h>
 
 Component::Component(SDL_Renderer *rend, int cnt, int init_val, int ct) {
   m_renderer = rend;
@@ -104,171 +95,24 @@ void RGB_LED::update_state() {
 }
 #endif
 
-SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct, bool is_len8)
-  : Component(rend, cnt, init_val, ct), is_len8(is_len8) {}
-
-void SEGS7::update_gui() {
-  int newval = get_state();
-  for (int i = 0; i < 8; ++i) {
-    int texture_idx = (7 - i) * 2 + (((newval >> i) & 1) ? 0 : 1);
-    SDL_RenderCopy(get_renderer(), get_texture(texture_idx), NULL, get_rect(texture_idx));
-  }
-  set_redraw();
-}
-
-void SEGS7::update_state() {
-  int newval = 0;
-  if (is_len8) {
-    newval = pin_peek8(get_pin());
-  } else {
-    for (int i = 0; i < 8; ++i) {
-      newval |= (pin_peek(get_pin(7 - i)) << i);
-    }
-  }
-  if (newval != get_state()) {
-    set_state(newval);
-    update_gui();
-  }
-}
-
-extern SDL_Texture *tbutton_on, *tbutton_off;
-extern SDL_Texture *tswitch_on, *tswitch_off;
-extern SDL_Texture *tsegled_ver_off, *tsegled_ver_on,
-                   *tsegled_hor_off, *tsegled_hor_on,
-                   *tsegled_dot_off, *tsegled_dot_on;
-extern SDL_Texture *tled_off, *tled_r, *tled_g, *tled_b,
-                   *tled_rg, *tled_rb, *tled_gb, *tled_rgb;
-extern SDL_Texture *tfpga_background, *tseg7_background;
-
-extern SDL_Rect segs_rect[8], btn_rects[6];
-
-SDL_Rect operator+(const SDL_Rect &A, const SDL_Rect &B) {
-  SDL_Rect ret;
-  ret.x = A.x + B.x;
-  ret.y = A.y + B.y;
-  ret.w = A.w + B.w;
-  ret.h = A.h + B.h;
-  return ret;
-}
-
-SDL_Texture *segs_texture(int index, int val);
-
 void init_components(SDL_Renderer *renderer) {
-  Component *ptr = nullptr;
-  SDL_Rect *rect_ptr = nullptr;
-
-  // init buttons
-  for (int i = 0; i < 5; ++i) {
-    ptr = new Component(renderer, 2, 0, BUTTON_TYPE);
-
-    // off
-    rect_ptr = new SDL_Rect;
-    *rect_ptr = btn_rects[i];
-    ptr->set_rect(rect_ptr, 0);
-    ptr->set_texture(tbutton_off, 0);
-    
-    // on
-    rect_ptr = new SDL_Rect;
-    *rect_ptr = btn_rects[i];
-    ptr->set_rect(rect_ptr, 1);
-    ptr->set_texture(tbutton_on, 1);
-    
-    ptr->add_pin(BTNC + i);
-    components.push_back(ptr);
-  }
-
-  // init switches
-  for (int i = 0; i < 16; ++i) {
-    ptr = new Component(renderer, 2, 0, SWITCH_TYPE);
-    
-    // off
-    rect_ptr = new SDL_Rect;
-    *rect_ptr = (SDL_Rect){SWITCH_X + (15 - i) * (SWITCH_WIDTH + SWITCH_SEP), SWITCH_Y, SWITCH_WIDTH, SWITCH_HEIGHT};
-    ptr->set_rect(rect_ptr, 0);
-    ptr->set_texture(tswitch_off, 0);
-    
-    // on
-    rect_ptr = new SDL_Rect;
-    *rect_ptr = (SDL_Rect){SWITCH_X + (15 - i) * (SWITCH_WIDTH + SWITCH_SEP), SWITCH_Y, SWITCH_WIDTH, SWITCH_HEIGHT};
-    ptr->set_rect(rect_ptr, 1);
-    ptr->set_texture(tswitch_on, 1);
-
-    ptr->add_pin(SW0 + i);
-    components.push_back(ptr);
-  }
-  
-  // init naive leds
-  for (int i = 0; i < 16; ++i) {
-    ptr = new Component(renderer, 2, 0, NAIVE_LED_TYPE);
-
-    // off
-    rect_ptr = new SDL_Rect;
-    *rect_ptr = (SDL_Rect){LED_X + (15 - i) * (LED_WIDTH + LED_SEP), LED_Y, LED_WIDTH, LED_HEIGHT};
-    ptr->set_rect(rect_ptr, 0);
-    ptr->set_texture(tled_off, 0);
-
-    // on
-    rect_ptr = new SDL_Rect;
-    *rect_ptr = (SDL_Rect){LED_X + (15 - i) * (LED_WIDTH + LED_SEP), LED_Y, LED_WIDTH, LED_HEIGHT};
-    ptr->set_rect(rect_ptr, 1);
-    ptr->set_texture(tled_g, 1);
-
-    ptr->add_pin(LD0 + i);
-    components.push_back(ptr);
-  }
-
-  // init 7-segment display
-  for (int i = 0; i < 8; ++i) {
-    SDL_Rect mv = {SEG_X + SEG_SEP + (7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_VER_WIDTH * 2 + SEG_SEP * 2), SEG_Y + SEG_SEP, 0, 0};
-    bool is_len8 = (pin_array[GET_SEGA(i)].vector_len == 8);
-    ptr = new SEGS7(renderer, 16, 0x5555, SEGS7_TYPE, is_len8);
-    for (int j = 0; j < 8; ++j) {
-      rect_ptr = new SDL_Rect;
-      *rect_ptr = mv + segs_rect[j];
-      ptr->set_texture(segs_texture(j, 0), j << 1 | 0);
-      ptr->set_rect(rect_ptr, j << 1 | 0);
-      rect_ptr = new SDL_Rect;
-      *rect_ptr = mv + segs_rect[j];
-      ptr->set_texture(segs_texture(j, 1), j << 1 | 1);
-      ptr->set_rect(rect_ptr, j << 1 | 1);
-    }
-
-    for (int p = GET_SEGA(i); p <= GET_DECP(i); p ++) {
-      ptr->add_pin(p);
-    }
-    components.push_back(ptr);
-  }
-
-#ifdef VGA_ENA
-  // init vga
-  extern VGA* vga;
-  vga = new VGA(renderer, 1, 0, VGA_TYPE);
-  rect_ptr = new SDL_Rect;
-  *rect_ptr = (SDL_Rect){0, WINDOW_HEIGHT / 2, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
-  vga->set_rect(rect_ptr, 0);
-  for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
-    vga->add_pin(p);
-  }
-#endif
-
-  // init keyboard
-  extern KEYBOARD* kb;
-  kb = new KEYBOARD(renderer, 0, 0, KEYBOARD_TYPE);
-  for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
-    kb->add_pin(p);
-  }
+#define COMPONENT_LIST(f) f(led) f(switch) f(button) f(segs7) f(keyboard) f(vga)
+#define INIT_FN(c) { void concat(init_, c)(SDL_Renderer *); concat(init_, c)(renderer); }
+  COMPONENT_LIST(INIT_FN);
 }
 
-static void delete_components(std::vector<Component *> *c) {
-  for (auto comp_ptr : *c) {
-    comp_ptr->remove();
-    delete comp_ptr;
-  }
-  c->clear();
+std::vector<Component *> components;
+
+void add_component(Component *c) {
+  components.push_back(c);
 }
 
 void delete_components() {
-  delete_components(&components);
+  for (auto comp_ptr : components) {
+    comp_ptr->remove();
+    delete comp_ptr;
+  }
+  components.clear();
 }
 
 // render buttons, switches, leds and 7-segs

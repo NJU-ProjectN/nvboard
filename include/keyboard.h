@@ -1,11 +1,8 @@
-#ifndef _VFPGA_KEYBOARD_H
-#define _VFPGA_KEYBOARD_H
+#ifndef __KEYBOARD_H__
+#define __KEYBOARD_H__
 
 #include <queue>
-#include <assert.h>
 #include <component.h>
-#include <map>
-#include <at_scancode.h>
 
 #define NOT_A_KEY -1
 #define CLK_NUM 10

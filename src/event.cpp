@@ -1,8 +1,3 @@
-#include <SDL.h>
-#include <map>
-#include <string>
-#include <iostream>
-#include <vector>
 #include <keyboard.h>
 #include <pins.h>
 

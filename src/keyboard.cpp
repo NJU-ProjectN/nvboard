@@ -1,6 +1,6 @@
 #include <keyboard.h>
 #include <pins.h>
-#include <assert.h>
+#include "at_scancode.h"
 
 KEYBOARD* kb = NULL;
 bool is_kb_idle = true;
@@ -11,27 +11,16 @@ bool is_kb_idle = true;
 static int keymap_first[256] = {};
 static int keymap_second[256] = {};
 
-void keymap_init(){
-  MAP(SCANCODE_LIST, FILL_KEYMAP_FIRST)
-  MAP(SCANCODE_LIST, FILL_KEYMAP_DECOND)
-}
-
-int sdl2at(int scancode, int is_first){
-  return is_first? keymap_first[scancode] : keymap_second[scancode];
-}
-
 KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int ct):
   Component(rend, cnt, init_val, ct),
-  data_idx(0), left_clk(0), cur_key(NOT_A_KEY) {
-    keymap_init();
-  }
+  data_idx(0), left_clk(0), cur_key(NOT_A_KEY) { }
 
 
 void KEYBOARD::push_key(uint8_t sdl_key, bool is_keydown){
-  uint8_t at_key = sdl2at(sdl_key, 1);
+  uint8_t at_key = keymap_first[sdl_key];
   if(at_key == 0xe0){
     all_keys.push(0xe0);
-    at_key = sdl2at(sdl_key, 0);
+    at_key = keymap_second[sdl_key];
   }
   if(!is_keydown) all_keys.push(0xf0);
   all_keys.push(at_key);
@@ -71,4 +60,13 @@ void KEYBOARD::update_state(){
   else{
     left_clk --;
   }
+}
+
+void init_keyboard(SDL_Renderer *renderer) {
+  kb = new KEYBOARD(renderer, 0, 0, KEYBOARD_TYPE);
+  for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
+    kb->add_pin(p);
+  }
+  MAP(SCANCODE_LIST, FILL_KEYMAP_FIRST)
+  MAP(SCANCODE_LIST, FILL_KEYMAP_DECOND)
 }

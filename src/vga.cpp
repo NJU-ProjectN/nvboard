@@ -1,9 +1,6 @@
+#include <nvboard.h>
 #include <vga.h>
-#include <keyboard.h>
-#include <pins.h>
-#include <render.h>
 #include <macro.h>
-#include <assert.h>
 
 VGA* vga = NULL;
 
@@ -103,4 +100,14 @@ void VGA::update_state() {
 
 void vga_set_clk_cycle(int cycle) {
   vga_clk_cycle = cycle;
+}
+
+void init_vga(SDL_Renderer *renderer) {
+  vga = new VGA(renderer, 1, 0, VGA_TYPE);
+  SDL_Rect *rect_ptr = new SDL_Rect;
+  *rect_ptr = (SDL_Rect){0, WINDOW_HEIGHT / 2, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
+  vga->set_rect(rect_ptr, 0);
+  for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
+    vga->add_pin(p);
+  }
 }

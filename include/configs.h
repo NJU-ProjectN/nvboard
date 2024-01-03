@@ -1,7 +1,7 @@
-#ifndef _VFPGA_CONFIGS_H
-#define _VFPGA_CONFIGS_H
+#ifndef __CONFIGS_H__
+#define __CONFIGS_H__
 
-// I. Mapping
+// 1. Mapping
 // You can replace pictures used in GUI
 
 // 640*480 png
@@ -20,14 +20,20 @@
 #define SEG_BKGND_CUSTOM
 #define VSEGLED_BG_PATH "vsegled_bg.png"
 
-// II. Hardware options
+// 2. Hardware options
 
 #define VGA_ENA
 
-// III. Experimental Function
+// 3. Experimental Function
 
 //#define HARDWARE_ACC
 
 //#define VSYNC
+
+// 4. Windows options
+
+#define WINDOW_WIDTH   (640 * 2)
+#define WINDOW_HEIGHT  (480 * 2)
+
 
 #endif

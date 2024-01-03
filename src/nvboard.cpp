@@ -1,13 +1,7 @@
-#include <SDL.h>
-#include <SDL_image.h>
 #include <nvboard.h>
 #include <keyboard.h>
 #include <vga.h>
-#include <render.h>
-#include <stdlib.h>
 #include <sys/time.h>
-#include <assert.h>
-#include <string>
 #include <stdarg.h>
 
 #define FPS 60
@@ -28,6 +22,8 @@ static uint64_t get_time() {
 
 static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
+static SDL_Surface *sfpga_background;
+static SDL_Texture *tfpga_background;
 std::string nvboard_home;
 PinNode pin_array[NR_PINS];
 
@@ -66,6 +62,13 @@ void nvboard_update() {
   }
 }
 
+static void load_background(SDL_Renderer *renderer) {
+  sfpga_background = IMG_Load((nvboard_home + "/pic/" + BG_PATH).c_str());
+  tfpga_background = SDL_CreateTextureFromSurface(renderer, sfpga_background);
+  SDL_Rect rect_bg = {0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2};
+  SDL_RenderCopy(renderer, tfpga_background, NULL, &rect_bg);
+}
+
 void nvboard_init(int vga_clk_cycle) {
     printf("NVBoard v0.3 (2024.01.02)\n");
     // init SDL and SDL_image
@@ -84,11 +87,10 @@ void nvboard_init(int vga_clk_cycle) {
     #endif
         0
     );
-    
+
     nvboard_home = getenv("NVBOARD_HOME");
-    
+
     load_background(main_renderer);
-    load_texture(main_renderer);
     init_components(main_renderer);
     init_gui(main_renderer);
 
