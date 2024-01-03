@@ -6,19 +6,10 @@
 #define SWITCH_WIDTH   20
 #define SWITCH_HEIGHT  40
 
-static SDL_Surface *sswitch_on, *sswitch_off;
-static SDL_Texture *tswitch_on, *tswitch_off;
-
-static void load_texture(SDL_Renderer *renderer) {
-  // switches
-  sswitch_on = IMG_Load((nvboard_home + "/pic/" + VSW_ON_PATH).c_str());
-  tswitch_on = SDL_CreateTextureFromSurface(renderer, sswitch_on);
-  sswitch_off = IMG_Load((nvboard_home + "/pic/" + VSW_OFF_PATH).c_str());
-  tswitch_off = SDL_CreateTextureFromSurface(renderer, sswitch_off);
-}
-
 void init_switch(SDL_Renderer *renderer) {
-  load_texture(renderer);
+  SDL_Texture *tswitch_on  = load_pic_texture(renderer, VSW_ON_PATH);
+  SDL_Texture *tswitch_off = load_pic_texture(renderer, VSW_OFF_PATH);
+
   for (int i = 0; i < 16; ++i) {
     Component *ptr = new Component(renderer, 2, 0, SWITCH_TYPE);
 

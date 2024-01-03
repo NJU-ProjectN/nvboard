@@ -21,11 +21,6 @@
 static SDL_Texture *tsegled_ver_off, *tsegled_ver_on,
                    *tsegled_hor_off, *tsegled_hor_on,
                    *tsegled_dot_off, *tsegled_dot_on;
-static SDL_Surface *ssegled_ver_off, *ssegled_ver_on,
-                   *ssegled_hor_off, *ssegled_hor_on,
-                   *ssegled_dot_off, *ssegled_dot_on;
-static SDL_Surface *sseg7_background;
-static SDL_Texture *tseg7_background;
 
 static SDL_Rect segs_rect[8] = {
   {SEG_SEP + SEG_VER_WIDTH,                     SEG_SEP                                                         , SEG_HOR_WIDTH, SEG_HOR_HEIGHT },
@@ -76,32 +71,24 @@ void SEGS7::update_state() {
 
 static void load_texture(SDL_Renderer *renderer) {
   // vertical
-  ssegled_ver_on = SDL_CreateRGBSurface(0, SEG_VER_WIDTH, SEG_VER_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_ver_on, &tsegled_ver_on, 0xff, 0x00, 0x00);
-  ssegled_ver_off = SDL_CreateRGBSurface(0, SEG_VER_WIDTH, SEG_VER_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_ver_off, &tsegled_ver_off, 0x2b, 0x2b, 0x2b);
+  tsegled_ver_on  = new_texture(renderer, SEG_VER_WIDTH, SEG_VER_HEIGHT, 0xff, 0x00, 0x00);
+  tsegled_ver_off = new_texture(renderer, SEG_VER_WIDTH, SEG_VER_HEIGHT, 0x2b, 0x2b, 0x2b);
 
   // horizontal
-  ssegled_hor_on = SDL_CreateRGBSurface(0, SEG_HOR_WIDTH, SEG_HOR_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_hor_on, &tsegled_hor_on, 0xff, 0x00, 0x00);
-  ssegled_hor_off = SDL_CreateRGBSurface(0, SEG_HOR_WIDTH, SEG_HOR_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_hor_off, &tsegled_hor_off, 0x2b, 0x2b, 0x2b);
+  tsegled_hor_on  = new_texture(renderer, SEG_HOR_WIDTH, SEG_HOR_HEIGHT, 0xff, 0x00, 0x00);
+  tsegled_hor_off = new_texture(renderer, SEG_HOR_WIDTH, SEG_HOR_HEIGHT, 0x2b, 0x2b, 0x2b);
 
   // dot
-  ssegled_dot_on = SDL_CreateRGBSurface(0, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_dot_on, &tsegled_dot_on, 0xff, 0x00, 0x00);
-  ssegled_dot_off = SDL_CreateRGBSurface(0, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 32, 0, 0, 0, 0);
-  fill_rect_texture(renderer, &ssegled_dot_off, &tsegled_dot_off, 0x2b, 0x2b, 0x2b);
+  tsegled_dot_on  = new_texture(renderer, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 0xff, 0x00, 0x00);
+  tsegled_dot_off = new_texture(renderer, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 0x2b, 0x2b, 0x2b);
 
 #ifdef SEG_BKGND_ENA
+  SDL_Texture *tseg7_background;
 #ifdef SEG_BKGND_CUSTOM
-  sseg7_background = IMG_Load((nvboard_home + "/pic/" + VSEGLED_BG_PATH).c_str());
+  tseg7_background = load_pic_texture(renderer, VSEGLED_BG_PATH);
 #else
-  sseg7_background = SDL_CreateRGBSurface(0, SEG_TOT_WIDTH, SEG_TOT_HEIGHT, 32, 0, 0, 0, 0);
-  SDL_FillRect(sseg7_background, NULL, SDL_MapRGB(sseg7_background->format, 0x00, 0x00, 0x00));
+  tseg7_background = new_texture(renderer, SEG_TOT_WIDTH, SEG_TOT_HEIGHT, 0x00, 0x00, 0x00);
 #endif
-
-  tseg7_background = SDL_CreateTextureFromSurface(renderer, sseg7_background);
   SDL_Rect rect_seg7 = {SEG_X, SEG_Y, SEG_TOT_WIDTH, SEG_TOT_HEIGHT};
   SDL_RenderCopy(renderer, tseg7_background, NULL, &rect_seg7);
 #endif

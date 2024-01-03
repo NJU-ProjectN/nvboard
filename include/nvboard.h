@@ -8,12 +8,10 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-extern std::string nvboard_home;
 void set_redraw();
 
-static inline void fill_rect_texture(SDL_Renderer *renderer, SDL_Surface **surface, SDL_Texture **texture, int r, int g, int b) {
-  SDL_FillRect(*surface, NULL, SDL_MapRGB((*surface)->format, r, g, b));
-  *texture = SDL_CreateTextureFromSurface(renderer, *surface);
-}
+void init_render(SDL_Renderer *renderer);
+SDL_Texture* load_pic_texture(SDL_Renderer *renderer, std::string path);
+SDL_Texture* new_texture(SDL_Renderer *renderer, int w, int h, int r, int g, int b);
 
 #endif
