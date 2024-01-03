@@ -5,7 +5,7 @@
 // You can replace pictures used in GUI
 
 // 640*480 png
-#define BG_PATH "vbg_2.png"
+#define BG_PATH "vbg.png"
 
 // png
 #define VBTN_ON_PATH "vbtn_on.png"
