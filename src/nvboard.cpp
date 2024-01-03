@@ -1,6 +1,7 @@
 #include <nvboard.h>
 #include <keyboard.h>
 #include <vga.h>
+#include <uart.h>
 #include <sys/time.h>
 #include <stdarg.h>
 
@@ -35,6 +36,10 @@ void nvboard_update() {
   extern KEYBOARD* kb;
   extern bool is_kb_idle;
   if (!is_kb_idle) kb->update_state();
+
+  extern UART* uart;
+  extern bool is_uart_idle;
+  if (!(is_uart_idle && pin_peek(UART_TX))) uart->update_state();
 
   static uint64_t last = 0;
   static uint32_t cpf = 0; // count per frame

@@ -2,9 +2,11 @@
 #include <uart.h>
 
 UART* uart = NULL;
+bool is_uart_idle = true;
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
-    Component(rend, cnt, init_val, ct) {
+    Component(rend, cnt, init_val, ct),
+    state(0), divisor(16), divisor_cnt(1) {
   term = new Term(rend, x, y, w, h);
 }
 
@@ -17,15 +19,33 @@ void UART::update_gui() {
 }
 
 void UART::update_state() {
-  static int i = 0;
-  i ++;
-  if (i < 10) return;
-  i = 0;
-  static uint8_t ch = ' ';
-  ch += 1;
-  if (ch == 128) ch = ' ';
-  term->feed_ch(ch);
-  update_gui();
+  if (divisor_cnt < divisor) {
+    divisor_cnt ++;
+    return;
+  }
+  divisor_cnt = 1;
+
+  uint8_t tx = pin_peek(UART_TX);
+  if (state == 0) { // idle
+    if (!tx) { // start bit
+      data = 0;
+      is_uart_idle = false;
+      state ++;
+    }
+  } else if (state >= 1 && state <= 8) { // data
+    data = (tx << 7) | (data >> 1);  // data bit
+    state ++;
+  } else if (state == 9) {
+    if (tx) {
+      term->feed_ch(data); update_gui();
+      state = 0;
+      is_uart_idle = true;
+    } // stop bit
+  }
+}
+
+void UART::set_divisor(uint16_t d) {
+  divisor = d;
 }
 
 void init_uart(SDL_Renderer *renderer) {

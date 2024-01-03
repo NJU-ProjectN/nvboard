@@ -147,3 +147,6 @@ output VGA_B7
 
 input PS2_CLK
 input PS2_DAT
+
+output UART_TX
+input  UART_RX

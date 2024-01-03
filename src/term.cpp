@@ -9,7 +9,6 @@ Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
   w_in_char = region.w / 10;
   h_in_char = region.h / 16;
   uint8_t *l = new_line();
-  memset(l, 'a', w_in_char);
   cursor_texture = new_texture(r, 10, 16, 0x10, 0x10, 0x10);
 }
 
