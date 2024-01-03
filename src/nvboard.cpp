@@ -79,9 +79,8 @@ void nvboard_init(int vga_clk_cycle) {
     );
     SDL_SetRenderDrawColor(main_renderer, 0xff, 0xff, 0xff, 0);
 
-    void init_font();
-    init_font();
-
+    void init_font(SDL_Renderer *renderer);
+    init_font(main_renderer);
     init_render(main_renderer);
     init_components(main_renderer);
     init_gui(main_renderer);

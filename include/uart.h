@@ -2,14 +2,13 @@
 #define _NVBOARD_UART_H
 
 #include <component.h>
-#include <string>
+#include <term.h>
 
 class UART : public Component{
 private:
-  int region_w, region_h;
-  std::string str;
+  Term *term;
 public:
-  UART(SDL_Renderer *rend, int cnt, int init_val, int ct);
+  UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h);
   ~UART();
 
   virtual void update_gui();
