@@ -96,7 +96,7 @@ void RGB_LED::update_state() {
 #endif
 
 void init_components(SDL_Renderer *renderer) {
-#define COMPONENT_LIST(f) f(led) f(switch) f(button) f(segs7) f(keyboard) f(vga)
+#define COMPONENT_LIST(f) f(led) f(switch) f(button) f(segs7) f(keyboard) f(vga) f(uart)
 #define INIT_FN(c) { void concat(init_, c)(SDL_Renderer *); concat(init_, c)(renderer); }
   COMPONENT_LIST(INIT_FN);
 }

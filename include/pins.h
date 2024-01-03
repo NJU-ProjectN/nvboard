@@ -13,10 +13,6 @@ typedef struct PinNode {
 } PinNode;
 extern PinNode pin_array[];
 
-static inline bool is_input_pin(int pin) {
-  return (pin < NR_INPUT_PINS);
-}
-
 static inline uint8_t pin_peek(int pin) {
   PinNode *p = &pin_array[pin];
   if (p->vector_len == 1) {

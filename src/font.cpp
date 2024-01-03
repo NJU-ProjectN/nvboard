@@ -7,18 +7,19 @@ void init_font() {
   int ret = TTF_Init();
   assert(ret != -1);
   std::string nvboard_home = getenv("NVBOARD_HOME");
-  font = TTF_OpenFont((nvboard_home + "/resources/font/" + "FreeMono.ttf").c_str(), 28);
+  font = TTF_OpenFont((nvboard_home + "/resources/font/" + "FreeMono.ttf").c_str(), 16);
   assert(font != NULL);
 }
 
-void test_font(SDL_Renderer *renderer) {
-  SDL_Color c = {.r = 0xff, .g = 0xff, .b = 0xff };
-  SDL_Surface *s = TTF_RenderText_Solid_Wrapped(font, "abc", c, 0);
+SDL_Texture* render_str(SDL_Renderer *renderer, std::string str, int wrap_len_in_pixel, int *w, int *h) {
+  SDL_Color c = {.r = 0x00, .g = 0x00, .b = 0x00 };
+  SDL_Surface *s = TTF_RenderText_Solid_Wrapped(font, str.c_str(), c, wrap_len_in_pixel);
+  assert(s != NULL);
   SDL_Texture *t = SDL_CreateTextureFromSurface(renderer, s);
-  SDL_Rect r = { 0, 0, s->w, s->h };
-  SDL_RenderCopy(renderer, t, NULL, &r);
+  assert(t != NULL);
+  *w = s->w; *h = s->h;
   SDL_FreeSurface(s);
-  SDL_DestroyTexture(t);
+  return t;
 }
 
 void close_font() {
