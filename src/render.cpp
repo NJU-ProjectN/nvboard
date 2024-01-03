@@ -76,7 +76,7 @@ extern std::string nvboard_home;
 void load_background(SDL_Renderer *renderer) {
   sfpga_background = IMG_Load((nvboard_home + "/pic/" + BG_PATH).c_str());
   tfpga_background = SDL_CreateTextureFromSurface(renderer, sfpga_background);
-  SDL_Rect rect_bg = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+  SDL_Rect rect_bg = {0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2};
   SDL_RenderCopy(renderer, tfpga_background, NULL, &rect_bg);
   
 #ifdef SEG_BKGND_ENA

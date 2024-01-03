@@ -3,8 +3,8 @@
 
 #include <SDL.h>
 
-#define WINDOW_WIDTH   640
-#define WINDOW_HEIGHT  480
+#define WINDOW_WIDTH   (640 * 2)
+#define WINDOW_HEIGHT  (480 * 2)
 
 #define SWITCH_X       60
 #define SWITCH_Y       400

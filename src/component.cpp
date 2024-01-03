@@ -244,7 +244,7 @@ void init_components(SDL_Renderer *renderer) {
   extern VGA* vga;
   vga = new VGA(renderer, 1, 0, VGA_TYPE);
   rect_ptr = new SDL_Rect;
-  *rect_ptr = (SDL_Rect){WINDOW_WIDTH, 0, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
+  *rect_ptr = (SDL_Rect){0, WINDOW_HEIGHT / 2, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
   vga->set_rect(rect_ptr, 0);
   for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
     vga->add_pin(p);
