@@ -12,7 +12,8 @@ private:
   int screen_y;
 
   void clear_screen();
-  uint8_t *new_line();
+  void newline();
+  uint8_t *add_line();
   void draw_cursor();
 
 public:

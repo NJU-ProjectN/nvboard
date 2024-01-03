@@ -8,7 +8,7 @@ Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
   region = { .x = x, .y = y, .w = w, .h = h };
   w_in_char = region.w / 10;
   h_in_char = region.h / 16;
-  uint8_t *l = new_line();
+  uint8_t *l = add_line();
   cursor_texture = new_texture(r, 10, 16, 0x10, 0x10, 0x10);
 }
 
@@ -20,7 +20,14 @@ void Term::clear_screen() {
   SDL_RenderFillRect(renderer, &region);
 }
 
-uint8_t* Term::new_line() {
+void Term::newline() {
+  cursor_x = 0;
+  cursor_y ++;
+  if (cursor_y >= lines.size()) add_line();
+  if (cursor_y == screen_y + h_in_char) screen_y ++;  // scroll one line
+}
+
+uint8_t* Term::add_line() {
   uint8_t *l = new uint8_t[w_in_char];
   memset(l, ' ', w_in_char);
   lines.push_back(l);
@@ -31,15 +38,14 @@ void Term::feed_ch(uint8_t ch) {
   assert(ch < 128);
   int y = cursor_y;
   assert(y < lines.size());
+  if (ch == '\n') {
+    newline();
+    return;
+  }
   uint8_t *l = lines[y];
   l[cursor_x] = ch;
   cursor_x ++;
-  if (cursor_x == w_in_char) {
-    cursor_x = 0;
-    cursor_y ++;
-    if (cursor_y >= lines.size()) new_line();
-    if (cursor_y == screen_y + h_in_char) screen_y ++;  // scroll one line
-  }
+  if (cursor_x == w_in_char) newline();
 }
 
 void Term::draw_cursor() {
