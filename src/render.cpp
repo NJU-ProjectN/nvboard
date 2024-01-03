@@ -10,7 +10,7 @@ static SDL_Texture* load_texture(SDL_Renderer *renderer, std::string path) {
 }
 
 SDL_Texture* load_pic_texture(SDL_Renderer *renderer, std::string path) {
-  return load_texture(renderer, "/pic/" + path);
+  return load_texture(renderer, "/resources/pic/" + path);
 }
 
 SDL_Texture* new_texture(SDL_Renderer *renderer, int w, int h, int r, int g, int b) {
