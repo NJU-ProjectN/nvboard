@@ -6,7 +6,7 @@ bool is_uart_idle = true;
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
     Component(rend, cnt, init_val, ct),
-    state(0), divisor(16), divisor_cnt(1) {
+    state(0), divisor(16), divisor_cnt(1), need_update_gui(false) {
   term = new Term(rend, x, y, w, h);
 }
 
@@ -18,7 +18,7 @@ void UART::update_gui() {
   term->update_gui();
 }
 
-void UART::update_state() {
+void UART::check_tx() {
   if (divisor_cnt < divisor) {
     divisor_cnt ++;
     return;
@@ -37,10 +37,18 @@ void UART::update_state() {
     state ++;
   } else if (state == 9) {
     if (tx) {
-      term->feed_ch(data); update_gui();
+      term->feed_ch(data);
       state = 0;
       is_uart_idle = true;
+      need_update_gui = true;
     } // stop bit
+  }
+}
+
+void UART::update_state() {
+  if (need_update_gui) {
+    need_update_gui = false;
+    update_gui();
   }
 }
 

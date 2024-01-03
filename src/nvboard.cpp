@@ -39,7 +39,7 @@ void nvboard_update() {
 
   extern UART* uart;
   extern bool is_uart_idle;
-  if (!(is_uart_idle && pin_peek(UART_TX))) uart->update_state();
+  if (!(is_uart_idle && pin_peek(UART_TX))) uart->check_tx();
 
   static uint64_t last = 0;
   static uint32_t cpf = 0; // count per frame
