@@ -82,6 +82,11 @@ void nvboard_init(int vga_clk_cycle) {
     init_components(main_renderer);
     init_gui(main_renderer);
 
+    void init_font();
+    void test_font(SDL_Renderer *renderer);
+    init_font();
+    test_font(main_renderer);
+
     for (int i = 0; i < NR_PINS; i ++) {
       if (pin_array[i].ptr == NULL) pin_array[i].ptr = &pin_array[i].data;
     }
