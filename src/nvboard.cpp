@@ -3,6 +3,7 @@
 #include <vga.h>
 #include <uart.h>
 #include <stdarg.h>
+#include <macro.h>
 
 #define FPS 60
 
@@ -20,16 +21,16 @@ void nvboard_update() {
 
   extern KEYBOARD* kb;
   extern bool is_kb_idle;
-  if (!is_kb_idle) kb->update_state();
+  if (unlikely(!is_kb_idle)) kb->update_state();
 
   extern UART* uart;
   extern int16_t uart_divisor_cnt;
-  if ((-- uart_divisor_cnt) < 0) uart->check_tx();
+  if (unlikely((-- uart_divisor_cnt) < 0)) uart->check_tx();
 
   static uint64_t last = 0;
   static int cpf = 1; // count per frame
   static int cnt = 0;
-  if ((-- cnt) < 0) {
+  if (unlikely((-- cnt) < 0)) {
     uint64_t now = nvboard_get_time();
     uint64_t diff = now - last;
     int cpf_new = ((uint64_t)cpf * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
