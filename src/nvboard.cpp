@@ -2,24 +2,9 @@
 #include <keyboard.h>
 #include <vga.h>
 #include <uart.h>
-#include <sys/time.h>
 #include <stdarg.h>
 
 #define FPS 60
-
-static uint64_t boot_time = 0;
-
-static uint64_t get_time_internal() {
-  struct timeval now;
-  gettimeofday(&now, NULL);
-  uint64_t us = now.tv_sec * 1000000 + now.tv_usec;
-  return us;
-}
-
-static uint64_t get_time() {
-  uint64_t now = get_time_internal();
-  return now - boot_time;
-}
 
 static SDL_Window *main_window = nullptr;
 static SDL_Renderer *main_renderer = nullptr;
@@ -45,7 +30,7 @@ void nvboard_update() {
   static int cpf = 1; // count per frame
   static int cnt = 0;
   if ((-- cnt) < 0) {
-    uint64_t now = get_time();
+    uint64_t now = nvboard_get_time();
     uint64_t diff = now - last;
     int cpf_new = ((uint64_t)cpf * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
     cnt += cpf_new - cpf;
@@ -95,9 +80,11 @@ void nvboard_init(int vga_clk_cycle) {
     init_components(main_renderer);
     init_gui(main_renderer);
 
+    void init_nvboard_timer();
+    init_nvboard_timer();
+
     update_components(main_renderer);
 
-    boot_time = get_time_internal();
     extern void vga_set_clk_cycle(int cycle);
     vga_set_clk_cycle(vga_clk_cycle);
 }

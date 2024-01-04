@@ -1,6 +1,9 @@
 #include <nvboard.h>
 #include <uart.h>
 
+// There is no need to update TX too frequently
+#define UART_TX_FPS 5
+
 UART* uart = NULL;
 int16_t uart_divisor_cnt = 0;
 
@@ -45,8 +48,13 @@ void UART::check_tx() {
 
 void UART::update_state() {
   if (need_update_gui) {
-    need_update_gui = false;
-    update_gui();
+    static uint64_t last = 0;
+    uint64_t now = nvboard_get_time();
+    if (now - last > 1000000 / UART_TX_FPS) {
+      last = now;
+      need_update_gui = false;
+      update_gui();
+    }
   }
 }
 
