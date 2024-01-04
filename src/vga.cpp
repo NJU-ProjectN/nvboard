@@ -17,7 +17,7 @@ VGA_MODE vga_mod_accepted[NR_VGA_MODE] = {
   },
 };
 
-static int vga_clk_cycle = 0;
+static int vga_clk_cycle_minus_1 = 0;
 uint8_t *vga_blank_n_ptr = NULL;
 
 VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int ct):
@@ -63,16 +63,7 @@ void VGA::update_gui() {
   set_redraw();
 }
 
-void VGA::update_state() {
-  if (vga_clk_cycle > 1) {
-    if (vga_clk_cnt > 0) { vga_clk_cnt --; return; }
-    vga_clk_cnt = vga_clk_cycle - 1;
-  }
-
-  int r = 0, g = 0, b = 0;
-  if (is_all_len8) {
-    r = *p_r; g = *p_g; b = *p_b;
-  } else {
+uint32_t VGA::get_pixel_color_slowpath() {
 #define concat3(a, b, c) concat(concat(a, b), c)
 #define MAP2(c, f, x)  c(f, x)
 #define GET_COLOR_BIT(color, n) (pin_peek(concat3(VGA_, color, n)) << n)
@@ -80,27 +71,41 @@ void VGA::update_state() {
                        f(color, 4) f(color, 5) f(color, 6) f(color, 7)
 #define GET_COLOR_BIT_REDUCE(color, n) GET_COLOR_BIT(color, n) |
 #define GET_COLOR(color) MAP2(BITS, GET_COLOR_BIT_REDUCE, color) 0
-    r = is_r_len8 ? *p_r : GET_COLOR(R);
-    g = is_g_len8 ? *p_g : GET_COLOR(G);
-    b = is_b_len8 ? *p_b : GET_COLOR(B);
-  }
+  int r = is_r_len8 ? *p_r : GET_COLOR(R);
+  int g = is_g_len8 ? *p_g : GET_COLOR(G);
+  int b = is_b_len8 ? *p_b : GET_COLOR(B);
   uint32_t color = (r << 16) | (g << 8) | b;
-  if (*p_pixel != color) {
-    *p_pixel = color;
-    is_pixels_same = false;
+  return color;
+}
+
+__attribute__((noinline)) void VGA::finish_one_frame() {
+  p_pixel = pixels;
+  if (!is_pixels_same) {
+    update_gui();
+    is_pixels_same = true;
   }
+}
+
+void VGA::update_state() {
+  if (unlikely(vga_clk_cycle_minus_1 > 0)) {
+    if (vga_clk_cnt > 0) { vga_clk_cnt --; return; }
+    vga_clk_cnt = vga_clk_cycle_minus_1;
+  }
+
+  uint32_t color = 0;
+  if (likely(is_all_len8)) color = ((*p_r) << 16) | ((*p_g) << 8) | (*p_b);
+  else                     color = get_pixel_color_slowpath();
+  bool is_same = (*p_pixel == color);
+  is_pixels_same &= is_same;
+  *p_pixel = color;
   p_pixel ++;
-  if (p_pixel == p_pixel_end) {
-    p_pixel = pixels;
-    if (!is_pixels_same) {
-      update_gui();
-      is_pixels_same = true;
-    }
+  if (unlikely(p_pixel == p_pixel_end)) {
+    finish_one_frame();
   }
 }
 
 void vga_set_clk_cycle(int cycle) {
-  vga_clk_cycle = cycle;
+  vga_clk_cycle_minus_1 = cycle - 1;
 }
 
 void init_vga(SDL_Renderer *renderer) {

@@ -26,6 +26,10 @@ private:
   bool is_r_len8, is_g_len8, is_b_len8;
   bool is_all_len8;
   bool is_pixels_same;
+
+  uint32_t get_pixel_color_slowpath();
+  void finish_one_frame();
+
 public:
   VGA(SDL_Renderer *rend, int cnt, int init_val, int ct);
   ~VGA();
