@@ -58,12 +58,9 @@ void VGA::update_gui() {
 }
 
 void VGA::update_state() {
-  if (vga_clk_cnt > 1) {
-    if (vga_clk_cnt < vga_clk_cycle) {
-      vga_clk_cnt ++;
-      return;
-    }
-    vga_clk_cnt = 1;
+  if (vga_clk_cycle > 1) {
+    if (vga_clk_cnt > 0) { vga_clk_cnt --; return; }
+    vga_clk_cnt = vga_clk_cycle - 1;
   }
 
   int r = 0, g = 0, b = 0;

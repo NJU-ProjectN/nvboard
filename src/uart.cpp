@@ -6,8 +6,9 @@ bool is_uart_idle = true;
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
     Component(rend, cnt, init_val, ct),
-    state(0), divisor(16), divisor_cnt(1), need_update_gui(false) {
+    state(0), divisor(16), need_update_gui(false) {
   term = new Term(rend, x, y, w, h);
+  divisor_cnt = divisor - 1;
 }
 
 UART::~UART() {
@@ -19,11 +20,8 @@ void UART::update_gui() {
 }
 
 void UART::check_tx() {
-  if (divisor_cnt < divisor) {
-    divisor_cnt ++;
-    return;
-  }
-  divisor_cnt = 1;
+  if (divisor_cnt > 0) { divisor_cnt --; return; }
+  divisor_cnt = divisor - 1;
 
   uint8_t tx = pin_peek(UART_TX);
   if (state == 0) { // idle
