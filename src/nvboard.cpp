@@ -43,16 +43,17 @@ void nvboard_update() {
   if (!(is_uart_idle && *uart_tx_ptr)) uart->check_tx();
 
   static uint64_t last = 0;
-  static uint32_t cpf = 0; // count per frame
-  static uint32_t cnt = 0;
-  cnt ++;
-  if (cnt > cpf) {
+  static int cpf = 1; // count per frame
+  static int cnt = 0;
+  if ((-- cnt) < 0) {
     uint64_t now = get_time();
     uint64_t diff = now - last;
-    cpf = ((uint64_t)cnt * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
+    int cpf_new = ((uint64_t)cpf * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
+    cnt += cpf_new - cpf;
+    cpf = cpf_new;
     if (diff > 1000000 / FPS) {
       last = now;
-      cnt = 0;
+      cnt = cpf;
 
       void read_event();
       read_event();
