@@ -12,6 +12,7 @@ private:
   uint16_t divisor_cnt;
   uint8_t data;
   bool need_update_gui;
+  uint8_t *p_tx;
 public:
   UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h);
   ~UART();

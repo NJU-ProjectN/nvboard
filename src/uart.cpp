@@ -3,12 +3,15 @@
 
 UART* uart = NULL;
 bool is_uart_idle = true;
+uint8_t *uart_tx_ptr = NULL;
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
     Component(rend, cnt, init_val, ct),
     state(0), divisor(16), need_update_gui(false) {
   term = new Term(rend, x, y, w, h);
   divisor_cnt = divisor - 1;
+  assert(pin_array[UART_TX].vector_len == 1);
+  uart_tx_ptr = (uint8_t *)pin_array[UART_TX].ptr;
 }
 
 UART::~UART() {
@@ -23,7 +26,7 @@ void UART::check_tx() {
   if (divisor_cnt > 0) { divisor_cnt --; return; }
   divisor_cnt = divisor - 1;
 
-  uint8_t tx = pin_peek(UART_TX);
+  uint8_t tx = *uart_tx_ptr;
   if (state == 0) { // idle
     if (!tx) { // start bit
       data = 0;

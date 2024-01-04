@@ -22,6 +22,7 @@ private:
   int vga_clk_cnt;
   uint32_t *p_pixel;
   uint32_t *p_pixel_end;
+  uint8_t *p_r, *p_g, *p_b;
   bool is_r_len8, is_g_len8, is_b_len8;
   bool is_all_len8;
   bool is_pixels_same;

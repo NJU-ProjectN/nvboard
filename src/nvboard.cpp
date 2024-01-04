@@ -30,8 +30,8 @@ void set_redraw() { need_redraw = true; }
 
 void nvboard_update() {
   extern VGA *vga;
-  int vga_blank_n = pin_peek(VGA_BLANK_N);
-  if (vga_blank_n) vga->update_state();
+  extern uint8_t *vga_blank_n_ptr;
+  if (*vga_blank_n_ptr) vga->update_state();
 
   extern KEYBOARD* kb;
   extern bool is_kb_idle;
@@ -39,7 +39,8 @@ void nvboard_update() {
 
   extern UART* uart;
   extern bool is_uart_idle;
-  if (!(is_uart_idle && pin_peek(UART_TX))) uart->check_tx();
+  extern uint8_t *uart_tx_ptr;
+  if (!(is_uart_idle && *uart_tx_ptr)) uart->check_tx();
 
   static uint64_t last = 0;
   static uint32_t cpf = 0; // count per frame
