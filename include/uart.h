@@ -9,7 +9,6 @@ private:
   Term *term;
   int state;
   uint16_t divisor;
-  uint16_t divisor_cnt;
   uint8_t data;
   bool need_update_gui;
   uint8_t *p_tx;

@@ -38,9 +38,8 @@ void nvboard_update() {
   if (!is_kb_idle) kb->update_state();
 
   extern UART* uart;
-  extern bool is_uart_idle;
-  extern uint8_t *uart_tx_ptr;
-  if (!(is_uart_idle && *uart_tx_ptr)) uart->check_tx();
+  extern int16_t uart_divisor_cnt;
+  if ((-- uart_divisor_cnt) < 0) uart->check_tx();
 
   static uint64_t last = 0;
   static int cpf = 1; // count per frame

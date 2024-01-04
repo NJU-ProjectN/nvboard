@@ -2,17 +2,16 @@
 #include <uart.h>
 
 UART* uart = NULL;
-bool is_uart_idle = true;
-uint8_t *uart_tx_ptr = NULL;
+int16_t uart_divisor_cnt = 0;
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
     Component(rend, cnt, init_val, ct),
     state(0), divisor(16), need_update_gui(false) {
   term = new Term(rend, x, y, w, h);
-  divisor_cnt = divisor - 1;
+  uart_divisor_cnt = divisor - 1;
   int len = pin_array[UART_TX].vector_len;
   assert(len == 0 || len == 1); // either unbound or bound to 1 bit signal
-  uart_tx_ptr = (uint8_t *)pin_array[UART_TX].ptr;
+  p_tx = (uint8_t *)pin_array[UART_TX].ptr;
 }
 
 UART::~UART() {
@@ -24,14 +23,12 @@ void UART::update_gui() {
 }
 
 void UART::check_tx() {
-  if (divisor_cnt > 0) { divisor_cnt --; return; }
-  divisor_cnt = divisor - 1;
+  uart_divisor_cnt = divisor - 1;
 
-  uint8_t tx = *uart_tx_ptr;
+  uint8_t tx = *p_tx;
   if (state == 0) { // idle
     if (!tx) { // start bit
       data = 0;
-      is_uart_idle = false;
       state ++;
     }
   } else if (state >= 1 && state <= 8) { // data
@@ -41,7 +38,6 @@ void UART::check_tx() {
     if (tx) {
       term->feed_ch(data);
       state = 0;
-      is_uart_idle = true;
       need_update_gui = true;
     } // stop bit
   }
