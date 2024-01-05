@@ -1,6 +1,5 @@
 #include <keyboard.h>
-#include <nvboard.h>
-#include <macro.h>
+#include <pins.h>
 #include <assert.h>
 
 KEYBOARD* kb = NULL;

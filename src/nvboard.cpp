@@ -1,6 +1,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <nvboard.h>
+#include <keyboard.h>
+#include <vga.h>
+#include <render.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
