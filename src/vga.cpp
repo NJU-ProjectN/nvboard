@@ -1,5 +1,7 @@
 #include <vga.h>
-#include <nvboard.h>
+#include <keyboard.h>
+#include <pins.h>
+#include <render.h>
 #include <macro.h>
 #include <assert.h>
 

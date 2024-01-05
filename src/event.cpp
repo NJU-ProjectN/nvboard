@@ -3,8 +3,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <component.h>
 #include <keyboard.h>
+#include <pins.h>
 
 extern std::vector<Component *> components;
 

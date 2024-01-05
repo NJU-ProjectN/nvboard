@@ -3,7 +3,7 @@
 
 #include <queue>
 #include <assert.h>
-#include <nvboard.h>
+#include <component.h>
 #include <map>
 #include <at_scancode.h>
 

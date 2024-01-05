@@ -1,4 +1,8 @@
-#include <nvboard.h>
+#include <configs.h>
+#include <vga.h>
+#include <keyboard.h>
+#include <render.h>
+#include <pins.h>
 #include <vector>
 #include <iostream>
 #include <map>
