@@ -22,3 +22,6 @@ seg7 (SEG7A, SEG7B, SEG7C, SEG7D, SEG7E, SEG7F, SEG7G, DEC7P)
 
 ps2_clk PS2_CLK
 ps2_data PS2_DAT
+
+uart_tx UART_TX
+uart_rx UART_RX

@@ -10,7 +10,7 @@ int16_t uart_divisor_cnt = 0;
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
     Component(rend, cnt, init_val, ct),
-    state(0), divisor(16), tx_update_gui(false) {
+    tx_state(0), rx_state(0), divisor(16), tx_update_gui(false) {
   tx_term = new Term(rend, x, y, w, h);
   rx_term = new Term(rend, x, y + h, w, 20);
   uart_divisor_cnt = divisor - 1;
@@ -20,7 +20,9 @@ UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int 
 
   rx_term->feed_str(rx_input_prompt);
   rx_input = "";
+  rx_sending_str = "";
   rx_update_gui = true;
+  pin_poke(UART_RX, 1);
 }
 
 UART::~UART() {
@@ -30,30 +32,48 @@ UART::~UART() {
 void UART::update_gui() { // everything is done in update_state()
 }
 
-void UART::tx_check() {
+void UART::tx_receive() {
   uart_divisor_cnt = divisor - 1;
 
   uint8_t tx = *p_tx;
-  if (state == 0) { // idle
+  if (tx_state == 0) { // idle
     if (!tx) { // start bit
-      data = 0;
-      state ++;
+      tx_data = 0;
+      tx_state ++;
     }
-  } else if (state >= 1 && state <= 8) { // data
-    data = (tx << 7) | (data >> 1);  // data bit
-    state ++;
-  } else if (state == 9) {
+  } else if (tx_state >= 1 && tx_state <= 8) { // data
+    tx_data = (tx << 7) | (tx_data >> 1);  // data bit
+    tx_state ++;
+  } else if (tx_state == 9) {
     if (tx) { // stop bit
-      state = 0;
-      tx_term->feed_ch(data);
+      tx_state = 0;
+      tx_term->feed_ch(tx_data);
       tx_update_gui = true;
     }
   }
 }
 
+void UART::rx_send() {
+  // the uart_divisor_cnt is maintained in tx_receive()
+  if (rx_state == 0) { // idle
+    rx_data = rx_sending_str[0];
+    if (rx_data == '\0') return;
+    rx_sending_str.erase(0, 1);
+    pin_poke(UART_RX, 0);  // start bit
+    rx_state ++;
+  } else if (rx_state >= 1 && rx_state <= 8) { // data
+    pin_poke(UART_RX, rx_data & 1);  // data bit
+    rx_data >>= 1;
+    rx_state ++;
+  } else if (rx_state == 9) {
+    pin_poke(UART_RX, 1);  // stop bit
+    rx_state = 0;
+  }
+}
+
 void UART::rx_getchar(uint8_t ch) {
   if (ch == '\n') {
-    printf("Get RX input = %s\n", rx_input.c_str());
+    rx_sending_str += rx_input;
     rx_term->clear();
     rx_term->feed_str(rx_input_prompt);
     rx_input = "";

@@ -5,6 +5,8 @@ module top(
     input [7:0] sw,
     input ps2_clk,
     input ps2_data,
+    input uart_rx,
+    output uart_tx,
     output [15:0] ledr,
     output VGA_CLK,
     output VGA_HSYNC,
@@ -75,6 +77,11 @@ vmem my_vmem(
     .h_addr(h_addr),
     .v_addr(v_addr[8:0]),
     .vga_data(vga_data)
+);
+
+uart my_uart(
+  .tx(uart_tx),
+  .rx(uart_rx)
 );
 
 endmodule
