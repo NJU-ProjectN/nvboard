@@ -1,9 +1,11 @@
-#include <keyboard.h>
+#include <SDL.h>
+#include <component.h>
 #include <pins.h>
 
 extern std::vector<Component *> components;
 void uart_rx_getchar(uint8_t ch);
 void uart_rx_term_focus(bool v);
+void kb_push_key(uint8_t scancode, bool is_keydown);
 static bool focus_uart_rx_term = false;
 
 static void mousedown_handler(const SDL_Event &ev) {
@@ -39,11 +41,6 @@ static void mouseup_handler(const SDL_Event &ev) {
   }
 }
 
-static void key_handler(uint8_t scancode, int is_keydown){
-  extern KEYBOARD* kb;
-  kb->push_key(scancode, is_keydown);
-}
-
 void read_event() {
   SDL_Event ev;
   SDL_PollEvent(&ev);
@@ -59,7 +56,7 @@ void read_event() {
         uart_rx_getchar('\n');
       }
     case SDL_KEYUP:
-      if (!focus_uart_rx_term) key_handler(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN);
+      if (!focus_uart_rx_term) kb_push_key(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN);
       break;
     case SDL_TEXTINPUT: if (focus_uart_rx_term) uart_rx_getchar(ev.text.text[0]); break;
   }

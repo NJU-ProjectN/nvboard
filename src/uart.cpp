@@ -4,7 +4,7 @@
 // There is no need to update TX too frequently
 #define UART_TX_FPS 5
 
-UART* uart = NULL;
+static UART* uart = NULL;
 int16_t uart_divisor_cnt = 0;
 
 
@@ -121,6 +121,14 @@ void init_uart(SDL_Renderer *renderer) {
   uart->add_pin(UART_TX);
   uart->add_pin(UART_RX);
   add_component(uart);
+}
+
+void uart_tx_receive() {
+  uart->tx_receive();
+}
+
+void uart_rx_send() {
+  uart->rx_send();
 }
 
 void uart_rx_getchar(uint8_t ch) {

@@ -1,7 +1,5 @@
 #include <nvboard.h>
 #include <keyboard.h>
-#include <vga.h>
-#include <uart.h>
 #include <stdarg.h>
 #include <macro.h>
 
@@ -14,20 +12,22 @@ PinNode pin_array[NR_PINS];
 static bool need_redraw = true;
 void set_redraw() { need_redraw = true; }
 
+void vga_update();
+void kb_update();
+void uart_tx_receive();
+void uart_rx_send();
+
 void nvboard_update() {
-  extern VGA *vga;
   extern uint8_t *vga_blank_n_ptr;
-  if (*vga_blank_n_ptr) vga->update_state();
+  if (*vga_blank_n_ptr) vga_update();
 
-  extern KEYBOARD* kb;
   extern bool is_kb_idle;
-  if (unlikely(!is_kb_idle)) kb->update_state();
+  if (unlikely(!is_kb_idle)) kb_update();
 
-  extern UART* uart;
   extern int16_t uart_divisor_cnt;
   if (unlikely((-- uart_divisor_cnt) < 0)) {
-    uart->tx_receive();
-    uart->rx_send();
+    uart_tx_receive();
+    uart_rx_send();
   }
 
   static uint64_t last = 0;

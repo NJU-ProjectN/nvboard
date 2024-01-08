@@ -2,7 +2,7 @@
 #include <vga.h>
 #include <macro.h>
 
-VGA* vga = NULL;
+static VGA* vga = NULL;
 
 VGA_MODE vga_mod_accepted[NR_VGA_MODE] = {
   [VGA_MODE_640_480] = {
@@ -116,4 +116,8 @@ void init_vga(SDL_Renderer *renderer) {
   for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
     vga->add_pin(p);
   }
+}
+
+void vga_update() {
+  vga->update_state();
 }

@@ -2,7 +2,7 @@
 #include <pins.h>
 #include "at_scancode.h"
 
-KEYBOARD* kb = NULL;
+static KEYBOARD* kb = NULL;
 bool is_kb_idle = true;
 
 #define FILL_KEYMAP_FIRST(a) keymap_first[SDL_PREFIX(a)] = GET_FIRST(AT_PREFIX(a));
@@ -69,4 +69,12 @@ void init_keyboard(SDL_Renderer *renderer) {
   }
   MAP(SCANCODE_LIST, FILL_KEYMAP_FIRST)
   MAP(SCANCODE_LIST, FILL_KEYMAP_DECOND)
+}
+
+void kb_update() {
+  kb->update_state();
+}
+
+void kb_push_key(uint8_t scancode, bool is_keydown){
+  kb->push_key(scancode, is_keydown);
 }
