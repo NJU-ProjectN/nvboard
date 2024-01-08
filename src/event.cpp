@@ -1,5 +1,6 @@
 #include <keyboard.h>
 #include <pins.h>
+#include <string>
 
 extern std::vector<Component *> components;
 
@@ -33,6 +34,8 @@ static void key_handler(uint8_t scancode, int is_keydown){
   kb->push_key(scancode, is_keydown);
 }
 
+static std::string uart_rx_input = "";
+
 void read_event() {
   SDL_Event ev;
   SDL_PollEvent(&ev);
@@ -44,7 +47,12 @@ void read_event() {
     case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
     case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
     case SDL_KEYDOWN:
+      if (ev.key.keysym.sym == SDLK_RETURN) {
+        printf("get text = %s\n", uart_rx_input.c_str());
+        uart_rx_input = "";
+      }
     case SDL_KEYUP:
-      key_handler(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN); break;
+      break; //key_handler(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN); break;
+    case SDL_TEXTINPUT: uart_rx_input += ev.text.text; break;
   }
 }
