@@ -33,6 +33,7 @@ void nvboard_update() {
   if (unlikely((-- cnt) < 0)) {
     uint64_t now = nvboard_get_time();
     uint64_t diff = now - last;
+    if (diff == 0) return;
     int cpf_new = ((uint64_t)cpf * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
     cnt += cpf_new - cpf;
     cpf = cpf_new;
