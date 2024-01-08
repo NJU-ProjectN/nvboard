@@ -80,9 +80,13 @@ void Term::feed_ch(uint8_t ch) {
   if (ch == '\n') {
     newline();
     return;
+  } else if (ch == '\b') {
+    if (cursor_x > 0) cursor_x --;  // FIXME: back to the last line for input
+    lines[y][cursor_x] = ' ';
+    if (is_cursor_on_screen()) set_dirty_char(cursor_y - screen_y, cursor_x);
+    return;
   }
-  uint8_t *l = lines[y];
-  l[cursor_x] = ch;
+  lines[y][cursor_x] = ch;
   cursor_x ++;
   if (cursor_x == w_in_char) newline();
 }

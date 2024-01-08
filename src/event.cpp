@@ -52,8 +52,11 @@ void read_event() {
     case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
     case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
     case SDL_KEYDOWN:
-      if (ev.key.keysym.sym == SDLK_RETURN && focus_uart_rx_term) {
-        uart_rx_getchar('\n');
+      if (focus_uart_rx_term) {
+        switch (ev.key.keysym.sym) {
+          case SDLK_RETURN: uart_rx_getchar('\n'); break;
+          case SDLK_BACKSPACE: uart_rx_getchar('\b'); break;
+        }
       }
     case SDL_KEYUP:
       if (!focus_uart_rx_term) kb_push_key(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN);
