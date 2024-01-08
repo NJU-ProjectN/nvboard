@@ -92,8 +92,6 @@ void nvboard_init(int vga_clk_cycle) {
 
     extern void vga_set_clk_cycle(int cycle);
     vga_set_clk_cycle(vga_clk_cycle);
-
-    SDL_StartTextInput();
 }
 
 void nvboard_quit(){

@@ -13,6 +13,11 @@ UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int 
     tx_state(0), rx_state(0), divisor(16), tx_update_gui(false) {
   tx_term = new Term(rend, x, y, w, h);
   rx_term = new Term(rend, x, y + h, w, 20);
+
+  SDL_Rect *rect_ptr = new SDL_Rect;
+  *rect_ptr = (SDL_Rect){x, y + h, w, 20};
+  set_rect(rect_ptr, 0);
+
   uart_divisor_cnt = divisor - 1;
   int len = pin_array[UART_TX].vector_len;
   assert(len == 0 || len == 1); // either unbound or bound to 1 bit signal
@@ -108,9 +113,6 @@ void UART::set_divisor(uint16_t d) {
 void init_uart(SDL_Renderer *renderer) {
   int x = WINDOW_WIDTH / 2, y = 0, w = WINDOW_WIDTH / 2, h = WINDOW_HEIGHT / 2;
   uart = new UART(renderer, 1, 0, UART_TYPE, x, y, w, h);
-  SDL_Rect *rect_ptr = new SDL_Rect;
-  *rect_ptr = (SDL_Rect){x, y + h, w, 10};
-  uart->set_rect(rect_ptr, 0);
   uart->add_pin(UART_TX);
   uart->add_pin(UART_RX);
   add_component(uart);
