@@ -25,9 +25,10 @@ void nvboard_update() {
   if (unlikely(!is_kb_idle)) kb_update();
 
   extern int16_t uart_divisor_cnt;
+  extern bool is_uart_rx_idle;
   if (unlikely((-- uart_divisor_cnt) < 0)) {
     uart_tx_receive();
-    uart_rx_send();
+    if (unlikely(!is_uart_rx_idle)) uart_rx_send();
   }
 
   static uint64_t last = 0;

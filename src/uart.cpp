@@ -6,6 +6,7 @@
 
 static UART* uart = NULL;
 int16_t uart_divisor_cnt = 0;
+bool is_uart_rx_idle = true;
 
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
@@ -63,7 +64,10 @@ void UART::rx_send() {
   // the uart_divisor_cnt is maintained in tx_receive()
   if (rx_state == 0) { // idle
     rx_data = rx_sending_str[0];
-    if (rx_data == '\0') return;
+    if (rx_data == '\0') {
+      is_uart_rx_idle = true;
+      return;
+    }
     rx_sending_str.erase(0, 1);
     pin_poke(UART_RX, 0);  // start bit
     rx_state ++;
@@ -80,6 +84,7 @@ void UART::rx_send() {
 void UART::rx_getchar(uint8_t ch) {
   if (ch == '\n') {
     rx_sending_str += rx_input;
+    is_uart_rx_idle = false;
     rx_term->clear();
     rx_term->feed_str(rx_input_prompt);
     rx_input = "";
