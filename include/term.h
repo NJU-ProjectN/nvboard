@@ -26,6 +26,8 @@ public:
   Term(SDL_Renderer *r, int x, int y, int w, int h);
   ~Term();
   void feed_ch(uint8_t ch);
+  void feed_str(const char *s);
+  void clear();
   void update_gui();
 };
 

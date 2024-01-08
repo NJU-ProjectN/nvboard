@@ -25,7 +25,7 @@ void nvboard_update() {
 
   extern UART* uart;
   extern int16_t uart_divisor_cnt;
-  if (unlikely((-- uart_divisor_cnt) < 0)) uart->check_tx();
+  if (unlikely((-- uart_divisor_cnt) < 0)) uart->tx_check();
 
   static uint64_t last = 0;
   static int cpf = 1; // count per frame

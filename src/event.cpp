@@ -1,8 +1,8 @@
 #include <keyboard.h>
 #include <pins.h>
-#include <string>
 
 extern std::vector<Component *> components;
+void uart_rx_getchar(uint8_t ch);
 
 static void mousedown_handler(const SDL_Event &ev) {
   int x_pos = ev.button.x;
@@ -34,8 +34,6 @@ static void key_handler(uint8_t scancode, int is_keydown){
   kb->push_key(scancode, is_keydown);
 }
 
-static std::string uart_rx_input = "";
-
 void read_event() {
   SDL_Event ev;
   SDL_PollEvent(&ev);
@@ -48,11 +46,10 @@ void read_event() {
     case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
     case SDL_KEYDOWN:
       if (ev.key.keysym.sym == SDLK_RETURN) {
-        printf("get text = %s\n", uart_rx_input.c_str());
-        uart_rx_input = "";
+        uart_rx_getchar('\n');
       }
     case SDL_KEYUP:
       break; //key_handler(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN); break;
-    case SDL_TEXTINPUT: uart_rx_input += ev.text.text; break;
+    case SDL_TEXTINPUT: uart_rx_getchar(ev.text.text[0]); break;
   }
 }

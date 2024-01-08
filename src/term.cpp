@@ -30,6 +30,18 @@ void Term::clear_screen() {
   SDL_RenderFillRect(renderer, &region);
 }
 
+void Term::clear() {
+  while (lines.size() > 1) {
+    delete [] lines.back();
+    lines.pop_back();
+  }
+  memset(lines[0], ' ', w_in_char);
+  cursor_x = cursor_y = screen_y = 0;
+  clear_screen();
+  init_dirty(false);
+  set_redraw();
+}
+
 void Term::newline() {
   cursor_x = 0;
   cursor_y ++;
@@ -66,6 +78,10 @@ void Term::feed_ch(uint8_t ch) {
   l[cursor_x] = ch;
   cursor_x ++;
   if (cursor_x == w_in_char) newline();
+}
+
+void Term::feed_str(const char *s) {
+  while (*s != '\0') feed_ch(*(s ++));
 }
 
 bool Term::is_cursor_on_screen() {
