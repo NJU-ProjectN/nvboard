@@ -10,6 +10,7 @@ Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
   h_in_char = region.h / 16;
   uint8_t *l = add_line();
   cursor_texture = new_texture(r, 10, 16, 0x10, 0x10, 0x10);
+  is_cursor_visible = true;
   clear_screen();
   dirty_line = new bool[h_in_char];
   dirty_char = new bool[w_in_char * h_in_char];
@@ -28,6 +29,12 @@ Term::~Term() {
 
 void Term::clear_screen() {
   SDL_RenderFillRect(renderer, &region);
+}
+
+void Term::set_cursor_visibility(bool v) {
+  bool update_cursor_gui = is_cursor_visible ^ v;
+  is_cursor_visible = v;
+  if (update_cursor_gui) draw_cursor();
 }
 
 void Term::clear() {
@@ -96,7 +103,9 @@ void Term::draw_cursor() {
     rect.w = 10, rect.h = 16;
     rect.y += 16 * y;
     rect.x += 10 * x;
-    SDL_RenderCopy(renderer, cursor_texture, NULL, &rect);
+    SDL_Texture *t = is_cursor_visible ? cursor_texture :  get_font_texture(' ');
+    SDL_RenderCopy(renderer, t, NULL, &rect);
+    set_redraw();
   }
 }
 
@@ -119,9 +128,9 @@ void Term::update_gui() {
       rect.x = region.x + rect.w * x;
       SDL_Texture *t  = get_font_texture(ch);
       SDL_RenderCopy(renderer, t, NULL, &rect);
+      set_redraw();
     }
   }
   draw_cursor();
-  set_redraw();
   init_dirty(false);
 }

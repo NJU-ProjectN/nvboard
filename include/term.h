@@ -8,6 +8,7 @@ private:
   int w_in_char, h_in_char;
   std::vector<uint8_t *> lines;
   int cursor_x, cursor_y; // cursor_y start with all history when scrolling is supported
+  bool is_cursor_visible;
   SDL_Texture *cursor_texture;
   int screen_y;
   bool dirty_screen;
@@ -28,6 +29,7 @@ public:
   void feed_ch(uint8_t ch);
   void feed_str(const char *s);
   void clear();
+  void set_cursor_visibility(bool v);
   void update_gui();
 };
 

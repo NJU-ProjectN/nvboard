@@ -3,6 +3,7 @@
 
 extern std::vector<Component *> components;
 void uart_rx_getchar(uint8_t ch);
+void uart_rx_term_focus(bool v);
 static bool focus_uart_rx_term = false;
 
 static void mousedown_handler(const SDL_Event &ev) {
@@ -22,6 +23,7 @@ static void mousedown_handler(const SDL_Event &ev) {
     if (click_uart_rx_term) SDL_StartTextInput();
     else SDL_StopTextInput();
     focus_uart_rx_term = click_uart_rx_term;
+    uart_rx_term_focus(focus_uart_rx_term);
   }
 }
 

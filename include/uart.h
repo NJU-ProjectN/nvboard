@@ -25,7 +25,8 @@ public:
   virtual void update_state();
   void tx_receive();
   void rx_send();
-  void rx_getchar(uint8_t);
+  void rx_getchar(uint8_t ch);
+  void rx_term_focus(bool v);
 };
 
 #endif

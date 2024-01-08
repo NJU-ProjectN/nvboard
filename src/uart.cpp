@@ -24,6 +24,7 @@ UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int 
   p_tx = (uint8_t *)pin_array[UART_TX].ptr;
 
   rx_term->feed_str(rx_input_prompt);
+  rx_term->set_cursor_visibility(false);
   rx_input = "";
   rx_sending_str = "";
   rx_update_gui = true;
@@ -110,6 +111,10 @@ void UART::set_divisor(uint16_t d) {
   divisor = d;
 }
 
+void UART::rx_term_focus(bool v) {
+  rx_term->set_cursor_visibility(v);
+}
+
 void init_uart(SDL_Renderer *renderer) {
   int x = WINDOW_WIDTH / 2, y = 0, w = WINDOW_WIDTH / 2, h = WINDOW_HEIGHT / 2;
   uart = new UART(renderer, 1, 0, UART_TYPE, x, y, w, h);
@@ -120,4 +125,8 @@ void init_uart(SDL_Renderer *renderer) {
 
 void uart_rx_getchar(uint8_t ch) {
   uart->rx_getchar(ch);
+}
+
+void uart_rx_term_focus(bool v) {
+  uart->rx_term_focus(v);
 }
