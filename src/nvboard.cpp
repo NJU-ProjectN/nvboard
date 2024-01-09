@@ -75,6 +75,7 @@ void nvboard_init(int vga_clk_cycle) {
         0
     );
     SDL_SetRenderDrawColor(main_renderer, 0xff, 0xff, 0xff, 0);
+    SDL_RenderFillRect(main_renderer, NULL);
 
     for (int i = 0; i < NR_PINS; i ++) {
       if (pin_array[i].ptr == NULL) pin_array[i].ptr = &pin_array[i].data;
