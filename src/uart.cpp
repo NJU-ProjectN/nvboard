@@ -93,9 +93,12 @@ void UART::rx_getchar(uint8_t ch) {
     if (ch == '\b') {
       if (rx_input.empty()) return;
       rx_input.pop_back();
+      rx_term->backspace(true);
     }
-    else { rx_input += ch; }
-    rx_term->feed_ch(ch);
+    else {
+      rx_input += ch;
+      rx_term->feed_ch(ch);
+    }
   }
   rx_update_gui = true;
 }

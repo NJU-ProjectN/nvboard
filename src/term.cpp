@@ -53,7 +53,7 @@ void Term::newline() {
   cursor_x = 0;
   cursor_y ++;
   if (cursor_y >= lines.size()) add_line();
-  if (cursor_y == screen_y + h_in_char) { // scroll one line
+  if (cursor_y == screen_y + h_in_char) { // scroll down one line
     screen_y ++;  // TODO: only set dirty if screen_y changes between two draws
     init_dirty(true);
   }
@@ -72,20 +72,33 @@ void Term::set_dirty_char(int y, int x) {
   dirty_screen = true;
 }
 
+void Term::backspace(bool is_input) {
+  if (cursor_x == 0) {
+    if (!is_input) return;
+    if (cursor_y == 0) return;
+    delete [] lines[cursor_y];
+    lines.erase(lines.begin() + cursor_y);
+    cursor_y --;
+    cursor_x = w_in_char - 1;
+    if (cursor_y < screen_y) { // scroll up one line
+      screen_y --;
+      init_dirty(true);
+    }
+  } else {
+    if (is_cursor_on_screen()) set_dirty_char(cursor_y - screen_y, cursor_x);
+    cursor_x --;
+  }
+  lines[cursor_y][cursor_x] = ' ';
+  if (is_cursor_on_screen()) set_dirty_char(cursor_y - screen_y, cursor_x);
+}
+
 void Term::feed_ch(uint8_t ch) {
   assert(ch < 128);
   if (is_cursor_on_screen()) set_dirty_char(cursor_y - screen_y, cursor_x);
   int y = cursor_y;
   assert(y < lines.size());
-  if (ch == '\n') {
-    newline();
-    return;
-  } else if (ch == '\b') {
-    if (cursor_x > 0) cursor_x --;  // FIXME: back to the last line for input
-    lines[y][cursor_x] = ' ';
-    if (is_cursor_on_screen()) set_dirty_char(cursor_y - screen_y, cursor_x);
-    return;
-  }
+  if      (ch == '\n') { newline(); return; }
+  else if (ch == '\b') { backspace(false); return; }
   lines[y][cursor_x] = ch;
   cursor_x ++;
   if (cursor_x == w_in_char) newline();
