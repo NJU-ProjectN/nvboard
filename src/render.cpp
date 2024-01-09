@@ -28,7 +28,7 @@ SDL_Texture* new_texture(SDL_Renderer *renderer, int w, int h, int r, int g, int
   return surface2texture(renderer, s);
 }
 
-void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n) {
+static void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n) {
   SDL_RenderDrawLines(renderer, point, n);
 
   SDL_Point *p = new SDL_Point[n];
@@ -38,6 +38,26 @@ void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n) {
   SDL_RenderDrawLines(renderer, &p[0], n);
   delete [] p;
 }
+
+void draw_surrounding_line(SDL_Renderer *renderer, SDL_Rect r,
+    int gap) { // gap between surrounding lines and component
+  SDL_Point top_left = Point(r.x, r.y) + Point(-gap, -gap);
+  const int w = r.w + gap * 2;
+  const int h = r.h + gap * 2;
+  const int d = 12;
+  SDL_Point p[9];
+  p[0] = top_left + Point(d, 0);
+  p[1] = p[0] + Point(w - 2 * d, 0);
+  p[2] = p[1] + Point(d, d);
+  p[3] = p[2] + Point(0, h - 2 * d);
+  p[4] = p[3] + Point(-d, d);
+  p[5] = p[4] - Point(w - 2 * d, 0);
+  p[6] = p[5] - Point(d, d);
+  p[7] = p[6] - Point(0, h - 2 * d);
+  p[8] = p[0];
+  draw_thicker_line(renderer, p, 9);
+}
+
 
 void init_render(SDL_Renderer *renderer) {
   nvboard_home = getenv("NVBOARD_HOME");

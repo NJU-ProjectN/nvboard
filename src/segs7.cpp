@@ -95,43 +95,27 @@ static void init_render_local(SDL_Renderer *renderer) {
 #endif
 
   // draw surrounding lines
-  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
-  const int gap = 14; // gap between surrounding lines and the 7-segments pad
-  SDL_Point top_left     = Point(SEG_X, SEG_Y) + Point(-gap, -gap);
-  const int w = SEG_TOT_WIDTH  + gap * 2;
-  const int h = SEG_TOT_HEIGHT + gap * 2;
-  const int ch_pad_h = 20;
-  const int ch_pad_w = 12;
-  const int d = 12;
-  SDL_Point p[32];
-  p[0] = top_left + Point(d, 0);
-  p[1] = p[0] + Point(w - 2 * d, 0);
-  p[2] = p[1] + Point(d, d);
-  p[3] = p[2] + Point(0, h - 2 * d);
-  p[4] = p[3] + Point(-d, d);
-  p[5] = p[4] - Point(w - 2 * d, 0);
-  p[6] = p[5] - Point(d, d);
-  p[7] = p[6] - Point(0, h - 2 * d);
-  p[8] = p[0];
-  draw_thicker_line(renderer, p, 9);
+  const int gap = 14;
+  draw_surrounding_line(renderer, Rect(SEG_X, SEG_Y, SEG_TOT_WIDTH, SEG_TOT_HEIGHT), gap);
 
-  char buf[2] = "0";
-  SDL_Point p0 = Point(SEG_X, SEG_Y) + Point(SEG_TOT_WIDTH, SEG_TOT_HEIGHT) + Point(0, gap)
+  // draw indices of each 7-seg display
+  SDL_Point p = Point(SEG_X, SEG_Y) + Point(SEG_TOT_WIDTH, SEG_TOT_HEIGHT) + Point(0, gap)
                  - Point(SEG_TOT_WIDTH / 8 / 2, 0) - Point(CH_WIDTH / 2, CH_HEIGHT / 2);
   for (int i = 0; i < 8; i ++) {
-    SDL_Texture *t = str2texture(renderer, buf, 0xffffff, BOARD_BG_COLOR);
-    SDL_Rect r = Rect(p0, CH_WIDTH, CH_HEIGHT);
+    SDL_Texture *t = ch2texture(renderer, '0' + i, 0xffffff, BOARD_BG_COLOR);
+    SDL_Rect r = Rect(p, CH_WIDTH, CH_HEIGHT);
     SDL_RenderCopy(renderer, t, NULL, &r);
     SDL_DestroyTexture(t);
-    buf[0] ++;
-    p0 = p0 - Point(SEG_TOT_WIDTH / 8, 0);
+    p = p - Point(SEG_TOT_WIDTH / 8, 0);
   }
-  char *str = "Seven Segment Display";
-  SDL_Texture *t = str2texture(renderer, "Seven Segment Display", 0xffffff, BOARD_BG_COLOR);
-  int w_texture = CH_WIDTH * strlen(str);
-  p0 = Point(SEG_X, SEG_Y) - Point(0, gap) - Point(0, CH_HEIGHT / 2)
-       + Point(SEG_TOT_WIDTH / 2, 0) - Point(w_texture / 2, 0);
-  SDL_Rect r = Rect(p0, w_texture, CH_HEIGHT);
+
+  // draw the title
+  const char *str = "Seven Segment Display";
+  SDL_Texture *t = str2texture(renderer, str, 0xffffff, BOARD_BG_COLOR);
+  int w = CH_WIDTH * strlen(str);
+  p = Point(SEG_X, SEG_Y) - Point(0, gap) - Point(0, CH_HEIGHT / 2)
+       + Point(SEG_TOT_WIDTH / 2, 0) - Point(w / 2, 0);
+  SDL_Rect r = Rect(p, w, CH_HEIGHT);
   SDL_RenderCopy(renderer, t, NULL, &r);
   SDL_DestroyTexture(t);
 }
