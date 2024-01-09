@@ -97,5 +97,5 @@ void init_render(SDL_Renderer *renderer) {
   p[0].y += 4, p[1].y += 4;
   draw_thicker_line(renderer, p, 2);
 
-  draw_str(renderer, "v1.0 (2024.01.10)", 60 + w + CH_WIDTH, 140 + h - CH_HEIGHT, 0xffffff);
+  draw_str(renderer, VERSION_STR, 60 + w + CH_WIDTH, 140 + h - CH_HEIGHT, 0xffffff);
 }

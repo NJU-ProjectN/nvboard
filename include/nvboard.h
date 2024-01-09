@@ -10,6 +10,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#define VERSION_STR "v1.0 (2024.01.10)"
+
 void set_redraw();
 uint64_t nvboard_get_time();
 
