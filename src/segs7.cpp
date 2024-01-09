@@ -1,4 +1,5 @@
 #include <nvboard.h>
+#include <render.h>
 
 #define SEG_X          60
 #define SEG_Y          225
@@ -69,7 +70,7 @@ void SEGS7::update_state() {
   }
 }
 
-static void load_texture(SDL_Renderer *renderer) {
+static void init_render_local(SDL_Renderer *renderer) {
   // vertical
   tsegled_ver_on  = new_texture(renderer, SEG_VER_WIDTH, SEG_VER_HEIGHT, 0xff, 0x00, 0x00);
   tsegled_ver_off = new_texture(renderer, SEG_VER_WIDTH, SEG_VER_HEIGHT, 0x2b, 0x2b, 0x2b);
@@ -84,7 +85,7 @@ static void load_texture(SDL_Renderer *renderer) {
 
 #ifdef SEG_BKGND_ENA
   SDL_Texture *tseg7_background;
-#ifdef SEG_BKGND_CUSTOM
+#if 0 //def SEG_BKGND_CUSTOM
   tseg7_background = load_pic_texture(renderer, VSEGLED_BG_PATH);
 #else
   tseg7_background = new_texture(renderer, SEG_TOT_WIDTH, SEG_TOT_HEIGHT, 0x00, 0x00, 0x00);
@@ -92,10 +93,51 @@ static void load_texture(SDL_Renderer *renderer) {
   SDL_Rect rect_seg7 = {SEG_X, SEG_Y, SEG_TOT_WIDTH, SEG_TOT_HEIGHT};
   SDL_RenderCopy(renderer, tseg7_background, NULL, &rect_seg7);
 #endif
+
+  // draw surrounding lines
+  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
+  const int gap = 14; // gap between surrounding lines and the 7-segments pad
+  SDL_Point top_left     = Point(SEG_X, SEG_Y) + Point(-gap, -gap);
+  const int w = SEG_TOT_WIDTH  + gap * 2;
+  const int h = SEG_TOT_HEIGHT + gap * 2;
+  const int ch_pad_h = 20;
+  const int ch_pad_w = 12;
+  const int d = 12;
+  SDL_Point p[32];
+  p[0] = top_left + Point(d, 0);
+  p[1] = p[0] + Point(w - 2 * d, 0);
+  p[2] = p[1] + Point(d, d);
+  p[3] = p[2] + Point(0, h - 2 * d);
+  p[4] = p[3] + Point(-d, d);
+  p[5] = p[4] - Point(w - 2 * d, 0);
+  p[6] = p[5] - Point(d, d);
+  p[7] = p[6] - Point(0, h - 2 * d);
+  p[8] = p[0];
+  draw_thicker_line(renderer, p, 9);
+
+  char buf[2] = "0";
+  SDL_Point p0 = Point(SEG_X, SEG_Y) + Point(SEG_TOT_WIDTH, SEG_TOT_HEIGHT) + Point(0, gap)
+                 - Point(SEG_TOT_WIDTH / 8 / 2, 0) - Point(CH_WIDTH / 2, CH_HEIGHT / 2);
+  for (int i = 0; i < 8; i ++) {
+    SDL_Texture *t = str2texture(renderer, buf, 0xffffff, BOARD_BG_COLOR);
+    SDL_Rect r = Rect(p0, CH_WIDTH, CH_HEIGHT);
+    SDL_RenderCopy(renderer, t, NULL, &r);
+    SDL_DestroyTexture(t);
+    buf[0] ++;
+    p0 = p0 - Point(SEG_TOT_WIDTH / 8, 0);
+  }
+  char *str = "Seven Segment Display";
+  SDL_Texture *t = str2texture(renderer, "Seven Segment Display", 0xffffff, BOARD_BG_COLOR);
+  int w_texture = CH_WIDTH * strlen(str);
+  p0 = Point(SEG_X, SEG_Y) - Point(0, gap) - Point(0, CH_HEIGHT / 2)
+       + Point(SEG_TOT_WIDTH / 2, 0) - Point(w_texture / 2, 0);
+  SDL_Rect r = Rect(p0, w_texture, CH_HEIGHT);
+  SDL_RenderCopy(renderer, t, NULL, &r);
+  SDL_DestroyTexture(t);
 }
 
 void init_segs7(SDL_Renderer *renderer) {
-  load_texture(renderer);
+  init_render_local(renderer);
   for (int i = 0; i < 8; ++i) {
     SDL_Rect mv = {SEG_X + SEG_SEP + (7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_VER_WIDTH * 2 + SEG_SEP * 2), SEG_Y + SEG_SEP, 0, 0};
     bool is_len8 = (pin_array[GET_SEGA(i)].vector_len == 8);

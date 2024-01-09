@@ -71,13 +71,4 @@ void add_component(Component *c);
 void update_components(SDL_Renderer *renderer);
 void delete_components();
 
-static inline SDL_Rect operator+(const SDL_Rect &A, const SDL_Rect &B) {
-  SDL_Rect ret;
-  ret.x = A.x + B.x;
-  ret.y = A.y + B.y;
-  ret.w = A.w + B.w;
-  ret.h = A.h + B.h;
-  return ret;
-}
-
 #endif

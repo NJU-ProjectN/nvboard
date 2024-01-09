@@ -13,10 +13,10 @@ UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int 
     Component(rend, cnt, init_val, ct),
     tx_state(0), rx_state(0), divisor(16), tx_update_gui(false) {
   tx_term = new Term(rend, x, y, w, h);
-  rx_term = new Term(rend, x, y + h + 1, w, 16);
+  rx_term = new Term(rend, x, y + h + 1, w, CH_HEIGHT);
 
   SDL_Rect *rect_ptr = new SDL_Rect;  // rx terminal
-  *rect_ptr = (SDL_Rect){x, y + h + 1, w, 16};
+  *rect_ptr = (SDL_Rect){x, y + h + 1, w, CH_HEIGHT};
   set_rect(rect_ptr, 0);
 
   uart_divisor_cnt = divisor - 1;
@@ -31,7 +31,7 @@ UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int 
 
   SDL_SetRenderDrawColor(rend, 0x00, 0x00, 0x00, 0);
   SDL_RenderDrawLine(rend, x, y + h, x + w, y + h);
-  SDL_RenderDrawLine(rend, x, y + h + 1 + 16, x + w, y + h + 1 + 16);
+  SDL_RenderDrawLine(rend, x, y + h + 1 + CH_HEIGHT, x + w, y + h + 1 + CH_HEIGHT);
   SDL_SetRenderDrawColor(rend, 0xff, 0xff, 0xff, 0);
 
   rx_update_gui = true;

@@ -2,9 +2,10 @@
 #define __NVBOARD_H__
 
 #include <pins.h>
-#include <string>
+#include <font.h>
 #include <component.h>
 #include <configs.h>
+#include <string>
 #include <SDL.h>
 #include <SDL_image.h>
 

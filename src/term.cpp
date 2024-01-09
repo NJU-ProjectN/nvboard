@@ -1,15 +1,13 @@
 #include <nvboard.h>
 #include <term.h>
 
-SDL_Texture* get_font_texture(uint8_t ch);
-
 Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
     renderer(r), cursor_x(0), cursor_y(0), screen_y(0) {
   region = { .x = x, .y = y, .w = w, .h = h };
-  w_in_char = region.w / 10;
-  h_in_char = region.h / 16;
+  w_in_char = region.w / CH_WIDTH;
+  h_in_char = region.h / CH_HEIGHT;
   uint8_t *l = add_line();
-  cursor_texture = new_texture(r, 10, 16, 0x10, 0x10, 0x10);
+  cursor_texture = new_texture(r, CH_WIDTH, CH_HEIGHT, 0x10, 0x10, 0x10);
   is_cursor_visible = true;
   clear_screen();
   dirty_line = new bool[h_in_char];
@@ -117,10 +115,10 @@ void Term::draw_cursor() {
     int y = cursor_y - screen_y;
     int x = cursor_x;
     SDL_Rect rect = region;
-    rect.w = 10, rect.h = 16;
-    rect.y += 16 * y;
-    rect.x += 10 * x;
-    SDL_Texture *t = is_cursor_visible ? cursor_texture :  get_font_texture(' ');
+    rect.w = CH_WIDTH, rect.h = CH_HEIGHT;
+    rect.y += CH_HEIGHT * y;
+    rect.x += CH_WIDTH * x;
+    SDL_Texture *t = is_cursor_visible ? cursor_texture :  ch2texture_term(' ');
     SDL_RenderCopy(renderer, t, NULL, &rect);
     set_redraw();
   }
@@ -130,7 +128,7 @@ void Term::update_gui() {
   if (!dirty_screen) return;
   SDL_Rect rect = region;
   int x_start = rect.x;
-  rect.w = 10, rect.h = 16;
+  rect.w = CH_WIDTH, rect.h = CH_HEIGHT;
   for (int y = 0; y < h_in_char; y ++) {
     if (screen_y + y >= lines.size()) break;
     if (!dirty_line[y]) continue;
@@ -143,7 +141,7 @@ void Term::update_gui() {
 
       uint8_t ch = l[x];
       rect.x = region.x + rect.w * x;
-      SDL_Texture *t  = get_font_texture(ch);
+      SDL_Texture *t  = ch2texture_term(ch);
       SDL_RenderCopy(renderer, t, NULL, &rect);
       set_redraw();
     }

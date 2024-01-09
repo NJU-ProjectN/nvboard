@@ -11,7 +11,6 @@ typedef struct {
 
 static KEYBOARD* kb = NULL;
 bool is_kb_idle = true;
-SDL_Surface* get_font_surface(const char *str);
 static Key keys[256] = {};
 
 KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int ct):
@@ -98,7 +97,7 @@ static SDL_Texture* gen_key_texture(SDL_Renderer *renderer, const char *desc1,
   uint32_t color_up = SDL_MapRGBA(key_shape->format, 0xf0, 0xf0, 0xf0, 0xff);
   uint32_t color_dn = SDL_MapRGBA(key_shape->format, 0xc0, 0xc0, 0xc0, 0xff);
   SDL_Surface *s = surdup(key_shape, is_down ? color_dn : color_up);
-  SDL_Surface *s_desc = get_font_surface(desc.c_str());
+  SDL_Surface *s_desc = str2surface(desc.c_str(), 0);
   SDL_Rect r = { .x = 1, .y = 1 };
   SDL_BlitSurface(s_desc, NULL, s, &r);
   SDL_Texture *t = SDL_CreateTextureFromSurface(renderer, s);
@@ -120,7 +119,7 @@ static void render_keyboard(SDL_Renderer *renderer) {
   const int key_gap = key_unit_width / 14;
   const int h_keyboard = key_unit_width * 6 + key_gap * 5 + key_unit_width / 2;
   const int x_top_left = WINDOW_WIDTH / 2 + 1;
-  const int y_below_uart_rx = WINDOW_HEIGHT / 2 + 2 + 16;
+  const int y_below_uart_rx = WINDOW_HEIGHT / 2 + 2 + CH_HEIGHT;
   const int y_top_left = y_below_uart_rx + (WINDOW_HEIGHT - y_below_uart_rx - h_keyboard) / 2;
   const int key_gap_before_extend_keys = key_unit_width / 3;
 

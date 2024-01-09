@@ -1,5 +1,5 @@
-#ifndef _NVBOARD_TERM_H
-#define _NVBOARD_TERM_H
+#ifndef __TERM_H__
+#define __TERM_H__
 
 class Term {
 private:

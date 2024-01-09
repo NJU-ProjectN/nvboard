@@ -1,5 +1,5 @@
-#ifndef _NVBOARD_UART_H
-#define _NVBOARD_UART_H
+#ifndef __UART_H__
+#define __UART_H__
 
 #include <component.h>
 #include <term.h>
