@@ -13,7 +13,7 @@ private:
   uint8_t tx_data, rx_data;
   std::string rx_input;
   std::string rx_sending_str;
-  static constexpr const char *rx_input_prompt = "UART RX (Press Enter to issue): ";
+  static constexpr const char *rx_input_prompt = "(Press Enter to issue): ";
   bool tx_update_gui, rx_update_gui;
   uint8_t *p_tx;
 public:
