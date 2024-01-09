@@ -114,7 +114,7 @@ static void init_key_texture(SDL_Renderer *renderer, uint8_t sdl_key,
   e->rect = { .x = x, .y = y, .w = key_shape->w, .h = key_shape->h };
 }
 
-static void render_keyboard(SDL_Renderer *renderer) {
+static void init_render_local(SDL_Renderer *renderer) {
   const int key_unit_width = 34;
   const int key_gap = key_unit_width / 14;
   const int h_keyboard = key_unit_width * 6 + key_gap * 5 + key_unit_width / 2;
@@ -251,9 +251,23 @@ static void render_keyboard(SDL_Renderer *renderer) {
   SDL_FreeSurface(s_2p0);
   SDL_FreeSurface(s_2p25);
   SDL_FreeSurface(s_6p0);
+
+
+  // draw line
+  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
+  SDL_Point p[3];
+  p[0] = Point(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2) - Point(10, 0);
+  p[1] = p[0] - Point(16, 16);
+  p[2] = p[1] - Point(20, 0);
+  draw_thicker_line(renderer, p, 3);
+
+  // draw label
+  const char *str = "PS/2 Keyboard";
+  draw_str(renderer, str, p[2].x - strlen(str) * CH_WIDTH, p[2].y - CH_HEIGHT / 2, 0xffffff);
 }
 
 void init_keyboard(SDL_Renderer *renderer) {
+  init_render_local(renderer);
   kb = new KEYBOARD(renderer, 0, 0, KEYBOARD_TYPE);
   for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
     kb->add_pin(p);
@@ -262,8 +276,6 @@ void init_keyboard(SDL_Renderer *renderer) {
 #define FILL_KEYMAP1(a) keys[SDL_PREFIX(a)].map1 = GET_SECOND(AT_PREFIX(a));
   MAP(SCANCODE_LIST, FILL_KEYMAP0)
   MAP(SCANCODE_LIST, FILL_KEYMAP1)
-
-  render_keyboard(renderer);
 }
 
 void kb_update() {
