@@ -82,16 +82,10 @@ static void init_render_local(SDL_Renderer *renderer) {
   tsegled_dot_on  = new_texture(renderer, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 0xff, 0x00, 0x00);
   tsegled_dot_off = new_texture(renderer, SEG_DOT_WIDTH, SEG_DOT_HEIGHT, 0x2b, 0x2b, 0x2b);
 
-#ifdef SEG_BKGND_ENA
-  SDL_Texture *tseg7_background;
-#if 0 //def SEG_BKGND_CUSTOM
-  tseg7_background = load_pic_texture(renderer, VSEGLED_BG_PATH);
-#else
-  tseg7_background = new_texture(renderer, SEG_TOT_WIDTH, SEG_TOT_HEIGHT, 0x00, 0x00, 0x00);
-#endif
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
   SDL_Rect rect_seg7 = {SEG_X, SEG_Y, SEG_TOT_WIDTH, SEG_TOT_HEIGHT};
-  SDL_RenderCopy(renderer, tseg7_background, NULL, &rect_seg7);
-#endif
+  SDL_RenderFillRect(renderer, &rect_seg7);
+  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
 
   // draw surrounding lines
   const int gap = 14;
