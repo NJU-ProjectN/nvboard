@@ -1,20 +1,23 @@
 #include <nvboard.h>
 #include <SDL_ttf.h>
 
-static TTF_Font *font;
+static TTF_Font *font = NULL;
 static SDL_Texture* font_texture_term[128] = { NULL };
 SDL_Texture* surface2texture(SDL_Renderer *renderer, SDL_Surface *s);
+SDL_Texture *nvboard_texture = NULL;
 
 void init_font(SDL_Renderer *renderer) {
   int ret = TTF_Init();
   assert(ret != -1);
   std::string nvboard_home = getenv("NVBOARD_HOME");
 
-  font = TTF_OpenFont((nvboard_home + "/resources/font/" + "FreeMono.ttf").c_str(), CH_HEIGHT);
+  font = TTF_OpenFont((nvboard_home + "/resources/font/" + "FreeMono.ttf").c_str(), 48);
   assert(font != NULL);
   TTF_SetFontHinting(font, TTF_HINTING_MONO);
   TTF_SetFontStyle(font, TTF_STYLE_BOLD);
+  nvboard_texture = str2texture(renderer, "NVBoard", 0xffffff, BOARD_BG_COLOR);
 
+  TTF_SetFontSize(font, CH_HEIGHT);
   SDL_Color fg = {.r = 0x00, .g = 0x00, .b = 0x00 };
   SDL_Color bg = {.r = 0xff, .g = 0xff, .b = 0xff };
   for (int i = 1; i < 128; i ++) {

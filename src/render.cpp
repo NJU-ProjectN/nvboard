@@ -78,15 +78,24 @@ void init_render(SDL_Renderer *renderer) {
   nvboard_home = getenv("NVBOARD_HOME");
 
   SDL_Rect rect_bg = {0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2};
-#if 0
-  tfpga_background = load_pic_texture(renderer, BG_PATH);
-  SDL_RenderCopy(renderer, tfpga_background, NULL, &rect_bg);
-#else
-  uint8_t r, g, b, a;
-  SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
   SDL_SetRenderDrawColor(renderer,
       (BOARD_BG_COLOR >> 16) & 0xff, (BOARD_BG_COLOR >> 8) & 0xff, BOARD_BG_COLOR & 0xff, 0);
   SDL_RenderFillRect(renderer, &rect_bg);
-  SDL_SetRenderDrawColor(renderer, r, g, b, a);
-#endif
+
+  extern SDL_Texture *nvboard_texture;
+  int w, h;
+  SDL_QueryTexture(nvboard_texture, NULL, NULL, &w, &h);
+  SDL_Rect r = Rect(60, 140, w, h);
+  SDL_RenderCopy(renderer, nvboard_texture, NULL, &r);
+  SDL_DestroyTexture(nvboard_texture);
+
+  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
+  SDL_Point p[2];
+  p[0] = Point(60, 140 + h + 4);
+  p[1] = Point(WINDOW_WIDTH / 2 / 2 + 120, p[0].y);
+  draw_thicker_line(renderer, p, 2);
+  p[0].y += 4, p[1].y += 4;
+  draw_thicker_line(renderer, p, 2);
+
+  draw_str(renderer, "v1.0 (2024.01.10)", 60 + w + CH_WIDTH, 140 + h - CH_HEIGHT, 0xffffff);
 }
