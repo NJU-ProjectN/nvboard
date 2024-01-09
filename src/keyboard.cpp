@@ -120,7 +120,8 @@ static void render_keyboard(SDL_Renderer *renderer) {
   const int key_gap = key_unit_width / 14;
   const int h_keyboard = key_unit_width * 6 + key_gap * 5 + key_unit_width / 2;
   const int x_top_left = WINDOW_WIDTH / 2 + 1;
-  const int y_top_left = WINDOW_HEIGHT / 2 + 16 + (WINDOW_HEIGHT / 2 - 16 - h_keyboard) / 2;
+  const int y_below_uart_rx = WINDOW_HEIGHT / 2 + 2 + 16;
+  const int y_top_left = y_below_uart_rx + (WINDOW_HEIGHT - y_below_uart_rx - h_keyboard) / 2;
   const int key_gap_before_extend_keys = key_unit_width / 3;
 
   SDL_Surface *s_1p0 = new_key_shape(key_unit_width, key_unit_width);
