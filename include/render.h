@@ -33,6 +33,7 @@ static inline SDL_Rect operator+(const SDL_Rect &A, const SDL_Rect &B) {
   return Rect(A.x + B.x, A.y + B.y, A.w + B.w, A.h + B.h);
 }
 
+void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n);
 void draw_surrounding_line(SDL_Renderer *renderer, SDL_Rect r, int gap);
 
 #endif

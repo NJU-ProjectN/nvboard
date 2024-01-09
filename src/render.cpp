@@ -28,7 +28,7 @@ SDL_Texture* new_texture(SDL_Renderer *renderer, int w, int h, int r, int g, int
   return surface2texture(renderer, s);
 }
 
-static void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n) {
+void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n) {
   SDL_RenderDrawLines(renderer, point, n);
 
   SDL_Point *p = new SDL_Point[n];
