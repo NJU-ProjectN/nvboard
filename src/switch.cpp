@@ -1,4 +1,5 @@
 #include <nvboard.h>
+#include <render.h>
 
 #define SWITCH_X       60
 #define SWITCH_Y       400
@@ -6,10 +7,41 @@
 #define SWITCH_WIDTH   20
 #define SWITCH_HEIGHT  40
 
+static void init_render_local(SDL_Renderer *renderer) {
+  // draw line
+  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
+  SDL_Point p[2];
+  const int gap2 = 16;
+  int w = (SWITCH_WIDTH + SWITCH_SEP) * 16 - SWITCH_SEP;
+  p[0] = Point(SWITCH_X, SWITCH_Y) + Point(-gap2, SWITCH_HEIGHT / 2);
+  p[1] = p[0] + Point(w + gap2 * 2, 0);
+  draw_thicker_line(renderer, p, 2);
+
+  int w_group4 = (SWITCH_WIDTH + SWITCH_SEP) * 4;
+  p[0] = Point(SWITCH_X, SWITCH_Y) + Point(w_group4, 0) - Point(SWITCH_SEP / 2, 0)
+         + Point(0, SWITCH_HEIGHT / 2) + Point(0, -SWITCH_SEP / 2);
+  p[1] = p[0] + Point(0, SWITCH_SEP);
+  for (int i = 0; i < 3; i ++) {
+    draw_thicker_line(renderer, p, 2);
+    p[0] = p[0] + Point(w_group4, 0);
+    p[1] = p[1] + Point(w_group4, 0);
+  }
+
+  // draw the title
+  const char *str = "SW";
+  SDL_Texture *t = str2texture(renderer, str, 0xffffff, BOARD_BG_COLOR);
+  int w0 = CH_WIDTH * strlen(str);
+  SDL_Point p0 = Point(SWITCH_X, SWITCH_Y) - Point(gap2 + 4, 0) + Point(0, SWITCH_HEIGHT / 2)
+                 - Point(0, CH_HEIGHT / 2) - Point(w0, 0);
+  SDL_Rect r = Rect(p0, w0, CH_HEIGHT);
+  SDL_RenderCopy(renderer, t, NULL, &r);
+  SDL_DestroyTexture(t);
+}
+
 void init_switch(SDL_Renderer *renderer) {
   SDL_Texture *tswitch_on  = load_pic_texture(renderer, VSW_ON_PATH);
   SDL_Texture *tswitch_off = load_pic_texture(renderer, VSW_OFF_PATH);
-
+  init_render_local(renderer);
   for (int i = 0; i < 16; ++i) {
     Component *ptr = new Component(renderer, 2, 0, SWITCH_TYPE);
 
