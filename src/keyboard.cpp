@@ -1,8 +1,6 @@
+#include <nvboard.h>
 #include <keyboard.h>
-#include <pins.h>
-#include <configs.h>
 #include "at_scancode.h"
-#include <string>
 
 typedef struct {
   SDL_Texture *t_up, *t_down;
@@ -22,14 +20,21 @@ KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int ct):
 
 
 void KEYBOARD::push_key(uint8_t sdl_key, bool is_keydown){
-  uint8_t at_key = keys[sdl_key].map0;
+  Key *e = &keys[sdl_key];
+  uint8_t at_key = e->map0;
   if(at_key == 0xe0){
     all_keys.push(0xe0);
-    at_key = keys[sdl_key].map1;
+    at_key = e->map1;
   }
   if(!is_keydown) all_keys.push(0xf0);
   all_keys.push(at_key);
   is_kb_idle = false;
+
+  if (e->pressing != is_keydown) {
+    e->pressing = is_keydown;
+    SDL_RenderCopy(get_renderer(), (is_keydown ? e->t_down : e->t_up), NULL, &e->rect);
+    set_redraw();
+  }
 }
 
 void KEYBOARD::update_state(){
@@ -68,10 +73,8 @@ void KEYBOARD::update_state(){
 }
 
 static SDL_Surface* new_key_shape(int w, int h) {
-  SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
-  uint32_t black = SDL_MapRGB(s->format, 0, 0, 0);
-  uint32_t white = SDL_MapRGB(s->format, 0xff, 0xff, 0xff);
-  SDL_FillRect(s, NULL, white);
+  SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, 32, 0xff0000, 0x00ff00, 0x0000ff, 0xff000000);
+  uint32_t black = SDL_MapRGBA(s->format, 0, 0, 0, 0xff);
   SDL_Rect r;
   r = (SDL_Rect){.x = 0, .y = 0, .w = 1, .h = h}; SDL_FillRect(s, &r, black);
   r = (SDL_Rect){.x = 0, .y = 0, .w = w, .h = 1}; SDL_FillRect(s, &r, black);
@@ -80,16 +83,21 @@ static SDL_Surface* new_key_shape(int w, int h) {
   return s;
 }
 
-static SDL_Surface* surdup(SDL_Surface *src) {
-  SDL_Surface *s = SDL_CreateRGBSurface(0, src->w, src->h, 32, 0, 0, 0, 0);
+static SDL_Surface* surdup(SDL_Surface *src, uint32_t bg) {
+  SDL_PixelFormat *f = src->format;
+  SDL_Surface *s = SDL_CreateRGBSurface(0, src->w, src->h,
+      f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
+  SDL_FillRect(s, NULL, bg);
   SDL_BlitSurface(src, NULL, s, NULL);
   return s;
 }
 
 static SDL_Texture* gen_key_texture(SDL_Renderer *renderer, const char *desc1,
-    const char *desc2, SDL_Surface *key_shape) {
+    const char *desc2, SDL_Surface *key_shape, bool is_down) {
   std::string desc = std::string(desc1) + '\n' + desc2;
-  SDL_Surface *s = surdup(key_shape);
+  uint32_t color_up = SDL_MapRGBA(key_shape->format, 0xf0, 0xf0, 0xf0, 0xff);
+  uint32_t color_dn = SDL_MapRGBA(key_shape->format, 0xc0, 0xc0, 0xc0, 0xff);
+  SDL_Surface *s = surdup(key_shape, is_down ? color_dn : color_up);
   SDL_Surface *s_desc = get_font_surface(desc.c_str());
   SDL_Rect r = { .x = 1, .y = 1 };
   SDL_BlitSurface(s_desc, NULL, s, &r);
@@ -102,7 +110,8 @@ static SDL_Texture* gen_key_texture(SDL_Renderer *renderer, const char *desc1,
 static void init_key_texture(SDL_Renderer *renderer, uint8_t sdl_key,
     const char *desc1, const char *desc2, SDL_Surface *key_shape, int x, int y) {
   Key *e = &keys[sdl_key];
-  e->t_up = gen_key_texture(renderer, desc1, desc2, key_shape);
+  e->t_up   = gen_key_texture(renderer, desc1, desc2, key_shape, false);
+  e->t_down = gen_key_texture(renderer, desc1, desc2, key_shape, true);
   e->rect = { .x = x, .y = y, .w = key_shape->w, .h = key_shape->h };
 }
 

@@ -33,7 +33,7 @@ void init_font(SDL_Renderer *renderer) {
 
 SDL_Surface* get_font_surface(const char *str) {
   SDL_Color fg = {.r = 0x00, .g = 0x00, .b = 0x00 };
-  SDL_Surface *s = TTF_RenderText_Solid_Wrapped(font, str, fg, 0);
+  SDL_Surface *s = TTF_RenderText_Blended_Wrapped(font, str, fg, 0);
   if (s == NULL) {
     printf("error = %s\n", SDL_GetError());
     assert(s != NULL);
