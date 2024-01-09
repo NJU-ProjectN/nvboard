@@ -4,15 +4,17 @@
 #include "at_scancode.h"
 #include <string>
 
+typedef struct {
+  SDL_Texture *t_up, *t_down;
+  SDL_Rect rect;
+  uint8_t map0, map1;
+  bool pressing;
+} Key;
+
 static KEYBOARD* kb = NULL;
 bool is_kb_idle = true;
 SDL_Surface* get_font_surface(const char *str);
-
-#define FILL_KEYMAP_FIRST(a) keymap_first[SDL_PREFIX(a)] = GET_FIRST(AT_PREFIX(a));
-#define FILL_KEYMAP_DECOND(a) keymap_second[SDL_PREFIX(a)] = GET_SECOND(AT_PREFIX(a));
-
-static int keymap_first[256] = {};
-static int keymap_second[256] = {};
+static Key keys[256] = {};
 
 KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int ct):
   Component(rend, cnt, init_val, ct),
@@ -20,10 +22,10 @@ KEYBOARD::KEYBOARD(SDL_Renderer *rend, int cnt, int init_val, int ct):
 
 
 void KEYBOARD::push_key(uint8_t sdl_key, bool is_keydown){
-  uint8_t at_key = keymap_first[sdl_key];
+  uint8_t at_key = keys[sdl_key].map0;
   if(at_key == 0xe0){
     all_keys.push(0xe0);
-    at_key = keymap_second[sdl_key];
+    at_key = keys[sdl_key].map1;
   }
   if(!is_keydown) all_keys.push(0xf0);
   all_keys.push(at_key);
@@ -84,9 +86,9 @@ static SDL_Surface* surdup(SDL_Surface *src) {
   return s;
 }
 
-static SDL_Texture* gen_key(SDL_Renderer *renderer, const char *desc_up,
-    const char *desc_down, SDL_Surface *key_shape) {
-  std::string desc = std::string(desc_up) + '\n' + desc_down;
+static SDL_Texture* gen_key_texture(SDL_Renderer *renderer, const char *desc1,
+    const char *desc2, SDL_Surface *key_shape) {
+  std::string desc = std::string(desc1) + '\n' + desc2;
   SDL_Surface *s = surdup(key_shape);
   SDL_Surface *s_desc = get_font_surface(desc.c_str());
   SDL_Rect r = { .x = 1, .y = 1 };
@@ -97,36 +99,149 @@ static SDL_Texture* gen_key(SDL_Renderer *renderer, const char *desc_up,
   return t;
 }
 
+static void init_key_texture(SDL_Renderer *renderer, uint8_t sdl_key,
+    const char *desc1, const char *desc2, SDL_Surface *key_shape, int x, int y) {
+  Key *e = &keys[sdl_key];
+  e->t_up = gen_key_texture(renderer, desc1, desc2, key_shape);
+  e->rect = { .x = x, .y = y, .w = key_shape->w, .h = key_shape->h };
+}
+
 static void render_keyboard(SDL_Renderer *renderer) {
   const int key_unit_width = 34;
   const int key_gap = key_unit_width / 14;
+  const int h_keyboard = key_unit_width * 6 + key_gap * 5 + key_unit_width / 2;
   const int x_top_left = WINDOW_WIDTH / 2 + 1;
+  const int y_top_left = WINDOW_HEIGHT / 2 + 16 + (WINDOW_HEIGHT / 2 - 16 - h_keyboard) / 2;
   const int key_gap_before_extend_keys = key_unit_width / 3;
 
   SDL_Surface *s_1p0 = new_key_shape(key_unit_width, key_unit_width);
   SDL_Surface *s_1p5 = new_key_shape(key_unit_width + key_gap + key_unit_width / 2, key_unit_width);
+  SDL_Surface *s_2p0 = new_key_shape(key_unit_width * 2 + key_gap, key_unit_width);
+  SDL_Surface *s_2p25= new_key_shape(key_unit_width * 2 + key_gap * 2 + key_unit_width / 4, key_unit_width);
+  SDL_Surface *s_6p0 = new_key_shape(key_unit_width * 6 + key_gap * 5, key_unit_width);
 
-  SDL_Texture *t_1 = gen_key(renderer, "!", "1", s_1p0);
-  SDL_Texture *t_backspace = gen_key(renderer, "<-", "", s_1p5);
-  SDL_Rect r_1p0 = {.x = x_top_left, .y = WINDOW_HEIGHT / 2 + 50, .w = s_1p0->w, .h = s_1p0->h };
-  SDL_Rect r_1p5 = {.x = x_top_left, .y = WINDOW_HEIGHT / 2 + 50, .w = s_1p5->w, .h = s_1p5->h };
+  int x = x_top_left, y = y_top_left;
+
+#define _entry(k, desc1, desc2, width) do { \
+  int idx = SDL_PREFIX(concat(_, k)); \
+  init_key_texture(renderer, idx, desc1, desc2, concat(s_, width), x, y); \
+  x += concat(s_, width)->w + key_gap; \
+  SDL_RenderCopy(renderer, keys[idx].t_up, NULL, &keys[idx].rect); \
+} while (0)
+
+#define nextline() do { x = x_top_left; y += key_unit_width + key_gap; } while (0)
+
+  _entry(ESCAPE,    "ESC", "", 1p0);
+  x += key_unit_width / 2 + key_gap;
+  _entry(F1,        "F1", "", 1p0);
+  _entry(F2,        "F2", "", 1p0);
+  _entry(F3,        "F3", "", 1p0);
+  _entry(F4,        "F4", "", 1p0);
+  x += key_unit_width / 2;
+  _entry(F5,        "F5", "", 1p0);
+  _entry(F6,        "F6", "", 1p0);
+  _entry(F7,        "F7", "", 1p0);
+  _entry(F8,        "F8", "", 1p0);
+  x += key_unit_width / 2;
+  _entry(F9,        "F9", "", 1p0);
+  _entry(F10,       "F10", "", 1p0);
+  _entry(F11,       "F11", "", 1p0);
+  _entry(F12,       "F12", "", 1p0);
+  x += key_gap_before_extend_keys;
+  _entry(PRINTSCREEN, "Prt", "Scr", 1p0);
+  _entry(SCROLLLOCK,  "Scr", "Lck", 1p0);
+  _entry(PAUSE,       "Pa-", "use", 1p0);
+
+  nextline();
+  y += key_unit_width / 2;  // more space between the 1st and 2nd line
+  _entry(GRAVE,     "~", "`", 1p0);
+  _entry(1,         "!", "1", 1p0);
+  _entry(2,         "@", "2", 1p0);
+  _entry(3,         "#", "3", 1p0);
+  _entry(4,         "$", "4", 1p0);
+  _entry(5,         "%", "5", 1p0);
+  _entry(6,         "^", "6", 1p0);
+  _entry(7,         "&", "7", 1p0);
+  _entry(8,         "*", "8", 1p0);
+  _entry(9,         "(", "9", 1p0);
+  _entry(0,         ")", "0", 1p0);
+  _entry(MINUS,     "_", "-", 1p0);
+  _entry(EQUALS,    "+", "=", 1p0);
+  _entry(BACKSPACE, "Back", "Space", 1p5);
+  x += key_gap_before_extend_keys - key_gap;
+  _entry(INSERT,    "Ins",  "", 1p0);
+  _entry(HOME,      "Ho-", "me", 1p0);
+  _entry(PAGEUP,    "Pg", "Up", 1p0);
+
+  nextline();
+  _entry(TAB,       "Tab", "", 1p5);
+  _entry(Q,         "Q", "", 1p0);
+  _entry(W,         "W", "", 1p0);
+  _entry(E,         "E", "", 1p0);
+  _entry(R,         "R", "", 1p0);
+  _entry(T,         "T", "", 1p0);
+  _entry(Y,         "Y", "", 1p0);
+  _entry(U,         "U", "", 1p0);
+  _entry(I,         "I", "", 1p0);
+  _entry(O,         "O", "", 1p0);
+  _entry(P,         "P", "", 1p0);
+  _entry(LEFTBRACKET, "{", "[", 1p0);
+  _entry(RIGHTBRACKET, "}", "]", 1p0);
+  _entry(BACKSLASH, "|", "\\", 1p0);
+  x += key_gap_before_extend_keys - key_gap;
+  _entry(DELETE,    "Del",  "", 1p0);
+  _entry(END,       "End",  "", 1p0);
+  _entry(PAGEDOWN,  "Pg", "Dn", 1p0);
+
+  nextline();
+  _entry(CAPSLOCK,  "Caps", "Lock", 2p0);
+  _entry(A,         "A", "", 1p0);
+  _entry(S,         "S", "", 1p0);
+  _entry(D,         "D", "", 1p0);
+  _entry(F,         "F", "", 1p0);
+  _entry(G,         "G", "", 1p0);
+  _entry(H,         "H", "", 1p0);
+  _entry(J,         "J", "", 1p0);
+  _entry(K,         "K", "", 1p0);
+  _entry(L,         "L", "", 1p0);
+  _entry(SEMICOLON, ":", ";", 1p0);
+  _entry(APOSTROPHE,"\"", "'", 1p0);
+  _entry(RETURN,    "Enter", "", 1p5);
+
+  nextline();
+  _entry(LSHIFT,    "Shift", "", 2p25);
+  _entry(Z,         "Z", "", 1p0);
+  _entry(X,         "X", "", 1p0);
+  _entry(C,         "C", "", 1p0);
+  _entry(V,         "V", "", 1p0);
+  _entry(B,         "B", "", 1p0);
+  _entry(N,         "N", "", 1p0);
+  _entry(M,         "M", "", 1p0);
+  _entry(COMMA,     "<", ",", 1p0);
+  _entry(PERIOD,    ">", ".", 1p0);
+  _entry(SLASH,     "?", "/", 1p0);
+  _entry(RSHIFT,    "Shift", "", 2p25);
+  x += key_gap_before_extend_keys + key_unit_width;
+  _entry(UP,        "^", "|", 1p0);
+
+  nextline();
+  _entry(LCTRL,    "Ctrl", "", 1p5);
+  x += key_unit_width + key_gap + key_unit_width / 4;
+  _entry(LALT,     "Alt", "", 1p5);
+  _entry(SPACE,    "Space", "", 6p0);
+  _entry(RALT,     "Alt", "", 1p5);
+  x += key_unit_width + key_gap + key_unit_width / 4;
+  _entry(RCTRL,    "Ctrl", "", 1p5);
+  x += key_gap_before_extend_keys - key_gap;
+  _entry(LEFT,      "<-", "", 1p0);
+  _entry(DOWN,      "|", "V", 1p0);
+  _entry(RIGHT,     "->", "", 1p0);
+
   SDL_FreeSurface(s_1p0);
   SDL_FreeSurface(s_1p5);
-
-
-  SDL_Rect r = r_1p0;
-  for (int i = 0; i < 13; i ++) {
-    SDL_RenderCopy(renderer, t_1, NULL, &r);
-    r.x += r_1p0.w + key_gap;
-  }
-  r.w = r_1p5.w;
-  SDL_RenderCopy(renderer, t_backspace, NULL, &r);
-  r.x += r_1p5.w + key_gap_before_extend_keys;
-  r.w = r_1p0.w;
-  for (int i = 0; i < 3; i ++) {
-    SDL_RenderCopy(renderer, t_1, NULL, &r);
-    r.x += r_1p0.w + key_gap;
-  }
+  SDL_FreeSurface(s_2p0);
+  SDL_FreeSurface(s_2p25);
+  SDL_FreeSurface(s_6p0);
 }
 
 void init_keyboard(SDL_Renderer *renderer) {
@@ -134,8 +249,10 @@ void init_keyboard(SDL_Renderer *renderer) {
   for (int p = PS2_CLK; p <= PS2_DAT; p ++) {
     kb->add_pin(p);
   }
-  MAP(SCANCODE_LIST, FILL_KEYMAP_FIRST)
-  MAP(SCANCODE_LIST, FILL_KEYMAP_DECOND)
+#define FILL_KEYMAP0(a) keys[SDL_PREFIX(a)].map0 = GET_FIRST(AT_PREFIX(a));
+#define FILL_KEYMAP1(a) keys[SDL_PREFIX(a)].map1 = GET_SECOND(AT_PREFIX(a));
+  MAP(SCANCODE_LIST, FILL_KEYMAP0)
+  MAP(SCANCODE_LIST, FILL_KEYMAP1)
 
   render_keyboard(renderer);
 }
