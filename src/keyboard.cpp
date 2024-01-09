@@ -232,7 +232,7 @@ static void render_keyboard(SDL_Renderer *renderer) {
   _entry(SLASH,     "?", "/", 1p0);
   _entry(RSHIFT,    "Shift", "", 2p25);
   x += key_gap_before_extend_keys + key_unit_width;
-  _entry(UP,        "^", "|", 1p0);
+  _entry(UP,        " ^", " |", 1p0);
 
   nextline();
   _entry(LCTRL,    "Ctrl", "", 1p5);
@@ -244,7 +244,7 @@ static void render_keyboard(SDL_Renderer *renderer) {
   _entry(RCTRL,    "Ctrl", "", 1p5);
   x += key_gap_before_extend_keys - key_gap;
   _entry(LEFT,      "<-", "", 1p0);
-  _entry(DOWN,      "|", "V", 1p0);
+  _entry(DOWN,      " |", " V", 1p0);
   _entry(RIGHT,     "->", "", 1p0);
 
   SDL_FreeSurface(s_1p0);
