@@ -35,5 +35,7 @@ static inline SDL_Rect operator+(const SDL_Rect &A, const SDL_Rect &B) {
 
 void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n);
 void draw_surrounding_line(SDL_Renderer *renderer, SDL_Rect r, int gap);
+void draw_str(SDL_Renderer *renderer, const char *str, int x, int y, uint32_t fg);
+void draw_str(SDL_Renderer *renderer, const char *str, int x, int y, uint32_t fg, uint32_t bg);
 
 #endif

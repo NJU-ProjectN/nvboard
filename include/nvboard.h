@@ -3,6 +3,7 @@
 
 #include <pins.h>
 #include <font.h>
+#include <render.h>
 #include <component.h>
 #include <configs.h>
 #include <string>

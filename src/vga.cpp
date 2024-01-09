@@ -108,7 +108,21 @@ void vga_set_clk_cycle(int cycle) {
   vga_clk_cycle_minus_1 = cycle - 1;
 }
 
+static void init_render_local(SDL_Renderer *renderer) {
+  // draw line
+  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
+  SDL_Point p[3];
+  p[0] = Point(0, WINDOW_HEIGHT / 2) + Point(30, 0) - Point(0, CH_HEIGHT);
+  p[1] = p[0] - Point(16, 0);
+  p[2] = Point(p[1].x,  WINDOW_HEIGHT / 2);
+  draw_thicker_line(renderer, p, 3);
+
+  // draw label
+  draw_str(renderer, "VGA", p[0].x + 4, p[0].y - CH_HEIGHT / 2, 0xffffff);
+}
+
 void init_vga(SDL_Renderer *renderer) {
+  init_render_local(renderer);
   vga = new VGA(renderer, 1, 0, VGA_TYPE);
   SDL_Rect *rect_ptr = new SDL_Rect;
   *rect_ptr = (SDL_Rect){0, WINDOW_HEIGHT / 2, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};

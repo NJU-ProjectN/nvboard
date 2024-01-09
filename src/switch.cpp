@@ -1,5 +1,4 @@
 #include <nvboard.h>
-#include <render.h>
 
 #define SWITCH_X       60
 #define SWITCH_Y       400
@@ -27,15 +26,11 @@ static void init_render_local(SDL_Renderer *renderer) {
     p[1] = p[1] + Point(w_group4, 0);
   }
 
-  // draw the title
+  // draw label
   const char *str = "SW";
-  SDL_Texture *t = str2texture(renderer, str, 0xffffff, BOARD_BG_COLOR);
-  int w0 = CH_WIDTH * strlen(str);
   SDL_Point p0 = Point(SWITCH_X, SWITCH_Y) - Point(gap2 + 4, 0) + Point(0, SWITCH_HEIGHT / 2)
-                 - Point(0, CH_HEIGHT / 2) - Point(w0, 0);
-  SDL_Rect r = Rect(p0, w0, CH_HEIGHT);
-  SDL_RenderCopy(renderer, t, NULL, &r);
-  SDL_DestroyTexture(t);
+                 - Point(0, CH_HEIGHT / 2) - Point(CH_WIDTH * strlen(str), 0);
+  draw_str(renderer, str, p0.x, p0.y, 0xffffff);
 }
 
 void init_switch(SDL_Renderer *renderer) {

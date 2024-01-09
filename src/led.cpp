@@ -1,5 +1,4 @@
 #include <nvboard.h>
-#include <render.h>
 
 #define LED_X          60 + (4/2)
 #define LED_Y          360
@@ -39,23 +38,15 @@ static void init_render_local(SDL_Renderer *renderer) {
   for (int i = 0; i < 16; i ++) {
     char buf[8];
     int n = snprintf(buf, 8, "%d", i);
-    SDL_Texture *t = str2texture(renderer, buf, 0xffffff, (21 << 16) | (153 << 8) | 120);
-    int w_texture = CH_WIDTH * n;
-    SDL_Rect r = Rect(p0 - Point(w_texture / 2, 0), w_texture, CH_HEIGHT);
-    SDL_RenderCopy(renderer, t, NULL, &r);
-    SDL_DestroyTexture(t);
+    draw_str(renderer, buf, p0.x - CH_WIDTH * n / 2, p0.y, 0xffffff);
     p0.x -= LED_WIDTH + LED_SEP;
   }
 
-  // draw the title
+  // draw label
   const char *str = "LED";
-  SDL_Texture *t = str2texture(renderer, str, 0xffffff, BOARD_BG_COLOR);
-  int w0 = CH_WIDTH * strlen(str);
   p0 = Point(LED_X, LED_Y) - Point(gap2 + 4, 0) + Point(0, LED_HEIGHT / 2)
-       - Point(0, CH_HEIGHT / 2) - Point(w0, 0);
-  r = Rect(p0, w0, CH_HEIGHT);
-  SDL_RenderCopy(renderer, t, NULL, &r);
-  SDL_DestroyTexture(t);
+       - Point(0, CH_HEIGHT / 2) - Point(CH_WIDTH * strlen(str), 0);
+  draw_str(renderer, str, p0.x, p0.y, 0xffffff);
 }
 
 void init_led(SDL_Renderer *renderer) {

@@ -1,5 +1,4 @@
 #include <nvboard.h>
-#include <render.h>
 
 static std::string nvboard_home;
 static SDL_Texture *tfpga_background;
@@ -56,6 +55,22 @@ void draw_surrounding_line(SDL_Renderer *renderer, SDL_Rect r,
   p[7] = p[6] - Point(0, h - 2 * d);
   p[8] = p[0];
   draw_thicker_line(renderer, p, 9);
+}
+
+static void draw_str_internal(SDL_Renderer *renderer, SDL_Texture *t, const char *str, int x, int y) {
+  SDL_Rect r = Rect(x, y, CH_WIDTH * strlen(str), CH_HEIGHT);
+  SDL_RenderCopy(renderer, t, NULL, &r);
+  SDL_DestroyTexture(t);
+}
+
+void draw_str(SDL_Renderer *renderer, const char *str, int x, int y, uint32_t fg) {
+  SDL_Texture *t = str2texture(renderer, str, fg);
+  draw_str_internal(renderer, t, str, x, y);
+}
+
+void draw_str(SDL_Renderer *renderer, const char *str, int x, int y, uint32_t fg, uint32_t bg) {
+  SDL_Texture *t = str2texture(renderer, str, fg, bg);
+  draw_str_internal(renderer, t, str, x, y);
 }
 
 

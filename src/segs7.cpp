@@ -1,5 +1,4 @@
 #include <nvboard.h>
-#include <render.h>
 
 #define SEG_X          60
 #define SEG_Y          225
@@ -101,23 +100,18 @@ static void init_render_local(SDL_Renderer *renderer) {
   // draw indices of each 7-seg display
   SDL_Point p = Point(SEG_X, SEG_Y) + Point(SEG_TOT_WIDTH, SEG_TOT_HEIGHT) + Point(0, gap)
                  - Point(SEG_TOT_WIDTH / 8 / 2, 0) - Point(CH_WIDTH / 2, CH_HEIGHT / 2);
+  char buf[2] = "?";
   for (int i = 0; i < 8; i ++) {
-    SDL_Texture *t = ch2texture(renderer, '0' + i, 0xffffff, BOARD_BG_COLOR);
-    SDL_Rect r = Rect(p, CH_WIDTH, CH_HEIGHT);
-    SDL_RenderCopy(renderer, t, NULL, &r);
-    SDL_DestroyTexture(t);
+    buf[0] = '0' + i;
+    draw_str(renderer, buf, p.x, p.y, 0xffffff, BOARD_BG_COLOR);
     p = p - Point(SEG_TOT_WIDTH / 8, 0);
   }
 
-  // draw the title
+  // draw label
   const char *str = "Seven Segment Display";
-  SDL_Texture *t = str2texture(renderer, str, 0xffffff, BOARD_BG_COLOR);
-  int w = CH_WIDTH * strlen(str);
   p = Point(SEG_X, SEG_Y) - Point(0, gap) - Point(0, CH_HEIGHT / 2)
-       + Point(SEG_TOT_WIDTH / 2, 0) - Point(w / 2, 0);
-  SDL_Rect r = Rect(p, w, CH_HEIGHT);
-  SDL_RenderCopy(renderer, t, NULL, &r);
-  SDL_DestroyTexture(t);
+       + Point(SEG_TOT_WIDTH / 2, 0) - Point(CH_WIDTH * strlen(str) / 2, 0);
+  draw_str(renderer, str, p.x, p.y, 0xffffff, BOARD_BG_COLOR);
 }
 
 void init_segs7(SDL_Renderer *renderer) {

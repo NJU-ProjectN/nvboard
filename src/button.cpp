@@ -1,5 +1,4 @@
 #include <nvboard.h>
-#include <render.h>
 
 #define BTNC_X         520
 #define BTNC_Y         250
@@ -24,24 +23,19 @@ static void init_render_local(SDL_Renderer *renderer) {
 
   // draw indices for each button
   const char *str = "CUDLR";
+  char buf[2] = "?";
   for (int i = 0; i < 5; i ++) {
-    SDL_Texture *t = ch2texture(renderer, str[i], 0xffffff, BOARD_BG_COLOR);
     SDL_Point p = Point(btn_rects[i].x, btn_rects[i].y) + Point(BTNC_WIDTH + 2, BTNC_HEIGHT / 2)
                   - Point(0, CH_HEIGHT / 2);
-    SDL_Rect r = Rect(p, CH_WIDTH, CH_HEIGHT);
-    SDL_RenderCopy(renderer, t, NULL, &r);
-    SDL_DestroyTexture(t);
+    buf[0] = str[i];
+    draw_str(renderer, buf, p.x, p.y, 0xffffff, BOARD_BG_COLOR);
   }
 
-  // draw the title
+  // draw label
   str = "Button Pad";
-  SDL_Texture *t = str2texture(renderer, str, 0xffffff, BOARD_BG_COLOR);
-  int w0 = CH_WIDTH * strlen(str);
   SDL_Point p = Point(btn_rects[3].x, btn_rects[1].y) - Point(0, gap) - Point(0, CH_HEIGHT / 2)
-                + Point(w / 2, 0) - Point(w0 / 2, 0);
-  SDL_Rect r = Rect(p, w0, CH_HEIGHT);
-  SDL_RenderCopy(renderer, t, NULL, &r);
-  SDL_DestroyTexture(t);
+                + Point(w / 2, 0) - Point(CH_WIDTH * strlen(str) / 2, 0);
+  draw_str(renderer, str, p.x, p.y, 0xffffff, BOARD_BG_COLOR);
 }
 
 void init_button(SDL_Renderer *renderer) {
