@@ -57,6 +57,10 @@ void Term::newline() {
   }
 }
 
+void Term::_return() {
+  cursor_x = 0;
+}
+
 uint8_t* Term::add_line() {
   uint8_t *l = new uint8_t[w_in_char];
   memset(l, ' ', w_in_char);
@@ -96,6 +100,7 @@ void Term::feed_ch(uint8_t ch) {
   int y = cursor_y;
   assert(y < lines.size());
   if      (ch == '\n') { newline(); return; }
+  else if (ch == '\r') { _return(); return; }
   else if (ch == '\b') { backspace(false); return; }
   lines[y][cursor_x] = ch;
   cursor_x ++;

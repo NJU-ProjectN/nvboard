@@ -17,6 +17,7 @@ private:
 
   void clear_screen();
   void newline();
+  void _return();
   uint8_t *add_line();
   void draw_cursor();
   bool is_cursor_on_screen();
