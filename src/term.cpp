@@ -12,6 +12,7 @@ Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
   is_cursor_visible = true;
   is_focus = false;
   clear_screen();
+  draw_cursor();
   dirty_line = new bool[h_in_char];
   dirty_char = new bool[w_in_char * h_in_char];
   init_dirty(false);
