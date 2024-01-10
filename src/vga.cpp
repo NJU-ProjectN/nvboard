@@ -37,7 +37,8 @@ VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int ct):
   if (is_r_len8) p_r = (uint8_t *)pin_array[VGA_R0].ptr;
   if (is_g_len8) p_g = (uint8_t *)pin_array[VGA_G0].ptr;
   if (is_b_len8) p_b = (uint8_t *)pin_array[VGA_B0].ptr;
-  assert(pin_array[VGA_BLANK_N].vector_len == 1);
+  int vga_blank_n_len = pin_array[VGA_BLANK_N].vector_len;
+  assert(vga_blank_n_len == 1 || vga_blank_n_len == 0);
   vga_blank_n_ptr = (uint8_t *)pin_array[VGA_BLANK_N].ptr;
   p_pixel = pixels;
   p_pixel_end = pixels + vga_screen_width * vga_screen_height;
