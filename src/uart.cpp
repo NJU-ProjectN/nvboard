@@ -88,23 +88,20 @@ void UART::rx_send() {
 }
 
 void UART::rx_getchar(uint8_t ch) {
-  if (ch == '\n') {
-    rx_sending_str += rx_input;
-    is_uart_rx_idle = false;
-    rx_term->clear();
-    rx_term->feed_str(rx_input_prompt);
-    rx_input = "";
-  }
-  else {
-    if (ch == '\b') {
-      if (rx_input.empty()) return;
-      rx_input.pop_back();
-      rx_term->backspace(true);
+  if (ch == '\b') {
+    if (rx_input.empty()) return;
+    rx_input.pop_back();
+    rx_term->backspace(true);
+  } else {
+    rx_input += ch;
+    if (ch == '\n') {
+      rx_sending_str += rx_input;
+      is_uart_rx_idle = false;
+      rx_term->clear();
+      rx_term->feed_str(rx_input_prompt);
+      rx_input = "";
     }
-    else {
-      rx_input += ch;
-      rx_term->feed_ch(ch);
-    }
+    else { rx_term->feed_ch(ch); }
   }
   rx_update_gui = true;
 }
