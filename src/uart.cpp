@@ -105,25 +105,17 @@ void UART::term_focus(bool v) {
 }
 
 static void init_render_local(SDL_Renderer *renderer) {
-  // draw line
   SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
-  SDL_Point p[5];
-  int x_pad = 20;
-  p[0] = Point(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-  p[1] = p[0] - Point(10, 10);
-  p[2] = p[1] - Point(0, 10);
-  p[3] = p[2] - Point(x_pad - 10, 0);
-  p[4] = p[3] - Point(0, 6);
-  draw_thicker_line(renderer, p, 5);
-
-  p[0].y = p[4].y - CH_HEIGHT * 3 / 2;
-  p[1] = p[0] - Point(x_pad - CH_WIDTH, 0);
-  draw_thicker_line(renderer, p, 2);
-
-  // draw label
-  draw_str(renderer, "RX", p[4].x - CH_WIDTH, p[4].y - CH_HEIGHT, 0xffffff);
-  draw_str(renderer, "TX", p[1].x - 2 * CH_WIDTH, p[1].y - CH_HEIGHT / 2, 0xffffff);
-  draw_str(renderer, "UART-[", p[1].x - 8 * CH_WIDTH, p[1].y, 0xffffff);
+  SDL_Point p[2];
+  p[0] = Point(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2) - Point(0, 30);
+  p[1] = p[0] - Point(10, 0);
+  const char* label[2] = { "RX", "TX" };
+  for (int i = 0; i < 2; i ++) {
+    draw_thicker_line(renderer, p, 2);
+    draw_str(renderer, label[i], p[1].x - 2 * CH_WIDTH, p[1].y - CH_HEIGHT / 2, 0xffffff);
+    p[0].y -= CH_HEIGHT; p[1].y -= CH_HEIGHT;
+  }
+  draw_str(renderer, "UART-[", p[1].x - 8 * CH_WIDTH, p[1].y + CH_HEIGHT, 0xffffff);
 }
 
 void init_uart(SDL_Renderer *renderer) {

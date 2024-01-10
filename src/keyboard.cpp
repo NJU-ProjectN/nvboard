@@ -256,7 +256,7 @@ static void init_render_local(SDL_Renderer *renderer) {
   // draw line
   SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
   SDL_Point p[3];
-  p[0] = Point(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2) - Point(10, 0);
+  p[0] = Point(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
   p[1] = p[0] - Point(16, 16);
   p[2] = p[1] - Point(20, 0);
   draw_thicker_line(renderer, p, 3);
