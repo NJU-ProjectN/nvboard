@@ -8,15 +8,13 @@ static UART* uart = NULL;
 int16_t uart_divisor_cnt = 0;
 bool is_uart_rx_idle = true;
 
-
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
     Component(rend, cnt, init_val, ct),
-    tx_state(0), rx_state(0), divisor(16), tx_update_gui(false) {
-  tx_term = new Term(rend, x, y, w, h);
-  rx_term = new Term(rend, x, y + h + 1, w, CH_HEIGHT);
+    tx_state(0), rx_state(0), divisor(16), need_update_gui(false) {
+  term = new Term(rend, x, y, w, h);
 
-  SDL_Rect *rect_ptr = new SDL_Rect;  // rx terminal
-  *rect_ptr = (SDL_Rect){x, y + h + 1, w, CH_HEIGHT};
+  SDL_Rect *rect_ptr = new SDL_Rect;
+  *rect_ptr = (SDL_Rect){x, y, w, h};
   set_rect(rect_ptr, 0);
 
   uart_divisor_cnt = divisor - 1;
@@ -24,17 +22,11 @@ UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int 
   assert(len == 0 || len == 1); // either unbound or bound to 1 bit signal
   p_tx = (uint8_t *)pin_array[UART_TX].ptr;
 
-  rx_term->feed_str(rx_input_prompt);
-  rx_term->set_cursor_visibility(false);
-  rx_input = "";
-  rx_sending_str = "";
-
   SDL_SetRenderDrawColor(rend, 0x00, 0x00, 0x00, 0);
   SDL_RenderDrawLine(rend, x, y + h, x + w, y + h);
-  SDL_RenderDrawLine(rend, x, y + h + 1 + CH_HEIGHT, x + w, y + h + 1 + CH_HEIGHT);
   SDL_SetRenderDrawColor(rend, 0xff, 0xff, 0xff, 0);
 
-  rx_update_gui = true;
+  rx_sending_str = "";
   pin_poke(UART_RX, 1);
 }
 
@@ -60,8 +52,8 @@ void UART::tx_receive() {
   } else if (tx_state == 9) {
     if (tx) { // stop bit
       tx_state = 0;
-      tx_term->feed_ch(tx_data);
-      tx_update_gui = true;
+      term->feed_ch(tx_data);
+      need_update_gui = true;
     }
   }
 }
@@ -88,37 +80,19 @@ void UART::rx_send() {
 }
 
 void UART::rx_getchar(uint8_t ch) {
-  if (ch == '\b') {
-    if (rx_input.empty()) return;
-    rx_input.pop_back();
-    rx_term->backspace(true);
-  } else {
-    rx_input += ch;
-    if (ch == '\n') {
-      rx_sending_str += rx_input;
-      is_uart_rx_idle = false;
-      rx_term->clear();
-      rx_term->feed_str(rx_input_prompt);
-      rx_input = "";
-    }
-    else { rx_term->feed_ch(ch); }
-  }
-  rx_update_gui = true;
+  rx_sending_str += ch;
+  is_uart_rx_idle = false;
 }
 
 void UART::update_state() {
-  if (tx_update_gui) {
+  if (need_update_gui) {
     static uint64_t last = 0;
     uint64_t now = nvboard_get_time();
     if (now - last > 1000000 / UART_TX_FPS) {
       last = now;
-      tx_update_gui = false;
-      tx_term->update_gui();
+      need_update_gui = false;
+      term->update_gui();
     }
-  }
-  if (rx_update_gui) {
-    rx_update_gui = false;
-    rx_term->update_gui();
   }
 }
 
@@ -126,8 +100,8 @@ void UART::set_divisor(uint16_t d) {
   divisor = d;
 }
 
-void UART::rx_term_focus(bool v) {
-  rx_term->set_cursor_visibility(v);
+void UART::term_focus(bool v) {
+  term->set_focus(v);
 }
 
 static void init_render_local(SDL_Renderer *renderer) {
@@ -173,6 +147,6 @@ void uart_rx_getchar(uint8_t ch) {
   uart->rx_getchar(ch);
 }
 
-void uart_rx_term_focus(bool v) {
-  uart->rx_term_focus(v);
+void uart_term_focus(bool v) {
+  uart->term_focus(v);
 }

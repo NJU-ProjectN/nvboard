@@ -8,7 +8,9 @@ Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
   h_in_char = region.h / CH_HEIGHT;
   uint8_t *l = add_line();
   cursor_texture = new_texture(r, CH_WIDTH, CH_HEIGHT, 0x10, 0x10, 0x10);
+  get_focus_cursor_texture = new_texture(r, CH_WIDTH, CH_HEIGHT, 0xff, 0x00, 0xff);
   is_cursor_visible = true;
+  is_focus = false;
   clear_screen();
   dirty_line = new bool[h_in_char];
   dirty_char = new bool[w_in_char * h_in_char];
@@ -32,6 +34,12 @@ void Term::clear_screen() {
 void Term::set_cursor_visibility(bool v) {
   bool update_cursor_gui = is_cursor_visible ^ v;
   is_cursor_visible = v;
+  if (update_cursor_gui) draw_cursor();
+}
+
+void Term::set_focus(bool v) {
+  bool update_cursor_gui = is_focus ^ v;
+  is_focus = v;
   if (update_cursor_gui) draw_cursor();
 }
 
@@ -123,7 +131,8 @@ void Term::draw_cursor() {
     rect.w = CH_WIDTH, rect.h = CH_HEIGHT;
     rect.y += CH_HEIGHT * y;
     rect.x += CH_WIDTH * x;
-    SDL_Texture *t = is_cursor_visible ? cursor_texture :  ch2texture_term(' ');
+    SDL_Texture *t = is_cursor_visible ? (is_focus ? get_focus_cursor_texture :
+                                          cursor_texture) :  ch2texture_term(' ');
     SDL_RenderCopy(renderer, t, NULL, &rect);
     set_redraw();
   }
