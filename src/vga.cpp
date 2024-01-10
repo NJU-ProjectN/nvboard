@@ -24,11 +24,17 @@ VGA::VGA(SDL_Renderer *rend, int cnt, int init_val, int ct):
     Component(rend, cnt, init_val, ct),
     vga_screen_width(VGA_DEFAULT_WIDTH), vga_screen_height(VGA_DEFAULT_HEIGHT),
     vga_clk_cnt(1) {
-  SDL_Texture *temp_texture = SDL_CreateTexture(rend, SDL_PIXELFORMAT_ARGB8888,
+  SDL_Texture *vga_texture = SDL_CreateTexture(rend, SDL_PIXELFORMAT_ARGB8888,
     SDL_TEXTUREACCESS_STREAMING, vga_screen_width, vga_screen_height);
-  set_texture(temp_texture, 0);
+  set_texture(vga_texture, 0);
   pixels = new uint32_t[vga_screen_width * vga_screen_height];
   memset(pixels, 0, vga_screen_width * vga_screen_height * sizeof(uint32_t));
+
+  SDL_Rect *rect_ptr = new SDL_Rect;
+  *rect_ptr = (SDL_Rect){0, WINDOW_HEIGHT / 2, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
+  set_rect(rect_ptr, 0);
+  SDL_UpdateTexture(vga_texture, NULL, pixels, vga_screen_width * sizeof(uint32_t));
+  SDL_RenderCopy(rend, vga_texture, NULL, rect_ptr);
 
   is_r_len8 = pin_array[VGA_R0].vector_len == 8;
   is_g_len8 = pin_array[VGA_G0].vector_len == 8;
@@ -55,12 +61,9 @@ void VGA::update_gui() {
   frames ++;
   printf("%d frames\n", frames);
 #endif
-  SDL_Texture *temp_texture = get_texture(0);
-  SDL_Renderer *temp_renderer = get_renderer();
-  SDL_Rect *temp_rect = get_rect(0);
-  SDL_UpdateTexture(temp_texture, NULL, pixels, vga_screen_width * sizeof(uint32_t));
-  //SDL_RenderClear(temp_renderer);
-  SDL_RenderCopy(temp_renderer, temp_texture, NULL, temp_rect);
+  SDL_Texture *vga_texture = get_texture(0);
+  SDL_UpdateTexture(vga_texture, NULL, pixels, vga_screen_width * sizeof(uint32_t));
+  SDL_RenderCopy(get_renderer(), vga_texture, NULL, get_rect(0));
   set_redraw();
 }
 
@@ -125,9 +128,6 @@ static void init_render_local(SDL_Renderer *renderer) {
 void init_vga(SDL_Renderer *renderer) {
   init_render_local(renderer);
   vga = new VGA(renderer, 1, 0, VGA_TYPE);
-  SDL_Rect *rect_ptr = new SDL_Rect;
-  *rect_ptr = (SDL_Rect){0, WINDOW_HEIGHT / 2, VGA_DEFAULT_WIDTH, VGA_DEFAULT_HEIGHT};
-  vga->set_rect(rect_ptr, 0);
   for (int p = VGA_VSYNC; p <= VGA_B7; p ++) {
     vga->add_pin(p);
   }
