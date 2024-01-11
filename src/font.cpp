@@ -38,7 +38,7 @@ SDL_Surface* str2surface(const char *str, uint32_t fg) {
 SDL_Surface* str2surface(const char *str, uint32_t fg, uint32_t bg) {
   SDL_Color c_fg = {.r = (uint8_t)(fg >> 16), .g = (uint8_t)(fg >> 8), .b = (uint8_t)fg };
   SDL_Color c_bg = {.r = (uint8_t)(bg >> 16), .g = (uint8_t)(bg >> 8), .b = (uint8_t)bg };
-  SDL_Surface *s = TTF_RenderText_LCD_Wrapped(font, str, c_fg, c_bg, 0);
+  SDL_Surface *s = TTF_RenderText_Shaded_Wrapped(font, str, c_fg, c_bg, 0);
   assert(s != NULL);
   return s;
 }
@@ -61,7 +61,7 @@ SDL_Surface* ch2surface(uint8_t ch, uint32_t fg) {
 SDL_Surface* ch2surface(uint8_t ch, uint32_t fg, uint32_t bg) {
   SDL_Color c_fg = {.r = (uint8_t)(fg >> 16), .g = (uint8_t)(fg >> 8), .b = (uint8_t)fg };
   SDL_Color c_bg = {.r = (uint8_t)(bg >> 16), .g = (uint8_t)(bg >> 8), .b = (uint8_t)bg };
-  SDL_Surface *s = TTF_RenderGlyph_LCD(font, ch, c_fg, c_bg);
+  SDL_Surface *s = TTF_RenderGlyph_Shaded(font, ch, c_fg, c_bg);
   assert(s != NULL);
   return s;
 }
