@@ -98,7 +98,7 @@ static SDL_Texture* gen_key_texture(SDL_Renderer *renderer, const char *desc1,
   uint32_t color_dn = SDL_MapRGBA(key_shape->format, 0xc0, 0xc0, 0xc0, 0xff);
   SDL_Surface *s = surdup(key_shape, is_down ? color_dn : color_up);
   SDL_Surface *s_desc = str2surface(desc.c_str(), 0);
-  SDL_Rect r = { .x = 1, .y = 1 };
+  SDL_Rect r = (SDL_Rect) { .x = 1, .y = 1 };
   SDL_BlitSurface(s_desc, NULL, s, &r);
   SDL_Texture *t = SDL_CreateTextureFromSurface(renderer, s);
   SDL_FreeSurface(s_desc);
@@ -111,7 +111,7 @@ static void init_key_texture(SDL_Renderer *renderer, uint8_t sdl_key,
   Key *e = &keys[sdl_key];
   e->t_up   = gen_key_texture(renderer, desc1, desc2, key_shape, false);
   e->t_down = gen_key_texture(renderer, desc1, desc2, key_shape, true);
-  e->rect = { .x = x, .y = y, .w = key_shape->w, .h = key_shape->h };
+  e->rect = (SDL_Rect){ .x = x, .y = y, .w = key_shape->w, .h = key_shape->h };
 }
 
 static void init_render_local(SDL_Renderer *renderer) {

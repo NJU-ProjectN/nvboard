@@ -3,7 +3,7 @@
 
 Term::Term(SDL_Renderer *r, int x, int y, int w, int h):
     renderer(r), cursor_x(0), cursor_y(0), screen_y(0) {
-  region = { .x = x, .y = y, .w = w, .h = h };
+  region = (SDL_Rect){ .x = x, .y = y, .w = w, .h = h };
   w_in_char = region.w / CH_WIDTH;
   h_in_char = region.h / CH_HEIGHT;
   uint8_t *l = add_line();
