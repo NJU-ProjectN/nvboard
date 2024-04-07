@@ -78,6 +78,7 @@ NVBoard提供了以下几组API
   - `len`为信号的长度，大于1时为向量信号
   - 可变参数列表`...`为引脚编号列表，编号为整数；绑定向量信号时，引脚编号列表从MSB到LSB排列
 - `void nvboard_update()`: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数
+- `void nvboard_manual_exit_handler()`: 当手动退出nvboard时（Ctrl-C、关闭SDL窗口）进行的操作，由用户定义
 
 ### 引脚绑定
 
@@ -118,6 +119,10 @@ signal (pin1, pin2, ..., pink)
 // ...
 nvboard_bind_all_pins(&dut);
 nvboard_init();
+
+void nvboard_manual_exit_handler() {
+  // ...
+}
 
 while (1) {
   // ...

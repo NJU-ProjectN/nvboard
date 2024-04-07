@@ -3,6 +3,7 @@
 #include <pins.h>
 
 extern std::vector<Component *> components;
+void nvboard_manual_exit_handler(); // user defined
 void uart_rx_getchar(uint8_t ch);
 void uart_term_focus(bool v);
 void kb_push_key(uint8_t scancode, bool is_keydown);
@@ -45,9 +46,9 @@ void read_event() {
   SDL_Event ev;
   SDL_PollEvent(&ev);
   switch (ev.type) {
-    case SDL_QUIT: exit(0);
+    case SDL_QUIT: nvboard_manual_exit_handler(); exit(0);
     case SDL_WINDOWEVENT:
-      if (ev.window.event == SDL_WINDOWEVENT_CLOSE) { exit(0); }
+      if (ev.window.event == SDL_WINDOWEVENT_CLOSE) { nvboard_manual_exit_handler(); exit(0); }
       break;
     case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
     case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;

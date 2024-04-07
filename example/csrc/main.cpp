@@ -1,9 +1,14 @@
+#include <iostream>
 #include <nvboard.h>
 #include <Vtop.h>
 
 static TOP_NAME dut;
 
 void nvboard_bind_all_pins(TOP_NAME* top);
+
+void nvboard_manual_exit_handler() {
+  std::cout << "Simulation is end by manual\n";
+}
 
 static void single_cycle() {
   dut.clk = 0; dut.eval();
