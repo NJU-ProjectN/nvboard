@@ -11,4 +11,5 @@
 !*.v
 !*.cpp
 !flake.nix
+!flake.lock
 build/
