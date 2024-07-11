@@ -12,10 +12,12 @@ set(Python3_EXECUTABLE ${Python3_EXECUTABLE} CACHE INTERNAL "Path to Python exec
 set(BIND_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/scripts/auto_pin_bind.py CACHE INTERNAL "Path to Python scripts")
 set(ENV{NVBOARD_HOME} ${CMAKE_CURRENT_SOURCE_DIR})
 
-function(auto_bind constraint_file output_file)
+function(auto_bind target constraint_file output_file)
     message("Generating bind file")
-    execute_process(
-        COMMAND ${Python3_EXECUTABLE} ${BIND_SCRIPT} ${constraint_file} ${output_file}
+    add_custom_command(
+        OUTPUT ${output_file}
+        COMMAND ${CMAKE_COMMAND} -E env NVBOARD_HOME=$ENV{NVBOARD_HOME} ${Python3_EXECUTABLE} ${BIND_SCRIPT} ${constraint_file} ${output_file}
+        DEPENDS ${constraint_file}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 endfunction(auto_bind)
