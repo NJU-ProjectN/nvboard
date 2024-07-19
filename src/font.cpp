@@ -10,9 +10,9 @@ void init_font(SDL_Renderer *renderer)
 {
     int ret = TTF_Init();
     assert(ret != -1);
-    char *s = getenv("NVBOARD_HOME");
-    assert(s != NULL);
-    std::string nvboard_home = s;
+    char *nvboard_home_cstr = getenv("NVBOARD_HOME");
+    assert(nvboard_home_cstr != NULL);
+    std::string nvboard_home = nvboard_home_cstr;
 
     font = TTF_OpenFont(
         (nvboard_home + "/resources/font/" + "FreeMono.ttf").c_str(), 48);
