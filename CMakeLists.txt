@@ -22,7 +22,8 @@ function(auto_bind target constraint_file output_file)
     )
 endfunction(auto_bind)
 
-add_library(nvboard 
+add_library(nvboard
+    SHARED
     src/button.cpp 
     src/component.cpp 
     src/event.cpp 
@@ -38,7 +39,7 @@ add_library(nvboard
     src/uart.cpp 
     src/vga.cpp
 )
-target_link_libraries(nvboard PUBLIC SDL2::SDL2 SDL2_image SDL2_ttf)
+target_link_libraries(nvboard PRIVATE SDL2::SDL2 SDL2_image SDL2_ttf)
 target_include_directories(nvboard PRIVATE include)
-target_include_directories(nvboard PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/usr/include)
+target_include_directories(nvboard INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/usr/include)
 target_compile_options(nvboard PRIVATE -O3)
