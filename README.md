@@ -12,6 +12,8 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 .
 ├── board                   # 引脚说明文件
 │   └── ...
+├── cmake                   # cmake 配置文件
+|   └── ...
 ├── example                 # 示例项目
 │   └── ...
 ├── include                 # 用于NVboard项目内部包含的头文件
@@ -52,6 +54,7 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 │   └── include           # 用于给外部项目包含的头文件
 │       ├── nvboard.h
 │       └── pins.h
+├── CMakeLists.txt
 ├── LICENSE
 └── README.md
 ```
@@ -133,6 +136,7 @@ nvboard_quit();
 
 ### 编译链接
 
+#### Makefile
 在Makefile中
 * 将生成的上述引脚绑定的C++文件加入源文件列表
 * 将NVBoard的构建脚本包含进来
@@ -143,3 +147,28 @@ include $(NVBOARD_HOME)/scripts/nvboard.mk
 * 在生成verilator仿真可执行文件(即`$(NVBOARD_ARCHIVE)`)将这个库文件加入链接过程，并添加链接选项`-lSDL2 -lSDL2_image`
 
 可以参考示例项目中的Makefile文件，即`example/Makefile`
+
+#### CMake
+首先需要 build 和 install
+```bash
+cd build && cd build
+cmake ..  # -DCMAKE_BUILD_TYPE=Release optional for release mode
+cmake --build . --target install
+```
+在外部项目中使用，需要在项目的 CMakeLists.txt 增加如下命令
+```cmake
+find_package(NVBoard HINTS $ENV{NVBOARD_HOME}/install)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+find_package(SDL2_image REQUIRED)
+```
+然后要把这些库链接到你的 target 中
+```cmake
+target_link_libraries(YOU_TARGET_NAME
+  PRIVATE 
+  NVBoard::NVBoard
+  SDL2::SDL2
+  SDL2_ttf::SDL2_ttf
+  SDL2_image::SDL2_image
+)
+```
