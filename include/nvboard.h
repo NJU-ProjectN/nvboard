@@ -7,8 +7,8 @@
 #include <component.h>
 #include <configs.h>
 #include <string>
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #define VERSION_STR "v1.0 (2024.01.10)"
 

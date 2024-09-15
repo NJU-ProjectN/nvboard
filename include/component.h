@@ -1,7 +1,7 @@
 #ifndef __COMPONENT_H__
 #define __COMPONENT_H__
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 
 // component type

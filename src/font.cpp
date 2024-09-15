@@ -1,5 +1,5 @@
 #include <nvboard.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 
 static TTF_Font *font = NULL;
 static SDL_Texture* font_texture_term[128] = { NULL };

@@ -1,7 +1,7 @@
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #define BOARD_BG_COLOR 0x00008060
 

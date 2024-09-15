@@ -1,7 +1,7 @@
 #ifndef __FONT_H__
 #define __FONT_H__
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #define CH_WIDTH  10
 #define CH_HEIGHT 16

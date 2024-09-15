@@ -1,7 +1,7 @@
 #ifndef __PINS_H__
 #define __PINS_H__
 
-#include <../usr/include/pins.h>
+#include "../usr/include/pins.h"
 #include <stdint.h>
 #include <assert.h>
 

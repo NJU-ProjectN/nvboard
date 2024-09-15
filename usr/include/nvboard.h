@@ -1,7 +1,7 @@
 #ifndef __NVBOARD_H__
 #define __NVBOARD_H__
 
-#include <pins.h>
+#include "pins.h"
 
 void nvboard_init(int vga_clk_cycle = 1);
 void nvboard_quit();

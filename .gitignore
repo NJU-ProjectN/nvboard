@@ -1,5 +1,5 @@
-*.*
-*
+# *.*
+# *
 !*/
 !.gitignore
 !Makefile
@@ -11,3 +11,5 @@
 !*.v
 !*.cpp
 build/
+install/
+.*
