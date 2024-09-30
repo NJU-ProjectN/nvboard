@@ -167,8 +167,8 @@ find_package(SDL2_image REQUIRED)
 target_link_libraries(YOU_TARGET_NAME
   PRIVATE 
   NVBoard::NVBoard
-  SDL2::SDL2
-  SDL2_ttf::SDL2_ttf
-  SDL2_image::SDL2_image
+  SDL2
+  SDL2_ttf
+  SDL2_image
 )
 ```
