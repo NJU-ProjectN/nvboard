@@ -133,6 +133,8 @@ nvboard_quit();
 
 ### 编译链接
 
+如果你使用Makefile作为构建系统：
+
 在Makefile中
 * 将生成的上述引脚绑定的C++文件加入源文件列表
 * 将NVBoard的构建脚本包含进来
@@ -143,3 +145,13 @@ include $(NVBOARD_HOME)/scripts/nvboard.mk
 * 在生成verilator仿真可执行文件(即`$(NVBOARD_ARCHIVE)`)将这个库文件加入链接过程，并添加链接选项`-lSDL2 -lSDL2_image`
 
 可以参考示例项目中的Makefile文件，即`example/Makefile`
+
+如果你使用CMake作为构建系统：
+
+* 通过`add_subdirectory`添加NVBoard项目的目录
+* 通过`add_custom_command`添加生成引脚绑定的命令，并将生成的文件添加到源文件列表
+* 通过`target_include_dir`将NVBoard项目的`usr/include`目录添加到包含路径
+* 通过`target_link_libraries`将你的程序链接到`nvboard`
+* 在`CMakeLists.txt`中调用Verilator
+
+可以参考示例项目中的CMakeLists.txt文件，即`example/CMakeLists.txt`，以及参考Verilator官方文档中关于在CMake中调用Verilator的部分。
