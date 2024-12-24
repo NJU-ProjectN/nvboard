@@ -59,7 +59,7 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 ## 安装教程
 
 1. 将项目拷贝到本地，`git clone https://github.com/NJU-ProjectN/nvboard.git`
-2. 通过`apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev`安装SDL2，SDL2-image和SDL2-ttf；对于`macOS`，可以通过`brew install sdl2 sdl2_image sdl2_ttf`安装
+2. 通过`apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev` / `yum install SDL2-devel SDL2_image-devel SDL2_ttf-devel`安装SDL2，SDL2-image和SDL2-ttf；对于`macOS`，可以通过`brew install sdl2 sdl2_image sdl2_ttf`安装
 3. 把本项目的目录设置成环境变量`NVBOARD_HOME`
 
 ## 示例
