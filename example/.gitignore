@@ -1,2 +1,3 @@
 !resource/*.hex
 !constr/*.nxdc
+!CMakeLists.txt
