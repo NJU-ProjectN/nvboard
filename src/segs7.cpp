@@ -113,6 +113,11 @@ void init_segs7(SDL_Renderer *renderer) {
   for (int i = 0; i < 8; ++i) {
     SDL_Rect mv = {SEG_X + SEG_SEP + (7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_VER_WIDTH * 2 + SEG_SEP * 2), SEG_Y + SEG_SEP, 0, 0};
     bool is_len8 = (pin_array[GET_SEGA(i)].vector_len == 8);
+    for (int j = 0; j < 8; ++j) {
+      PinNode pin = pin_array[GET_SEGA(i) + j];
+      if (!((pin.vector_len == 8) && (pin.bit_offset == 8 - i - 1)))
+        is_len8 = false;
+    }
     Component *ptr = new SEGS7(renderer, 16, 0x5555, SEGS7_TYPE, is_len8);
     for (int j = 0; j < 8; ++j) {
       SDL_Rect *rect_ptr = new SDL_Rect;
