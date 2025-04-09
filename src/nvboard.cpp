@@ -59,6 +59,7 @@ void nvboard_update() {
 void nvboard_init(int vga_clk_cycle) {
     // init SDL and SDL_image
     SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+    SDL_SetEventFilter(EventFilter, NULL); 
     IMG_Init(IMG_INIT_PNG);
 
     main_window = SDL_CreateWindow("NVBoard " VERSION_STR, SDL_WINDOWPOS_CENTERED,

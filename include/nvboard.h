@@ -18,5 +18,6 @@ uint64_t nvboard_get_time();
 void init_render(SDL_Renderer *renderer);
 SDL_Texture* load_pic_texture(SDL_Renderer *renderer, std::string path);
 SDL_Texture* new_texture(SDL_Renderer *renderer, int w, int h, int r, int g, int b);
+int EventFilter(void* userdata, SDL_Event* event);
 
 #endif
