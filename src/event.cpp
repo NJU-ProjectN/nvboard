@@ -43,24 +43,25 @@ static void mouseup_handler(const SDL_Event &ev) {
 
 void read_event() {
   SDL_Event ev;
-  SDL_PollEvent(&ev);
-  switch (ev.type) {
-    case SDL_QUIT: exit(0);
-    case SDL_WINDOWEVENT:
-      if (ev.window.event == SDL_WINDOWEVENT_CLOSE) { exit(0); }
-      break;
-    case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
-    case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
-    case SDL_KEYDOWN:
-      if (uart_term_get_focus) {
-        switch (ev.key.keysym.sym) {
-          case SDLK_RETURN: uart_rx_getchar('\n'); break;
-          case SDLK_BACKSPACE: uart_rx_getchar('\b'); break;
+  while (SDL_PollEvent(&ev)) {
+    switch (ev.type) {
+      case SDL_QUIT: exit(0);
+      case SDL_WINDOWEVENT:
+        if (ev.window.event == SDL_WINDOWEVENT_CLOSE) { exit(0); }
+        break;
+      case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
+      case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
+      case SDL_KEYDOWN:
+        if (uart_term_get_focus) {
+          switch (ev.key.keysym.sym) {
+            case SDLK_RETURN: uart_rx_getchar('\n'); break;
+            case SDLK_BACKSPACE: uart_rx_getchar('\b'); break;
+          }
         }
-      }
-    case SDL_KEYUP:
-      if (!uart_term_get_focus) kb_push_key(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN);
-      break;
-    case SDL_TEXTINPUT: if (uart_term_get_focus) uart_rx_getchar(ev.text.text[0]); break;
+      case SDL_KEYUP:
+        if (!uart_term_get_focus) kb_push_key(ev.key.keysym.scancode, ev.key.type == SDL_KEYDOWN);
+        break;
+      case SDL_TEXTINPUT: if (uart_term_get_focus) uart_rx_getchar(ev.text.text[0]); break;
+    }
   }
 }
