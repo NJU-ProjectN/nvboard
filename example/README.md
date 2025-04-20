@@ -1,6 +1,6 @@
 # 示例工程
 
-先设置环境变量`NVBOARD_HOME`为NVBoard项目的路径, 然后执行`make run`.
+先设置环境变量`NVBOARD_HOME`为NVBoard项目的路径, 然后执行`make run`，或者使用CMake构建本项目。
 
 该示例的演示效果如下:
 1. 左边8个LED为流水灯效果

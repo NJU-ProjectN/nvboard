@@ -10,4 +10,5 @@
 !board/*
 !*.v
 !*.cpp
+!CMakeLists.txt
 build/
