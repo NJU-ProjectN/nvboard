@@ -7,6 +7,7 @@
 static UART* uart = NULL;
 int16_t uart_divisor_cnt = 0;
 bool is_uart_rx_idle = true;
+bool tx_first_ch = false;
 
 UART::UART(SDL_Renderer *rend, int cnt, int init_val, int ct, int x, int y, int w, int h):
     Component(rend, cnt, init_val, ct),
@@ -54,6 +55,7 @@ void UART::tx_receive() {
       tx_state = 0;
       term->feed_ch(tx_data);
       need_update_gui = true;
+      tx_first_ch = true;
     }
   }
 }

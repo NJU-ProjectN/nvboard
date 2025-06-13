@@ -47,6 +47,17 @@ void nvboard_update() {
 
       void read_event();
       read_event();
+
+      extern bool tx_first_ch;
+      if (tx_first_ch) {
+        static const char *p = " poweroff\n";
+        if (*p != '\0') {
+          void uart_rx_getchar(uint8_t ch);
+          uart_rx_getchar(*p);
+          p ++;
+        }
+      }
+
       update_components(main_renderer);
       if (need_redraw) {
         SDL_RenderPresent(main_renderer);
