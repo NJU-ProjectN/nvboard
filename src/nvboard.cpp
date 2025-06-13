@@ -2,6 +2,8 @@
 #include <keyboard.h>
 #include <stdarg.h>
 #include <macro.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #define FPS 60
 
@@ -47,6 +49,21 @@ void nvboard_update() {
 
       void read_event();
       read_event();
+
+      static char buf[256];
+      static char *p = buf;
+      if (*p == '\0') {
+        if (fgets(buf, sizeof(buf), stdin) == NULL) {
+          buf[0] = '\0';
+        }
+        p = buf;
+      }
+      if (*p != '\0') {
+        void uart_rx_getchar(uint8_t ch);
+        uart_rx_getchar(*p);
+        p ++;
+      }
+
       update_components(main_renderer);
       if (need_redraw) {
         SDL_RenderPresent(main_renderer);
@@ -94,6 +111,10 @@ void nvboard_init(int vga_clk_cycle) {
 
     extern void vga_set_clk_cycle(int cycle);
     vga_set_clk_cycle(vga_clk_cycle);
+
+    // make stdin non-blocking
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
 }
 
 void nvboard_quit(){

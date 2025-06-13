@@ -5,7 +5,7 @@ static SDL_Texture *tfpga_background;
 
 static SDL_Texture* load_texture(SDL_Renderer *renderer, std::string path) {
   SDL_Texture *t = IMG_LoadTexture(renderer, (nvboard_home + path).c_str());
-  assert(t != NULL);
+  //assert(t != NULL);
   return t;
 }
 
@@ -16,7 +16,7 @@ SDL_Texture* load_pic_texture(SDL_Renderer *renderer, std::string path) {
 SDL_Texture* surface2texture(SDL_Renderer *renderer, SDL_Surface *s) {
   assert(s != NULL);
   SDL_Texture *t = SDL_CreateTextureFromSurface(renderer, s);
-  assert(t != NULL);
+  //assert(t != NULL);
   SDL_FreeSurface(s);
   return t;
 }

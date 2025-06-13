@@ -108,6 +108,8 @@ void Term::feed_ch(uint8_t ch) {
   if (is_cursor_on_screen()) set_dirty_char(cursor_y - screen_y, cursor_x);
   int y = cursor_y;
   assert(y < lines.size());
+  putchar(ch);
+  fflush(stdout);
   if      (ch == '\n') { newline(); return; }
   else if (ch == '\r') { _return(); return; }
   else if (ch == '\b') { backspace(false); return; }
