@@ -135,6 +135,7 @@ nvboard_quit();
 
 在Makefile中
 * 将生成的上述引脚绑定的C++文件加入源文件列表
+* 在文件目录下编写constr下的.nxdc文件，将verilog代码的输入输出绑定到对应引脚
 * 将NVBoard的构建脚本包含进来
 ```
 include $(NVBOARD_HOME)/scripts/nvboard.mk
