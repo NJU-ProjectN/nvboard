@@ -122,13 +122,15 @@ nvboard_init();
 while (1) {
   // ...
   nvboard_update();
+  single_cycle();
+  // ...
 }
 
 nvboard_quit();
 ```
 具体地
 * 在进入verilator仿真的循环前，先对引脚进行绑定，然后对NVBoard进行初始化
-* 在verilator仿真的循环中更新NVBoard各组件的状态
+* 在verilator仿真的每个周期中更新NVBoard各组件的状态
 * 退出verilator仿真的循环后，销毁NVBoard的相关资源
 
 ### 编译链接
