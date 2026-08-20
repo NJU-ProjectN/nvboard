@@ -42,8 +42,8 @@ static SDL_Texture *segs_texture(int index, int val) {
   }
 }
 
-SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct, bool is_len8)
-  : Component(rend, cnt, init_val, ct), is_len8(is_len8) {}
+SEGS7::SEGS7(SDL_Renderer *rend, int cnt, int init_val, int ct)
+  : Component(rend, cnt, init_val, ct) {}
 
 void SEGS7::update_gui() {
   int newval = get_state();
@@ -56,12 +56,11 @@ void SEGS7::update_gui() {
 
 void SEGS7::update_state() {
   int newval = 0;
-  if (is_len8) {
-    newval = pin_peek8(get_pin());
-  } else {
-    for (int i = 0; i < 8; ++i) {
-      newval |= (pin_peek(get_pin(7 - i)) << i);
-    }
+  for (int i = 0; i < 8; ++i) {
+    int pin_idx = get_pin(7 - i);
+    int b = pin_peek(pin_idx);
+    int offset = 7 - (pin_idx - GET_SEGA(0)) % 8;
+    newval |= b << offset;
   }
   if (newval != get_state()) {
     set_state(newval);
@@ -112,8 +111,7 @@ void init_segs7(SDL_Renderer *renderer) {
   init_render_local(renderer);
   for (int i = 0; i < 8; ++i) {
     SDL_Rect mv = {SEG_X + SEG_SEP + (7 - i) * (SEG_HOR_WIDTH + SEG_DOT_WIDTH + SEG_VER_WIDTH * 2 + SEG_SEP * 2), SEG_Y + SEG_SEP, 0, 0};
-    bool is_len8 = (pin_array[GET_SEGA(i)].vector_len == 8);
-    Component *ptr = new SEGS7(renderer, 16, 0x5555, SEGS7_TYPE, is_len8);
+    Component *ptr = new SEGS7(renderer, 16, 0x5555, SEGS7_TYPE);
     for (int j = 0; j < 8; ++j) {
       SDL_Rect *rect_ptr = new SDL_Rect;
       *rect_ptr = mv + segs_rect[j];
