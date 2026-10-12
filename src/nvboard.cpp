@@ -63,9 +63,26 @@ void nvboard_init(int vga_clk_cycle) {
     #if defined(__APPLE__)
         SDL_SetHint(SDL_HINT_RENDER_DRIVER, "gpu");
     #endif
-    
+
+    // The window size should be equally rescale into usable size.
+    int win_w = WINDOW_WIDTH;
+    int win_h = WINDOW_HEIGHT;
+    SDL_Rect rect;
+    if (SDL_GetDisplayUsableBounds(0, &rect) == 0) {
+      // Get the minimum scale size.
+      float scale = std::min(1.0f * rect.w / win_w, 1.0f * rect.h / win_h);
+      if (scale >= 1.0f) {
+        scale = 1.0f;
+      }
+      // We need get some remaining left for display.
+      win_w = (int)SDL_ceilf(0.9f * scale * win_w);  
+      win_h = (int)SDL_ceilf(0.9f * scale * win_h);
+    } else {
+      printf("SDL_GetDisplayUsableBounds get error with %s\n", SDL_GetError());
+    }
+
     main_window = SDL_CreateWindow("NVBoard " VERSION_STR, SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+        SDL_WINDOWPOS_CENTERED, win_w, win_h, SDL_WINDOW_SHOWN);
     main_renderer = SDL_CreateRenderer(main_window, -1, 
     #ifdef VSYNC
         SDL_RENDERER_PRESENTVSYNC |
@@ -77,6 +94,8 @@ void nvboard_init(int vga_clk_cycle) {
     #endif
         0
     );
+    // Make auto rescale from original size.
+    SDL_RenderSetLogicalSize(main_renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_SetRenderDrawColor(main_renderer, 0xff, 0xff, 0xff, 0);
     SDL_RenderFillRect(main_renderer, NULL);
 
