@@ -129,7 +129,10 @@ void nvboard_quit(){
 }
 
 void nvboard_bind_pin(void *signal, int len, ...) {
-  assert(len < 64);
+  if (len < 1 || len > 64) {
+    fprintf(stderr, "NVBoard: invalid signal length %d, must be in [1, 64]\n", len);
+    exit(1);
+  }
   if (signal == NULL) {
     fprintf(stderr, "NVBoard: cannot bind a NULL signal\n");
     exit(1);
