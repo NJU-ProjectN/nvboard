@@ -60,8 +60,15 @@ void nvboard_update() {
 
 void nvboard_init(int vga_clk_cycle) {
     // init SDL and SDL_image
-    SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-    IMG_Init(IMG_INIT_PNG);
+    if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
+      fprintf(stderr, "NVBoard: failed to initialize SDL: %s\n", SDL_GetError());
+      exit(1);
+    }
+    if (IMG_Init(IMG_INIT_PNG) == 0) {
+      fprintf(stderr, "NVBoard: failed to initialize SDL_image: %s\n", IMG_GetError());
+      SDL_Quit();
+      exit(1);
+    }
     #if defined(__APPLE__)
         SDL_SetHint(SDL_HINT_RENDER_DRIVER, "gpu");
     #endif
@@ -85,6 +92,14 @@ void nvboard_init(int vga_clk_cycle) {
 
     main_window = SDL_CreateWindow("NVBoard " VERSION_STR, SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, win_w, win_h, SDL_WINDOW_SHOWN);
+    if (main_window == NULL) {
+      fprintf(stderr, "NVBoard: failed to create the window: %s\n",
+          SDL_GetError());
+      fprintf(stderr, "         (no display available? try SDL_VIDEODRIVER=dummy)\n");
+      IMG_Quit();
+      SDL_Quit();
+      exit(1);
+    }
     main_renderer = SDL_CreateRenderer(main_window, -1, 
     #ifdef VSYNC
         SDL_RENDERER_PRESENTVSYNC |
@@ -96,6 +111,14 @@ void nvboard_init(int vga_clk_cycle) {
     #endif
         0
     );
+    if (main_renderer == NULL) {
+      fprintf(stderr, "NVBoard: failed to create the renderer: %s\n",
+          SDL_GetError());
+      SDL_DestroyWindow(main_window);
+      IMG_Quit();
+      SDL_Quit();
+      exit(1);
+    }
     // Make auto rescale from original size.
     SDL_RenderSetLogicalSize(main_renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_SetRenderDrawColor(main_renderer, 0xff, 0xff, 0xff, 0);
