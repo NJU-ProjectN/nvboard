@@ -1,10 +1,24 @@
 #include <nvboard.h>
+#include <cstdio>
+#include <cstdlib>
 
-static std::string nvboard_home;
 static SDL_Texture *tfpga_background;
 
+const std::string &nvboard_home() {
+  static const std::string home = []() {
+    const char *env = getenv("NVBOARD_HOME");
+    if (env == NULL || env[0] == '\0') {
+      fprintf(stderr, "NVBoard: environment variable NVBOARD_HOME is not set,\n"
+                      "         please set it to the root directory of NVBoard.\n");
+      exit(1);
+    }
+    return std::string(env);
+  }();
+  return home;
+}
+
 static SDL_Texture* load_texture(SDL_Renderer *renderer, std::string path) {
-  SDL_Texture *t = IMG_LoadTexture(renderer, (nvboard_home + path).c_str());
+  SDL_Texture *t = IMG_LoadTexture(renderer, (nvboard_home() + path).c_str());
   assert(t != NULL);
   return t;
 }
@@ -75,8 +89,6 @@ void draw_str(SDL_Renderer *renderer, const char *str, int x, int y, uint32_t fg
 
 
 void init_render(SDL_Renderer *renderer) {
-  nvboard_home = getenv("NVBOARD_HOME");
-
   SDL_Rect rect_bg = {0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2};
   SDL_SetRenderDrawColor(renderer,
       (BOARD_BG_COLOR >> 16) & 0xff, (BOARD_BG_COLOR >> 8) & 0xff, BOARD_BG_COLOR & 0xff, 0);

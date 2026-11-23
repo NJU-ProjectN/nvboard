@@ -2,6 +2,7 @@
 #define __RENDER_H__
 
 #include <SDL.h>
+#include <string>
 
 #define BOARD_BG_COLOR 0x00008060
 
@@ -32,6 +33,10 @@ static inline SDL_Rect Rect(const SDL_Point &top_left, const SDL_Point &size) {
 static inline SDL_Rect operator+(const SDL_Rect &A, const SDL_Rect &B) {
   return Rect(A.x + B.x, A.y + B.y, A.w + B.w, A.h + B.h);
 }
+
+// The root directory of NVBoard, taken from the NVBOARD_HOME environment
+// variable. Resources are loaded from there at runtime.
+const std::string &nvboard_home();
 
 void draw_thicker_line(SDL_Renderer *renderer, const SDL_Point *point, int n);
 void draw_surrounding_line(SDL_Renderer *renderer, SDL_Rect r, int gap);
