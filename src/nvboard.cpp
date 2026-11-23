@@ -1,6 +1,8 @@
 #include <nvboard.h>
 #include <keyboard.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <macro.h>
 
 #define FPS 60
@@ -128,10 +130,18 @@ void nvboard_quit(){
 
 void nvboard_bind_pin(void *signal, int len, ...) {
   assert(len < 64);
+  if (signal == NULL) {
+    fprintf(stderr, "NVBoard: cannot bind a NULL signal\n");
+    exit(1);
+  }
   va_list ap;
   va_start(ap, len);
   for (int i = 0; i < len; i ++) {
-    uint16_t pin = va_arg(ap, int);
+    int pin = va_arg(ap, int);
+    if (pin < 0 || pin >= NR_PINS) {
+      fprintf(stderr, "NVBoard: invalid pin id %d, must be in [0, %d]\n", pin, NR_PINS - 1);
+      exit(1);
+    }
     pin_array[pin].ptr = signal;
     pin_array[pin].vector_len = len;
     pin_array[pin].bit_offset = len - 1 - i;
