@@ -41,13 +41,14 @@ static void mouseup_handler(const SDL_Event &ev) {
   }
 }
 
-void read_event() {
+// Returns false when the user asks to close the board.
+bool read_event() {
   SDL_Event ev;
   while (SDL_PollEvent(&ev)) {
     switch (ev.type) {
-      case SDL_QUIT: exit(0);
+      case SDL_QUIT: return false;
       case SDL_WINDOWEVENT:
-        if (ev.window.event == SDL_WINDOWEVENT_CLOSE) { exit(0); }
+        if (ev.window.event == SDL_WINDOWEVENT_CLOSE) return false;
         break;
       case SDL_MOUSEBUTTONDOWN: mousedown_handler(ev); break;
       case SDL_MOUSEBUTTONUP: mouseup_handler(ev); break;
@@ -65,4 +66,5 @@ void read_event() {
       case SDL_TEXTINPUT: if (uart_term_get_focus) uart_rx_getchar(ev.text.text[0]); break;
     }
   }
+  return true;
 }

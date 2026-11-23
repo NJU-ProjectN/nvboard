@@ -18,8 +18,20 @@ void vga_update();
 void kb_update();
 void uart_tx_receive();
 void uart_rx_send();
+void nvboard_quit();
+bool read_event();
 
-void nvboard_update() {
+static bool window_closed = false;
+
+bool nvboard_update() {
+  if (window_closed) {
+    // The caller ignored the false returned by the previous call and keeps
+    // looping with a closed window. Keep the historical behaviour and stop
+    // the simulation instead of spinning forever.
+    nvboard_quit();
+    exit(0);
+  }
+
   extern uint8_t *vga_blank_n_ptr;
   if (*vga_blank_n_ptr) vga_update();
 
@@ -39,7 +51,7 @@ void nvboard_update() {
   if (unlikely((-- cnt) < 0)) {
     uint64_t now = nvboard_get_time();
     uint64_t diff = now - last;
-    if (diff == 0) return;
+    if (diff == 0) return true;
     int cpf_new = ((uint64_t)cpf * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
     cnt += cpf_new - cpf;
     cpf = cpf_new;
@@ -47,8 +59,10 @@ void nvboard_update() {
       last = now;
       cnt = cpf;
 
-      void read_event();
-      read_event();
+      if (!read_event()) {
+        window_closed = true;
+        return false;
+      }
       update_components(main_renderer);
       if (need_redraw) {
         SDL_RenderPresent(main_renderer);
@@ -56,6 +70,7 @@ void nvboard_update() {
       }
     }
   }
+  return true;
 }
 
 void nvboard_init(int vga_clk_cycle) {
