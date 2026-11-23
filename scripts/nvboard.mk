@@ -1,3 +1,6 @@
+# NVBOARD_HOME must point at the root of this repository. It is used here to
+# locate the sources, and at run time to load the fonts and pictures.
+#
 # files of NVBoard
 NVBOARD_SRC = $(NVBOARD_HOME)/src
 NVBOARD_SRCS := $(shell find $(NVBOARD_SRC) -name "*.cpp")
