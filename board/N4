@@ -1,3 +1,8 @@
+# Pin list of the N4 board.
+# "input"/"output" describes the pin, not the HDL signal bound to it:
+# auto_pin_bind.py checks pin names only and cannot detect a signal that is
+# bound to a pin of the opposite direction.
+
 input BTNC
 input BTNU
 input BTND

@@ -2,6 +2,9 @@
 
 先设置环境变量`NVBOARD_HOME`为NVBoard项目的路径, 然后执行`make run`.
 
+若运行环境没有可用的显示(例如CI)，可以设置`SDL_VIDEODRIVER=dummy`，此时不会打开窗口，但仿真可以正常进行。
+关闭窗口后，`nvboard_update()`返回`false`，示例会退出仿真并调用`nvboard_quit()`。
+
 该示例的演示效果如下:
 1. 左边8个LED为流水灯效果
 1. 拨动右边的8个拨码开关, 可控制对应LED的亮灭

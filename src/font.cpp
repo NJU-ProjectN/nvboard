@@ -9,9 +9,7 @@ SDL_Texture *nvboard_texture = NULL;
 void init_font(SDL_Renderer *renderer) {
   int ret = TTF_Init();
   assert(ret != -1);
-  std::string nvboard_home = getenv("NVBOARD_HOME");
-
-  font = TTF_OpenFont((nvboard_home + "/resources/font/" + "FreeMono.ttf").c_str(), 48);
+  font = TTF_OpenFont((nvboard_home() + "/resources/font/" + "FreeMono.ttf").c_str(), 48);
   assert(font != NULL);
   TTF_SetFontHinting(font, TTF_HINTING_MONO);
   TTF_SetFontStyle(font, TTF_STYLE_BOLD);

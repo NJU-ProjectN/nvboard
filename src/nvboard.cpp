@@ -1,6 +1,8 @@
 #include <nvboard.h>
 #include <keyboard.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <macro.h>
 
 #define FPS 60
@@ -16,8 +18,20 @@ void vga_update();
 void kb_update();
 void uart_tx_receive();
 void uart_rx_send();
+void nvboard_quit();
+bool read_event();
 
-void nvboard_update() {
+static bool window_closed = false;
+
+bool nvboard_update() {
+  if (window_closed) {
+    // The caller ignored the false returned by the previous call and keeps
+    // looping with a closed window. Keep the historical behaviour and stop
+    // the simulation instead of spinning forever.
+    nvboard_quit();
+    exit(0);
+  }
+
   extern uint8_t *vga_blank_n_ptr;
   if (*vga_blank_n_ptr) vga_update();
 
@@ -37,7 +51,7 @@ void nvboard_update() {
   if (unlikely((-- cnt) < 0)) {
     uint64_t now = nvboard_get_time();
     uint64_t diff = now - last;
-    if (diff == 0) return;
+    if (diff == 0) return true;
     int cpf_new = ((uint64_t)cpf * 1000000) / ((uint64_t)diff * FPS); // adjust cpf
     cnt += cpf_new - cpf;
     cpf = cpf_new;
@@ -45,8 +59,10 @@ void nvboard_update() {
       last = now;
       cnt = cpf;
 
-      void read_event();
-      read_event();
+      if (!read_event()) {
+        window_closed = true;
+        return false;
+      }
       update_components(main_renderer);
       if (need_redraw) {
         SDL_RenderPresent(main_renderer);
@@ -54,12 +70,20 @@ void nvboard_update() {
       }
     }
   }
+  return true;
 }
 
 void nvboard_init(int vga_clk_cycle) {
     // init SDL and SDL_image
-    SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-    IMG_Init(IMG_INIT_PNG);
+    if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
+      fprintf(stderr, "NVBoard: failed to initialize SDL: %s\n", SDL_GetError());
+      exit(1);
+    }
+    if (IMG_Init(IMG_INIT_PNG) == 0) {
+      fprintf(stderr, "NVBoard: failed to initialize SDL_image: %s\n", IMG_GetError());
+      SDL_Quit();
+      exit(1);
+    }
     #if defined(__APPLE__)
         SDL_SetHint(SDL_HINT_RENDER_DRIVER, "gpu");
     #endif
@@ -83,6 +107,14 @@ void nvboard_init(int vga_clk_cycle) {
 
     main_window = SDL_CreateWindow("NVBoard " VERSION_STR, SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, win_w, win_h, SDL_WINDOW_SHOWN);
+    if (main_window == NULL) {
+      fprintf(stderr, "NVBoard: failed to create the window: %s\n",
+          SDL_GetError());
+      fprintf(stderr, "         (no display available? try SDL_VIDEODRIVER=dummy)\n");
+      IMG_Quit();
+      SDL_Quit();
+      exit(1);
+    }
     main_renderer = SDL_CreateRenderer(main_window, -1, 
     #ifdef VSYNC
         SDL_RENDERER_PRESENTVSYNC |
@@ -94,6 +126,14 @@ void nvboard_init(int vga_clk_cycle) {
     #endif
         0
     );
+    if (main_renderer == NULL) {
+      fprintf(stderr, "NVBoard: failed to create the renderer: %s\n",
+          SDL_GetError());
+      SDL_DestroyWindow(main_window);
+      IMG_Quit();
+      SDL_Quit();
+      exit(1);
+    }
     // Make auto rescale from original size.
     SDL_RenderSetLogicalSize(main_renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_SetRenderDrawColor(main_renderer, 0xff, 0xff, 0xff, 0);
@@ -127,11 +167,22 @@ void nvboard_quit(){
 }
 
 void nvboard_bind_pin(void *signal, int len, ...) {
-  assert(len < 64);
+  if (len < 1 || len > 64) {
+    fprintf(stderr, "NVBoard: invalid signal length %d, must be in [1, 64]\n", len);
+    exit(1);
+  }
+  if (signal == NULL) {
+    fprintf(stderr, "NVBoard: cannot bind a NULL signal\n");
+    exit(1);
+  }
   va_list ap;
   va_start(ap, len);
   for (int i = 0; i < len; i ++) {
-    uint16_t pin = va_arg(ap, int);
+    int pin = va_arg(ap, int);
+    if (pin < 0 || pin >= NR_PINS) {
+      fprintf(stderr, "NVBoard: invalid pin id %d, must be in [0, %d]\n", pin, NR_PINS - 1);
+      exit(1);
+    }
     pin_array[pin].ptr = signal;
     pin_array[pin].vector_len = len;
     pin_array[pin].bit_offset = len - 1 - i;

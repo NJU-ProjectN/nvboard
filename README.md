@@ -72,12 +72,12 @@ NVBoard(NJU Virtual Board)是基于SDL开发的虚拟FPGA开发板，可以在Ve
 
 NVBoard提供了以下几组API
 
-- `void nvboard_init()`: 初始化NVBoard
+- `void nvboard_init(int vga_clk_cycle = 1)`: 初始化NVBoard。`vga_clk_cycle`为VGA的采样周期(以仿真周期计)，默认为1，即每个仿真周期采样一次VGA信号
 - `void nvboard_quit()`: 退出NVBoard
 - `void nvboard_bind_pin(void *signal, int len, ...)`: 将HDL的信号signal连接到NVBoard里的引脚上，具体地
   - `len`为信号的长度，大于1时为向量信号
   - 可变参数列表`...`为引脚编号列表，编号为整数；绑定向量信号时，引脚编号列表从MSB到LSB排列
-- `void nvboard_update()`: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数
+- `bool nvboard_update()`: 更新NVBoard中各组件的状态，每当电路状态发生改变时都需要调用该函数；用户关闭NVBoard的窗口时返回`false`，此时应结束仿真并调用`nvboard_quit()`
 
 ### 引脚绑定
 
@@ -119,9 +119,8 @@ signal (pin1, pin2, ..., pink)
 nvboard_bind_all_pins(&dut);
 nvboard_init();
 
-while (1) {
+while (nvboard_update()) {
   // ...
-  nvboard_update();
   single_cycle();
   // ...
 }
